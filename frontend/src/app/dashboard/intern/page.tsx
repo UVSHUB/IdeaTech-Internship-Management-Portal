@@ -366,21 +366,21 @@ export default function InternDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 flex">
       <Sidebar />
       
       <main className="flex-1 lg:ml-64 p-8 pt-20 lg:pt-8 space-y-6 overflow-y-auto max-h-screen">
         {/* Banner Welcome */}
-        <div className="flex justify-between items-center bg-theme-gradient p-8 rounded-3xl shadow-xl shadow-blue-500/10">
+        <div className="flex justify-between items-center bg-theme-gradient p-8 rounded-3xl shadow-xl shadow-zinc-500/5">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight">Welcome, {user?.firstName}!</h1>
-            <p className="text-sm text-blue-100/80 mt-1">
+            <h1 className="text-3xl font-extrabold tracking-tight text-white">Welcome, {user?.firstName}!</h1>
+            <p className="text-sm text-zinc-300 mt-1">
               Intern ID: <strong className="text-white">{user?.internProfile?.internId || 'Awaiting ID'}</strong> | Department: {user?.internProfile?.department?.name}
             </p>
           </div>
           <div className="hidden md:flex items-center space-x-3 bg-white/10 px-5 py-3 rounded-2xl border border-white/10 backdrop-blur-sm">
             <Calendar size={18} />
-            <span className="text-sm font-semibold">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</span>
+            <span className="text-sm font-semibold text-white">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</span>
           </div>
         </div>
 
@@ -389,34 +389,34 @@ export default function InternDashboard() {
           <>
             {/* Stats Row Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-blue-500">
-                <div className="p-3 bg-blue-500/10 text-blue-400 rounded-2xl"><Award size={22} /></div>
+              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-900 dark:border-l-zinc-100">
+                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><Award size={22} /></div>
                 <div>
-                  <p className="text-xs text-slate-450 font-semibold uppercase">Current Level</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Current Level</p>
                   <h3 className="text-2xl font-bold">Level {stats.level}</h3>
                 </div>
               </GlassCard>
 
-              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-purple-500">
-                <div className="p-3 bg-purple-500/10 text-purple-400 rounded-2xl"><Zap size={22} /></div>
+              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-700 dark:border-l-zinc-300">
+                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><Zap size={22} /></div>
                 <div>
-                  <p className="text-xs text-slate-455 font-semibold uppercase">Active Streak</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Active Streak</p>
                   <h3 className="text-2xl font-bold">{stats.streak} Days</h3>
                 </div>
               </GlassCard>
 
-              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-emerald-500">
-                <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-2xl"><CheckCircle size={22} /></div>
+              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-500 dark:border-l-zinc-500">
+                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><CheckCircle size={22} /></div>
                 <div>
-                  <p className="text-xs text-slate-450 font-semibold uppercase">Completion Progress</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Completion Progress</p>
                   <h3 className="text-2xl font-bold">{stats.completionProgress}%</h3>
                 </div>
               </GlassCard>
 
-              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-amber-500">
-                <div className="p-3 bg-amber-500/10 text-amber-400 rounded-2xl"><Clock size={22} /></div>
+              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-300 dark:border-l-zinc-700">
+                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><Clock size={22} /></div>
                 <div>
-                  <p className="text-xs text-slate-450 font-semibold uppercase">Remaining Days</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Remaining Days</p>
                   <h3 className="text-2xl font-bold">{stats.remainingDays} Days</h3>
                 </div>
               </GlassCard>

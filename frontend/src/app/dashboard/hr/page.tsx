@@ -152,13 +152,13 @@ export default function HRDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 flex">
       <Sidebar />
 
       <main className="flex-1 lg:ml-64 p-8 pt-20 lg:pt-8 space-y-6 overflow-y-auto max-h-screen">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">HR Operations Dashboard</h1>
-          <p className="text-sm text-slate-400 mt-1">Manage intern approvals, leaves, warnings, and department stats.</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Manage intern approvals, leaves, warnings, and department stats.</p>
         </div>
 
         {/* Counts Panel Grid */}

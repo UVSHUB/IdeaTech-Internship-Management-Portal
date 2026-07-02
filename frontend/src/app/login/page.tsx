@@ -96,84 +96,80 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-slate-900 text-slate-100">
-      {/* Background glow animations */}
-      <div className="absolute top-[20%] left-[25%] w-[350px] h-[350px] rounded-full bg-blue-500/10 filter blur-[80px]" />
-      <div className="absolute bottom-[20%] right-[25%] w-[350px] h-[350px] rounded-full bg-purple-500/10 filter blur-[80px]" />
-
+    <div className="min-h-screen flex items-center justify-center p-4 bg-zinc-950 text-zinc-100 relative">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md rounded-3xl border border-white/10 p-8 glass-panel shadow-2xl relative z-10"
+        transition={{ duration: 0.4 }}
+        className="w-full max-w-md rounded-2xl border border-zinc-800 p-8 bg-zinc-900/60 shadow-2xl relative z-10"
       >
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-theme-gradient mb-3 shadow-lg shadow-blue-500/20 text-white font-bold text-lg">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white text-zinc-950 mb-3 font-bold text-lg border border-zinc-200">
             IT
           </div>
-          <h1 className="text-2xl font-bold tracking-tight font-sans">Welcome Back</h1>
-          <p className="text-xs text-slate-400 mt-1">IdeaTech Internship Management Portal (ITIMP)</p>
+          <h1 className="text-2xl font-bold tracking-tight">Welcome Back</h1>
+          <p className="text-xs text-zinc-400 mt-1">IdeaTech Internship Management Portal (ITIMP)</p>
         </div>
 
         {/* Admin Quick Login Pill */}
-        <div className="mb-6 p-3 rounded-2xl bg-blue-500/10 border border-blue-500/25 flex justify-between items-center">
+        <div className="mb-6 p-3.5 rounded-xl bg-zinc-950 border border-zinc-800 flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <ShieldAlert size={16} className="text-blue-400" />
+            <ShieldAlert size={16} className="text-zinc-300" />
             <div className="text-left">
-              <span className="text-[10px] text-slate-400 block font-semibold uppercase">Admin Access</span>
-              <span className="text-[11px] text-blue-300 font-medium">vibodhasilvaulindu@gmail.com</span>
+              <span className="text-[10px] text-zinc-550 block font-bold uppercase tracking-wider">Admin Sandbox</span>
+              <span className="text-[11px] text-zinc-300 font-medium">vibodhasilvaulindu@gmail.com</span>
             </div>
           </div>
           <button
             type="button"
             onClick={handleAdminQuickLogin}
-            className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold transition-all shadow-md"
+            className="px-3 py-1.5 rounded-lg bg-white text-zinc-950 hover:bg-zinc-200 text-[10px] font-bold transition-colors shadow-sm"
           >
             Quick Login
           </button>
         </div>
 
         {error && (
-          <div className="p-3 mb-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs text-center leading-relaxed">
+          <div className="p-3 mb-4 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300 text-xs text-center leading-relaxed">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-[11px] text-slate-400 mb-1 font-semibold tracking-wider">EMAIL ADDRESS</label>
+            <label className="block text-[11px] text-zinc-450 mb-1 font-semibold tracking-wider">EMAIL ADDRESS</label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-3.5 text-slate-500" size={15} />
+              <Mail className="absolute left-3.5 top-3 text-zinc-500" size={14} />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-slate-950/40 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors"
-                placeholder="e.g. vibodhasilvaulindu@gmail.com"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-zinc-500 transition-colors"
+                placeholder="e.g. name@domain.com"
               />
             </div>
           </div>
 
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="block text-[11px] text-slate-400 font-semibold tracking-wider">PASSWORD</label>
+              <label className="block text-[11px] text-zinc-450 font-semibold tracking-wider">PASSWORD</label>
               <button
                 type="button"
                 onClick={() => setError('Use your seeded password (e.g. Ulindu_2004 for admin, password123 for others).')}
-                className="text-[10px] text-blue-400 hover:underline"
+                className="text-[10px] text-zinc-400 hover:underline"
               >
                 Forgot Password?
               </button>
             </div>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-3.5 text-slate-500" size={15} />
+              <Lock className="absolute left-3.5 top-3 text-zinc-500" size={14} />
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-950/40 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-zinc-500 transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -183,37 +179,37 @@ export default function LoginPage() {
             type="submit"
             id="login-submit-btn"
             disabled={loading}
-            className="w-full flex items-center justify-center space-x-2 py-3 rounded-xl bg-theme-gradient text-white font-semibold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 mt-6"
+            className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-sm transition-colors mt-6 shadow-md shadow-black/10"
           >
             {loading ? <span>Authenticating Session...</span> : (
               <>
                 <span>Secure Sign In</span>
-                <ArrowRight size={15} />
+                <ArrowRight size={14} />
               </>
             )}
           </button>
         </form>
 
         <div className="relative flex py-4 items-center">
-          <div className="flex-grow border-t border-white/5"></div>
-          <span className="flex-shrink mx-4 text-[10px] text-slate-500 uppercase tracking-widest">or continue with</span>
-          <div className="flex-grow border-t border-white/5"></div>
+          <div className="flex-grow border-t border-zinc-800"></div>
+          <span className="flex-shrink mx-4 text-[9px] text-zinc-500 uppercase tracking-widest">or login with</span>
+          <div className="flex-grow border-t border-zinc-800"></div>
         </div>
 
-        {/* Google OAuth trigger */}
+        {/* Google OAuth Simulation trigger */}
         <button
           type="button"
           onClick={() => setGoogleModalOpen(true)}
-          className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 font-medium text-xs transition-colors border border-white/5 shadow-md"
+          className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 text-zinc-300 font-semibold text-xs transition-colors border border-zinc-800 shadow-sm"
         >
-          <Chrome size={14} className="text-red-400" />
+          <Chrome size={13} className="text-zinc-300" />
           <span>Google Workspace SSO</span>
         </button>
 
-        <div className="text-center mt-6 text-xs text-slate-400">
-          Not an intern yet?{' '}
-          <button onClick={() => router.push('/apply')} className="text-blue-400 font-semibold hover:underline">
-            Submit Application
+        <div className="text-center mt-6 text-xs text-zinc-400">
+          Not registered yet?{' '}
+          <button onClick={() => router.push('/apply')} className="text-zinc-200 font-semibold hover:underline">
+            Submit Internship Form
           </button>
         </div>
       </motion.div>
@@ -221,31 +217,31 @@ export default function LoginPage() {
       {/* Google Login Simulator Modal */}
       <AnimatePresence>
         {googleModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 p-4">
+          <div className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-xs z-50 p-4 animate-fade-in">
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="w-full max-w-sm rounded-3xl border border-white/10 p-6 bg-slate-900 shadow-2xl space-y-4"
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-sm rounded-2xl border border-zinc-800 p-6 bg-zinc-900 shadow-2xl space-y-4"
             >
               <div className="text-center">
-                <Chrome size={32} className="text-red-400 mx-auto mb-2" />
-                <h3 className="text-base font-bold text-white">Sign in with Google</h3>
-                <p className="text-xs text-slate-400 leading-relaxed px-4">
-                  Provide your Google Gmail address. Google SSO checks if this address was registered via form application.
+                <Chrome size={28} className="text-zinc-300 mx-auto mb-2" />
+                <h3 className="text-base font-bold text-zinc-100">Sign in with Google</h3>
+                <p className="text-xs text-zinc-400 leading-normal px-2 mt-1">
+                  Enter your pre-registered Google email. SSO will query the database to issue your session token.
                 </p>
               </div>
 
               <form onSubmit={handleGoogleSubmit} className="space-y-3">
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-0.5">GOOGLE EMAIL</label>
+                  <label className="block text-[10px] text-zinc-550 mb-1">GOOGLE EMAIL</label>
                   <input
                     type="email"
                     required
                     value={googleEmail}
                     onChange={(e) => setGoogleEmail(e.target.value)}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-blue-500"
-                    placeholder="e.g. candidate@gmail.com"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-zinc-350 focus:outline-none focus:border-zinc-500"
+                    placeholder="e.g. name@gmail.com"
                   />
                 </div>
 
@@ -253,16 +249,16 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setGoogleModalOpen(false)}
-                    className="flex-1 py-2 rounded-xl bg-slate-800 text-slate-400 text-xs font-semibold hover:bg-slate-750"
+                    className="flex-1 py-2 rounded-xl bg-zinc-950 text-zinc-400 text-xs font-semibold hover:bg-zinc-900 border border-zinc-800"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={googleLoading}
-                    className="flex-1 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow-md shadow-red-500/10"
+                    className="flex-1 py-2 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-semibold shadow-md"
                   >
-                    {googleLoading ? 'Signing In...' : 'Verify Gmail'}
+                    {googleLoading ? 'Verifying...' : 'Verify SSO'}
                   </button>
                 </div>
               </form>

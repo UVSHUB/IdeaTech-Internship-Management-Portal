@@ -171,7 +171,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
                 <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
                   {user.firstName} {user.lastName}
                 </p>
-                <p className="text-[9px] font-bold text-blue-500 dark:text-purple-400 uppercase tracking-widest truncate">
+                <p className="text-[9px] font-bold text-zinc-500 dark:text-zinc-450 uppercase tracking-widest truncate">
                   {user.role.replace('_', ' ')}
                 </p>
               </div>

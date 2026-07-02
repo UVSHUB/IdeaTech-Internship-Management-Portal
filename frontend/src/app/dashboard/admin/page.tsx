@@ -346,26 +346,26 @@ export default function AdminDashboard() {
   }
 
   // Dashboard Overview Variables
-  const COLORS = ['#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444'];
+  const COLORS = ['#09090b', '#27272a', '#71717a', '#d4d4d8'];
   const attendanceChartData = [
-    { name: 'Present', value: stats.attendance.PRESENT, fill: '#10B981' },
-    { name: 'Late', value: stats.attendance.LATE, fill: '#F59E0B' },
-    { name: 'Half Day', value: stats.attendance.HALF_DAY, fill: '#8B5CF6' },
-    { name: 'Absent', value: stats.attendance.ABSENT, fill: '#EF4444' },
+    { name: 'Present', value: stats.attendance.PRESENT, fill: '#18181b' },
+    { name: 'Late', value: stats.attendance.LATE, fill: '#3f3f46' },
+    { name: 'Half Day', value: stats.attendance.HALF_DAY, fill: '#71717a' },
+    { name: 'Absent', value: stats.attendance.ABSENT, fill: '#a1a1aa' },
   ].filter(item => item.value > 0);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 flex">
       <Sidebar />
 
       <main className="flex-1 lg:ml-64 p-8 pt-20 lg:pt-8 space-y-6 overflow-y-auto max-h-screen">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-white/5 pb-4">
+        <div className="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-4">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight capitalize">
               {tab ? `${tab} Console` : 'System Admin Console'}
             </h1>
-            <p className="text-sm text-slate-400 mt-1">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
               {tab ? `Manage and view portal ${tab} inputs.` : 'ITIMP portal health, logs, database reports, and audits.'}
             </p>
           </div>
@@ -376,34 +376,34 @@ export default function AdminDashboard() {
           <>
             {/* Counts row */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-blue-500">
-                <div className="p-3 bg-blue-500/10 text-blue-400 rounded-2xl"><Activity size={20} /></div>
+              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-900 dark:border-l-zinc-100">
+                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><Activity size={20} /></div>
                 <div>
-                  <p className="text-xs text-slate-400 font-semibold uppercase">Total Database Records</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Total Database Records</p>
                   <h3 className="text-2xl font-bold">{stats.counts.total}</h3>
                 </div>
               </GlassCard>
               
-              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-emerald-500">
-                <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-2xl"><CheckSquare size={20} /></div>
+              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-700 dark:border-l-zinc-300">
+                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><CheckSquare size={20} /></div>
                 <div>
-                  <p className="text-xs text-slate-400 font-semibold uppercase">Task Completion Rate</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Task Completion Rate</p>
                   <h3 className="text-2xl font-bold">{stats.tasks.completionRate}%</h3>
                 </div>
               </GlassCard>
 
-              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-amber-500">
-                <div className="p-3 bg-amber-500/10 text-amber-400 rounded-2xl"><ShieldAlert size={20} /></div>
+              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-500 dark:border-l-zinc-500">
+                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><ShieldAlert size={20} /></div>
                 <div>
-                  <p className="text-xs text-slate-400 font-semibold uppercase">Active Warning Alerts</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Active Warning Alerts</p>
                   <h3 className="text-2xl font-bold">{stats.counts.warning}</h3>
                 </div>
               </GlassCard>
 
-              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-red-500">
-                <div className="p-3 bg-red-500/10 text-red-400 rounded-2xl"><Clock size={20} /></div>
+              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-300 dark:border-l-zinc-700">
+                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><Clock size={20} /></div>
                 <div>
-                  <p className="text-xs text-slate-400 font-semibold uppercase">Auto-Terminations</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Auto-Terminations</p>
                   <h3 className="text-2xl font-bold">{stats.counts.terminated}</h3>
                 </div>
               </GlassCard>
@@ -413,21 +413,21 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Department count Bar chart */}
               <GlassCard className="lg:col-span-2 space-y-4">
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Department Capacities</h3>
+                <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Department Capacities</h3>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={stats.departments}>
-                      <XAxis dataKey="name" stroke="#64748B" fontSize={12} tickLine={false} />
-                      <YAxis stroke="#64748B" fontSize={12} tickLine={false} />
+                      <XAxis dataKey="name" stroke="#71717a" fontSize={12} tickLine={false} />
+                      <YAxis stroke="#71717a" fontSize={12} tickLine={false} />
                       <Tooltip 
-                        contentStyle={{ background: '#1E293B', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px' }}
+                        contentStyle={{ background: '#18181b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px' }}
                         labelStyle={{ color: '#FFFFFF', fontWeight: 'bold' }}
                       />
                       <Bar dataKey="count" fill="url(#bluePurpleGrad)" radius={[8, 8, 0, 0]} />
                       <defs>
                         <linearGradient id="bluePurpleGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#3B82F6" />
-                          <stop offset="100%" stopColor="#A855F7" />
+                          <stop offset="0%" stopColor="#09090b" />
+                          <stop offset="100%" stopColor="#71717a" />
                         </linearGradient>
                       </defs>
                     </BarChart>
