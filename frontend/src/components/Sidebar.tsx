@@ -40,8 +40,12 @@ export default function Sidebar({ activeTab }: SidebarProps) {
   // Generate links based on Role
   const getLinks = () => {
     const role = user.role;
+    let roleSlug = role.toLowerCase().replace('_', '-');
+    if (role === 'SUPER_ADMIN') roleSlug = 'admin';
+    if (role === 'HR_MANAGER') roleSlug = 'hr';
+
     const base = [
-      { name: 'Dashboard', icon: LayoutDashboard, path: `/dashboard/${role.toLowerCase().replace('_', '-')}` }
+      { name: 'Dashboard', icon: LayoutDashboard, path: `/dashboard/${roleSlug}` }
     ];
 
     if (role === 'SUPER_ADMIN') {
