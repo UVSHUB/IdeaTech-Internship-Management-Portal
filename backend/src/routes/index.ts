@@ -3,12 +3,12 @@ import upload from '../utils/upload';
 import { authenticateToken, authorizeRoles } from '../middleware/auth';
 import prisma from '../utils/db';
 
-// Import Controllers
 import {
   registerIntern,
   login,
   approveIntern,
   rejectIntern,
+  googleLogin,
 } from '../controllers/authController';
 
 import {
@@ -78,6 +78,7 @@ const router = Router();
 // PUBLIC ROUTES
 // ==========================================
 router.post('/auth/login', login);
+router.post('/auth/google-login', googleLogin);
 router.post('/auth/register-intern', upload.single('cv'), registerIntern);
 router.get('/certificates/verify/:key', verifyCertificate);
 

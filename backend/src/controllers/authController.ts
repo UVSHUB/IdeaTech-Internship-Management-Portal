@@ -354,3 +354,95 @@ export async function rejectIntern(req: AuthenticatedRequest, res: Response) {
     return res.status(500).json({ message: 'Internal server error.', error: error.message });
   }
 }
+
+/**
+ * Handle Google Single Sign-In
+ */
+export async function googleLogin(req: Request, res: Response) {
+  try {
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ message: 'Google credential token is required.' });
+    }
+
+    // Call Google Token Info Endpoint
+    const verifyRes = await global.fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
+    if (!verifyRes.ok) {
+      return res.status(400).json({ message: 'Google credential verification failed.' });
+    }
+
+    const payload: any = await verifyRes.json();
+    const email = payload.email;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email not returned from Google Account.' });
+    }
+
+    // Check if user exists in the database
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { internProfile: true },
+    });
+
+    if (!user) {
+      return res.status(403).json({
+        message: 'This Google account is not registered. Please submit your internship application first.',
+      });
+    }
+
+    // If intern, check status
+    if (user.role === 'INTERN' && user.internProfile) {
+      if (user.internProfile.status === 'PENDING') {
+        return res.status(403).json({ message: 'Your application is pending admin approval.' });
+      }
+      if (user.internProfile.status === 'TERMINATED') {
+        return res.status(403).json({ message: 'Your internship has been terminated.' });
+      }
+    }
+
+    // Generate JWT
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+      JWT_SECRET,
+      { expiresIn: '8h' }
+    );
+
+    // Track active timestamp if Intern
+    if (user.role === 'INTERN' && user.internProfile) {
+      await prisma.internProfile.update({
+        where: { id: user.internProfile.id },
+        data: { lastActive: new Date() },
+      });
+    }
+
+    // Audit Log
+    await prisma.activityLog.create({
+      data: {
+        userId: user.id,
+        action: 'GOOGLE_LOGIN',
+        details: `User logged in successfully via Google Sign-In as ${user.role}.`,
+      },
+    });
+
+    return res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        internProfile: user.internProfile,
+      },
+    });
+  } catch (error: any) {
+    console.error('Error during Google login:', error);
+    return res.status(500).json({ message: 'Internal server error.', error: error.message });
+  }
+}

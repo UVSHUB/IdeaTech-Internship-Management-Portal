@@ -40,16 +40,24 @@ async function main() {
   console.log('Created departments.');
 
   // 2. Create Users
+  const adminPasswordHash = await bcrypt.hash('Ulindu_2054', 10); // Wait, password is Ulindu_2004! Let me write Ulindu_2004 hash
+  const adminPasswordHash2 = await bcrypt.hash('Ulindu_2004', 10);
+  
   // Super Admin
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@ideatech.lk' },
-    update: {},
+    where: { id: '60d5ec49f30f513904a43e61' },
+    update: {
+      email: 'vibodhasilvaulindu@gmail.com',
+      passwordHash: adminPasswordHash2,
+      firstName: 'Ulindu',
+      lastName: 'Vibodha',
+    },
     create: {
       id: '60d5ec49f30f513904a43e61',
-      email: 'admin@ideatech.lk',
-      passwordHash: defaultPasswordHash,
-      firstName: 'Samantha',
-      lastName: 'Perera',
+      email: 'vibodhasilvaulindu@gmail.com',
+      passwordHash: adminPasswordHash2,
+      firstName: 'Ulindu',
+      lastName: 'Vibodha',
       role: 'SUPER_ADMIN',
     },
   });
