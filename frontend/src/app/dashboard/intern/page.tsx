@@ -2,22 +2,33 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useParams } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import GlassCard from '@/components/GlassCard';
 import { motion } from 'framer-motion';
 import { 
   Award, Zap, Calendar, AlertTriangle, MessageSquare, 
-  Send, CheckCircle, Clock, MapPin, Code, Link as LinkIcon 
+  Send, CheckCircle, Clock, MapPin, Code, Loader2, Play 
 } from 'lucide-react';
 
 export default function InternDashboard() {
   const { user, token, refreshUser } = useAuth();
-  
-  // Dashboard states
+  const params = useParams();
+  const tab = params?.tab as string | undefined; // undefined (Overview), 'attendance', 'reports', 'logbook', 'tasks', 'leaves', 'certificates'
+
+  // Metrics loading
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  
-  // Attendance actions
+
+  // Tab-Specific Lists
+  const [attendanceHistory, setAttendanceHistory] = useState<any[]>([]);
+  const [reportsHistory, setReportsHistory] = useState<any[]>([]);
+  const [logbookHistory, setLogbookHistory] = useState<any[]>([]);
+  const [tasksList, setTasksList] = useState<any[]>([]);
+  const [leavesList, setLeavesList] = useState<any[]>([]);
+  const [certificatesList, setCertificatesList] = useState<any[]>([]);
+
+  // Clock state
   const [checkInTime, setCheckInTime] = useState<string | null>(null);
   const [checkOutTime, setCheckOutTime] = useState<string | null>(null);
   const [attendanceStatus, setAttendanceStatus] = useState('Not Checked In');
@@ -39,40 +50,48 @@ export default function InternDashboard() {
   const [solutions, setSolutions] = useState('');
   const [logbookMsg, setLogbookMsg] = useState('');
 
+  // Leave Form State
+  const [leaveForm, setLeaveForm] = useState({ reason: 'PERSONAL', startDate: '', endDate: '', description: '' });
+  const [leaveMsg, setLeaveMsg] = useState('');
+
   // Chatbot State
-  const [chatOpen, setChatOpen] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
   const [chatHistory, setChatHistory] = useState<Array<{ sender: 'user' | 'bot'; text: string }>>([
     { sender: 'bot', text: 'Hello! I am ITA, your IdeaTech Assistant. How can I help you today with your WFH internship?' }
   ]);
   const [chatLoading, setChatLoading] = useState(false);
 
+  const [submitting, setSubmitting] = useState(false);
+
   useEffect(() => {
     if (user) {
       fetchInternData();
     }
-  }, [user]);
+  }, [user, tab]);
 
   const fetchInternData = async () => {
+    if (!token) return;
     setLoading(true);
     try {
-      // 1. Stats
+      // 1. Fetch main metrics & warnings
       const res = await fetch('/api/analytics/intern', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (res.ok) {
-        const data = await res.json();
-        setStats(data);
+        setStats(await res.json());
       }
 
-      // 2. Today's Attendance
+      // 2. Fetch attendance history & check-in state
       const attRes = await fetch('/api/attendance/my', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (attRes.ok) {
         const attData = await attRes.json();
+        setAttendanceHistory(attData.history || []);
+        
+        // Find today's clock in/out status
         const today = new Date().toDateString();
-        const todayRecord = attData.history.find((h: any) => new Date(h.date).toDateString() === today);
+        const todayRecord = (attData.history || []).find((h: any) => new Date(h.date).toDateString() === today);
         if (todayRecord) {
           setCheckInTime(new Date(todayRecord.checkIn).toLocaleTimeString());
           if (todayRecord.checkOut) {
@@ -80,9 +99,47 @@ export default function InternDashboard() {
             setAttendanceStatus('Checked Out');
           } else {
             setAttendanceStatus('Checked In');
+            setCheckOutTime(null);
           }
+        } else {
+          setCheckInTime(null);
+          setCheckOutTime(null);
+          setAttendanceStatus('Not Checked In');
         }
       }
+
+      // 3. Tab-Specific Fetches
+      if (tab === 'reports') {
+        const rRes = await fetch('/api/reports/my', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (rRes.ok) setReportsHistory(await rRes.json());
+      } else if (tab === 'logbook') {
+        const lRes = await fetch('/api/logbook/my', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (lRes.ok) setLogbookHistory(await lRes.json());
+      } else if (tab === 'tasks') {
+        const tRes = await fetch('/api/tasks', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (tRes.ok) {
+          const allTasks = await tRes.json();
+          // Filter tasks assigned to this user
+          setTasksList(allTasks.filter((t: any) => t.assigneeId === user.id));
+        }
+      } else if (tab === 'leaves') {
+        const lvRes = await fetch('/api/leaves/my', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (lvRes.ok) setLeavesList(await lvRes.json());
+      } else if (tab === 'certificates') {
+        const cRes = await fetch('/api/certificates/my', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (cRes.ok) setCertificatesList(await cRes.json());
+      }
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -92,6 +149,7 @@ export default function InternDashboard() {
 
   // Clock In
   const handleCheckIn = async () => {
+    setSubmitting(true);
     try {
       const res = await fetch('/api/attendance/checkin', {
         method: 'POST',
@@ -99,18 +157,22 @@ export default function InternDashboard() {
       });
       const data = await res.json();
       if (res.ok) {
+        alert('Clocked in successfully! Have a great productive day.');
         fetchInternData();
         refreshUser();
       } else {
-        alert(data.message);
+        alert(data.message || 'Clock-in failed.');
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
+      alert('Network error.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   // Clock Out
   const handleCheckOut = async () => {
+    setSubmitting(true);
     try {
       const res = await fetch('/api/attendance/checkout', {
         method: 'POST',
@@ -118,20 +180,23 @@ export default function InternDashboard() {
       });
       const data = await res.json();
       if (res.ok) {
+        alert('Clocked out successfully! Rest well.');
         fetchInternData();
         refreshUser();
       } else {
-        alert(data.message);
+        alert(data.message || 'Clock-out failed.');
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
+      alert('Network error.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   // Submit Daily Report
   const handleReportSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setReportMsg('Submitting...');
+    setReportMsg('Submitting report...');
     try {
       const res = await fetch('/api/reports/submit', {
         method: 'POST',
@@ -143,14 +208,14 @@ export default function InternDashboard() {
           todayTasks,
           completedWork,
           problemsFaced,
-          hoursWorked,
-          githubLink: gitLink,
-          commitLink,
+          hoursWorked: parseFloat(hoursWorked),
+          githubLink: gitLink || undefined,
+          commitLink: commitLink || undefined,
         })
       });
       const data = await res.json();
       if (res.ok) {
-        setReportMsg('Daily report submitted successfully!');
+        setReportMsg('Daily report submitted successfully! (+15 XP)');
         setTodayTasks('');
         setCompletedWork('');
         setProblemsFaced('');
@@ -161,7 +226,7 @@ export default function InternDashboard() {
       } else {
         setReportMsg(data.message || 'Submission failed.');
       }
-    } catch (err) {
+    } catch {
       setReportMsg('Submission error.');
     }
   };
@@ -169,7 +234,7 @@ export default function InternDashboard() {
   // Submit Logbook
   const handleLogbookSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLogbookMsg('Submitting...');
+    setLogbookMsg('Logging entry...');
     try {
       const res = await fetch('/api/logbook/submit', {
         method: 'POST',
@@ -177,17 +242,11 @@ export default function InternDashboard() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          activities,
-          learning,
-          skillsLearned,
-          challenges,
-          solutions
-        })
+        body: JSON.stringify(activitiesFormPayload())
       });
       const data = await res.json();
       if (res.ok) {
-        setLogbookMsg('Logbook logged successfully!');
+        setLogbookMsg('Logbook insight registered! (+15 XP)');
         setActivities('');
         setLearning('');
         setSkillsLearned('');
@@ -198,8 +257,68 @@ export default function InternDashboard() {
       } else {
         setLogbookMsg(data.message || 'Submission failed.');
       }
-    } catch (err) {
+    } catch {
       setLogbookMsg('Submission error.');
+    }
+  };
+
+  const activitiesFormPayload = () => ({
+    activities,
+    learning,
+    skillsLearned,
+    challenges,
+    solutions
+  });
+
+  // Submit Leave Request
+  const handleLeaveSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!leaveForm.startDate || !leaveForm.endDate || !leaveForm.description) {
+      alert('Please fill out all fields.');
+      return;
+    }
+    setLeaveMsg('Submitting leave request...');
+    try {
+      const res = await fetch('/api/leaves/apply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(leaveForm)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setLeaveMsg('Leave request submitted. Awaiting HR review.');
+        setLeaveForm({ reason: 'PERSONAL', startDate: '', endDate: '', description: '' });
+        fetchInternData();
+      } else {
+        setLeaveMsg(data.message || 'Application failed.');
+      }
+    } catch {
+      setLeaveMsg('Application error.');
+    }
+  };
+
+  // Task Status Update
+  const handleUpdateTaskStatus = async (taskId: string, newStatus: 'WORKING' | 'COMPLETED') => {
+    try {
+      const res = await fetch(`/api/tasks/update/${taskId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) {
+        alert(`Task marked as ${newStatus.toLowerCase()}!`);
+        fetchInternData();
+      } else {
+        alert('Failed to update task.');
+      }
+    } catch {
+      alert('Network error.');
     }
   };
 
@@ -226,9 +345,9 @@ export default function InternDashboard() {
       if (res.ok) {
         setChatHistory(prev => [...prev, { sender: 'bot', text: data.reply }]);
       } else {
-        setChatHistory(prev => [...prev, { sender: 'bot', text: 'Support agent is currently offline. Please try again later.' }]);
+        setChatHistory(prev => [...prev, { sender: 'bot', text: 'Support agent is currently offline.' }]);
       }
-    } catch (err) {
+    } catch {
       setChatHistory(prev => [...prev, { sender: 'bot', text: 'Error contacting AI agent.' }]);
     } finally {
       setChatLoading(false);
@@ -239,8 +358,8 @@ export default function InternDashboard() {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-900 text-slate-100">
         <div className="text-center space-y-3">
-          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-xs text-slate-400">Loading intern metrics...</p>
+          <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto" />
+          <p className="text-xs text-slate-400">Loading Intern Workspace...</p>
         </div>
       </div>
     );
@@ -255,7 +374,9 @@ export default function InternDashboard() {
         <div className="flex justify-between items-center bg-theme-gradient p-8 rounded-3xl shadow-xl shadow-blue-500/10">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight">Welcome, {user?.firstName}!</h1>
-            <p className="text-sm text-blue-100/80 mt-1">Intern ID: <strong className="text-white">{user?.internProfile?.internId || 'Awaiting ID'}</strong> | Department: {user?.internProfile?.department?.name}</p>
+            <p className="text-sm text-blue-100/80 mt-1">
+              Intern ID: <strong className="text-white">{user?.internProfile?.internId || 'Awaiting ID'}</strong> | Department: {user?.internProfile?.department?.name}
+            </p>
           </div>
           <div className="hidden md:flex items-center space-x-3 bg-white/10 px-5 py-3 rounded-2xl border border-white/10 backdrop-blur-sm">
             <Calendar size={18} />
@@ -263,81 +384,237 @@ export default function InternDashboard() {
           </div>
         </div>
 
-        {/* Stats Row Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <GlassCard className="flex items-center space-x-4">
-            <div className="p-3.5 bg-blue-500/10 text-blue-400 rounded-2xl"><Award size={24} /></div>
-            <div>
-              <p className="text-xs text-slate-400 font-medium">CURRENT LEVEL</p>
-              <h3 className="text-2xl font-bold">Level {stats.level}</h3>
-            </div>
-          </GlassCard>
-
-          <GlassCard className="flex items-center space-x-4">
-            <div className="p-3.5 bg-purple-500/10 text-purple-400 rounded-2xl"><Zap size={24} /></div>
-            <div>
-              <p className="text-xs text-slate-400 font-medium">ACTIVE STREAK</p>
-              <h3 className="text-2xl font-bold">{stats.streak} Days</h3>
-            </div>
-          </GlassCard>
-
-          <GlassCard className="flex items-center space-x-4">
-            <div className="p-3.5 bg-green-500/10 text-green-400 rounded-2xl"><CheckCircle size={24} /></div>
-            <div>
-              <p className="text-xs text-slate-400 font-medium">COMPLETION PROGRESS</p>
-              <h3 className="text-2xl font-bold">{stats.completionProgress}%</h3>
-            </div>
-          </GlassCard>
-
-          <GlassCard className="flex items-center space-x-4">
-            <div className="p-3.5 bg-amber-500/10 text-amber-400 rounded-2xl"><Clock size={24} /></div>
-            <div>
-              <p className="text-xs text-slate-400 font-medium">REMAINING DAYS</p>
-              <h3 className="text-2xl font-bold">{stats.remainingDays} Days</h3>
-            </div>
-          </GlassCard>
-        </div>
-
-        {/* Middle content grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Actions Column */}
-          <div className="lg:col-span-2 space-y-6">
-            
-            {/* WFH Attendance Action Card */}
-            <GlassCard>
-              <h2 className="text-lg font-bold mb-4 flex items-center space-x-2">
-                <MapPin size={18} className="text-blue-400" />
-                <span>Work From Home Attendance</span>
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                <div className="space-y-2">
-                  <div className="text-sm font-semibold text-slate-350">Status: <span className="text-blue-400 font-bold">{attendanceStatus}</span></div>
-                  <div className="text-xs text-slate-450">
-                    {checkInTime && <p>Check-In: {checkInTime}</p>}
-                    {checkOutTime && <p>Check-Out: {checkOutTime}</p>}
-                  </div>
+        {/* 1. DEFAULT OVERVIEW VIEW */}
+        {!tab && (
+          <>
+            {/* Stats Row Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-blue-500">
+                <div className="p-3 bg-blue-500/10 text-blue-400 rounded-2xl"><Award size={22} /></div>
+                <div>
+                  <p className="text-xs text-slate-450 font-semibold uppercase">Current Level</p>
+                  <h3 className="text-2xl font-bold">Level {stats.level}</h3>
                 </div>
+              </GlassCard>
+
+              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-purple-500">
+                <div className="p-3 bg-purple-500/10 text-purple-400 rounded-2xl"><Zap size={22} /></div>
+                <div>
+                  <p className="text-xs text-slate-455 font-semibold uppercase">Active Streak</p>
+                  <h3 className="text-2xl font-bold">{stats.streak} Days</h3>
+                </div>
+              </GlassCard>
+
+              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-emerald-500">
+                <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-2xl"><CheckCircle size={22} /></div>
+                <div>
+                  <p className="text-xs text-slate-450 font-semibold uppercase">Completion Progress</p>
+                  <h3 className="text-2xl font-bold">{stats.completionProgress}%</h3>
+                </div>
+              </GlassCard>
+
+              <GlassCard className="flex items-center space-x-4 border-l-4 border-l-amber-500">
+                <div className="p-3 bg-amber-500/10 text-amber-400 rounded-2xl"><Clock size={22} /></div>
+                <div>
+                  <p className="text-xs text-slate-450 font-semibold uppercase">Remaining Days</p>
+                  <h3 className="text-2xl font-bold">{stats.remainingDays} Days</h3>
+                </div>
+              </GlassCard>
+            </div>
+
+            {/* Middle Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left Column: Quick CheckIn & Warning Logs */}
+              <div className="lg:col-span-2 space-y-6">
                 
-                <div className="flex space-x-4">
+                {/* Check In Action Card */}
+                <GlassCard>
+                  <h2 className="text-lg font-bold mb-4 flex items-center space-x-2">
+                    <MapPin size={18} className="text-blue-400" />
+                    <span>Work From Home Attendance Status</span>
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div className="space-y-1.5 text-xs text-slate-350">
+                      <p>Status: <span className="text-blue-400 font-bold">{attendanceStatus}</span></p>
+                      {checkInTime && <p>Check-In time: {checkInTime}</p>}
+                      {checkOutTime && <p>Check-Out time: {checkOutTime}</p>}
+                    </div>
+                    <div className="flex space-x-3">
+                      <button
+                        onClick={handleCheckIn}
+                        disabled={submitting || attendanceStatus !== 'Not Checked In'}
+                        className={`flex-grow py-2.5 rounded-xl font-bold text-xs ${
+                          attendanceStatus === 'Not Checked In' ? 'bg-blue-600 hover:bg-blue-750 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                        }`}
+                      >
+                        Clock In
+                      </button>
+                      <button
+                        onClick={handleCheckOut}
+                        disabled={submitting || attendanceStatus !== 'Checked In'}
+                        className={`flex-grow py-2.5 rounded-xl font-bold text-xs ${
+                          attendanceStatus === 'Checked In' ? 'bg-purple-600 hover:bg-purple-750 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                        }`}
+                      >
+                        Clock Out
+                      </button>
+                    </div>
+                  </div>
+                </GlassCard>
+
+                {/* Warning alerts list */}
+                <GlassCard>
+                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center space-x-1.5">
+                    <AlertTriangle size={16} className="text-red-400" />
+                    <span>System Warning Logs ({stats.warnings.length})</span>
+                  </h3>
+                  {stats.warnings.length === 0 ? (
+                    <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs rounded-2xl flex items-center space-x-2">
+                      <CheckCircle size={15} />
+                      <span>Congratulations! Your profile is clean and has zero warning escalations.</span>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {stats.warnings.map((w: any, i: number) => (
+                        <div key={i} className="p-3.5 bg-red-950/20 border border-red-500/20 rounded-2xl text-xs space-y-1">
+                          <div className="flex justify-between font-bold text-red-400">
+                            <span>{w.type}</span>
+                            <span>{new Date(w.date).toLocaleDateString()}</span>
+                          </div>
+                          <p className="text-slate-400 leading-normal">{w.reason}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </GlassCard>
+              </div>
+
+              {/* Right Column: Gamification progress & Assistant */}
+              <div className="space-y-6">
+                <GlassCard className="text-center">
+                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">XP Level Progression</h3>
+                  <div className="w-32 h-32 rounded-full border-4 border-slate-800 border-t-blue-500 border-r-purple-500 mx-auto flex items-center justify-center mb-4">
+                    <div>
+                      <span className="text-3xl font-extrabold text-white">{stats.xp}</span>
+                      <span className="text-[10px] text-slate-400 block font-semibold">XP POINTS</span>
+                    </div>
+                  </div>
+                  <div className="w-full bg-slate-800 h-2 rounded-full mb-1.5 overflow-hidden">
+                    <div className="bg-theme-gradient h-full rounded-full" style={{ width: `${stats.xpProgress}%` }} />
+                  </div>
+                  <div className="flex justify-between text-[10px] text-slate-450">
+                    <span>Level {stats.level}</span>
+                    <span>{stats.xpProgress}% to Level {stats.level + 1}</span>
+                  </div>
+                </GlassCard>
+
+                {/* AI Assistant chat panel */}
+                <GlassCard className="flex flex-col h-[280px]">
+                  <h3 className="text-xs font-bold text-slate-450 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
+                    <MessageSquare size={14} className="text-blue-400" />
+                    <span>IdeaTech Assistant</span>
+                  </h3>
+                  <div className="flex-grow bg-slate-950/40 border border-white/5 rounded-xl p-3 overflow-y-auto space-y-2 mb-2 max-h-[170px]">
+                    {chatHistory.map((chat, i) => (
+                      <div key={i} className={`flex ${chat.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`p-2 rounded-xl text-[11px] max-w-[85%] ${chat.sender === 'user' ? 'bg-blue-600 text-white' : 'bg-slate-900 text-slate-200 border border-white/5'}`}>
+                          {chat.text}
+                        </div>
+                      </div>
+                    ))}
+                    {chatLoading && <div className="text-[10px] text-slate-500 animate-pulse">ITA is thinking...</div>}
+                  </div>
+                  <form onSubmit={handleChatSend} className="flex space-x-1.5">
+                    <input
+                      type="text"
+                      value={chatMessage}
+                      onChange={(e) => setChatMessage(e.target.value)}
+                      className="flex-grow bg-slate-900 border border-white/10 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-blue-500"
+                      placeholder="Ask ITA a question..."
+                    />
+                    <button type="submit" className="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white"><Send size={12} /></button>
+                  </form>
+                </GlassCard>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* 2. ATTENDANCE HISTORICAL REGISTRY */}
+        {tab === 'attendance' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <GlassCard className="lg:col-span-2 space-y-4">
+              <h2 className="text-base font-bold flex items-center space-x-2 text-blue-400 border-b border-white/5 pb-2">
+                <Clock size={18} />
+                <span>My Attendance History</span>
+              </h2>
+              <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-white/5 text-slate-500 uppercase font-semibold">
+                      <th className="py-2.5">Date</th>
+                      <th className="py-2.5">Check In</th>
+                      <th className="py-2.5">Check Out</th>
+                      <th className="py-2.5">Hours</th>
+                      <th className="py-2.5 text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5 text-slate-350">
+                    {attendanceHistory.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="text-center py-12 text-slate-550">No check-in logs submitted.</td>
+                      </tr>
+                    ) : (
+                      attendanceHistory.map((h: any) => (
+                        <tr key={h.id}>
+                          <td className="py-3 font-semibold">{new Date(h.date).toLocaleDateString()}</td>
+                          <td className="py-3 text-slate-400">{new Date(h.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                          <td className="py-3 text-slate-450">
+                            {h.checkOut ? new Date(h.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Logged Check-In Only'}
+                          </td>
+                          <td className="py-3 font-mono">{h.workingHours ? `${h.workingHours.toFixed(2)} hrs` : '-'}</td>
+                          <td className="py-3 text-center">
+                            <span className={`px-2 py-0.5 rounded font-bold text-[9px] ${
+                              h.status === 'PRESENT' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
+                            }`}>
+                              {h.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </GlassCard>
+
+            <GlassCard className="space-y-4 h-fit">
+              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest border-b border-white/5 pb-2">Record WFH Shifts</h3>
+              <div className="space-y-4 text-xs">
+                <div className="p-3 bg-slate-900 border border-white/5 rounded-2xl text-slate-300">
+                  <p className="font-semibold text-blue-400">🕒 Shifts Rules Reminder:</p>
+                  <ul className="list-disc pl-4 space-y-1 mt-2 text-slate-400">
+                    <li>Clock in must be executed before **9:15 AM** to avoid late logs.</li>
+                    <li>Both Clock In and Clock Out must be logged daily.</li>
+                    <li>Missing check-ins/check-outs will trigger automated alerts.</li>
+                  </ul>
+                </div>
+
+                <div className="flex flex-col space-y-2">
                   <button
                     onClick={handleCheckIn}
-                    disabled={attendanceStatus !== 'Not Checked In'}
-                    className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm text-center shadow-lg transition-all ${
-                      attendanceStatus === 'Not Checked In'
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/10'
-                        : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-white/5'
+                    disabled={submitting || attendanceStatus !== 'Not Checked In'}
+                    className={`w-full py-3 rounded-xl font-bold ${
+                      attendanceStatus === 'Not Checked In' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-white/5'
                     }`}
                   >
                     Clock In
                   </button>
                   <button
                     onClick={handleCheckOut}
-                    disabled={attendanceStatus !== 'Checked In'}
-                    className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm text-center shadow-lg transition-all ${
-                      attendanceStatus === 'Checked In'
-                        ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-purple-500/10'
-                        : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-white/5'
+                    disabled={submitting || attendanceStatus !== 'Checked In'}
+                    className={`w-full py-3 rounded-xl font-bold ${
+                      attendanceStatus === 'Checked In' ? 'bg-purple-600 hover:bg-purple-750 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-white/5'
                     }`}
                   >
                     Clock Out
@@ -345,306 +622,455 @@ export default function InternDashboard() {
                 </div>
               </div>
             </GlassCard>
+          </div>
+        )}
 
-            {/* Daily Report Submission Form */}
-            <GlassCard>
-              <h2 className="text-lg font-bold mb-4 flex items-center space-x-2">
-                <Code size={18} className="text-purple-400" />
-                <span>Submit Daily Performance Report</span>
+        {/* 3. DAILY REPORTS TAB */}
+        {tab === 'reports' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <GlassCard className="lg:col-span-2 space-y-4">
+              <h2 className="text-base font-bold flex items-center space-x-2 text-blue-400 border-b border-white/5 pb-2">
+                <Code size={18} />
+                <span>My Performance Reports</span>
               </h2>
+              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                {reportsHistory.length === 0 ? (
+                  <p className="text-xs text-slate-500 text-center py-16">No daily reports submitted yet.</p>
+                ) : (
+                  reportsHistory.map((rep: any) => (
+                    <div key={rep.id} className="p-4 bg-slate-900/60 border border-white/5 rounded-2xl space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="text-xs font-bold text-white">{new Date(rep.date).toLocaleDateString()}</h4>
+                          <p className="text-xs text-slate-350 mt-1 font-semibold">Tasks: {rep.todayTasks}</p>
+                          <p className="text-xs text-slate-400">Deliverables: {rep.completedWork}</p>
+                        </div>
+                        <span className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase ${
+                          rep.status === 'APPROVED' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
+                          rep.status === 'REJECTED' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                        }`}>
+                          {rep.status}
+                        </span>
+                      </div>
+                      {rep.remarks && <p className="text-[10px] text-amber-400 bg-amber-500/5 p-2 rounded-lg mt-2"><strong>Review Remarks:</strong> "{rep.remarks}"</p>}
+                    </div>
+                  ))
+                )}
+              </div>
+            </GlassCard>
 
-              {reportMsg && <div className="p-3 mb-4 rounded-xl bg-slate-900 border border-white/5 text-xs text-center text-blue-400">{reportMsg}</div>}
-
-              <form onSubmit={handleReportSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">Today's Assigned Tasks *</label>
-                    <input
-                      type="text"
-                      required
-                      value={todayTasks}
-                      onChange={(e) => setTodayTasks(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-                      placeholder="e.g. Design layouts, link database"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">Completed Work & Deliverables *</label>
-                    <input
-                      type="text"
-                      required
-                      value={completedWork}
-                      onChange={(e) => setCompletedWork(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-                      placeholder="e.g. Created Sidebar.tsx and GlassCard.tsx"
-                    />
-                  </div>
+            <GlassCard className="space-y-4">
+              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest border-b border-white/5 pb-2">Submit Daily Report</h3>
+              {reportMsg && <div className="p-3 mb-2 rounded-xl bg-slate-900 border border-white/5 text-[10px] text-center text-blue-400 font-bold">{reportMsg}</div>}
+              <form onSubmit={handleReportSubmit} className="space-y-3 text-xs">
+                <div>
+                  <label className="block text-slate-500 mb-0.5">TODAY'S TASKS *</label>
+                  <input
+                    type="text"
+                    required
+                    value={todayTasks}
+                    onChange={(e) => setTodayTasks(e.target.value)}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    placeholder="Short list of work items..."
+                  />
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-slate-500 mb-0.5">COMPLETED WORK *</label>
+                  <input
+                    type="text"
+                    required
+                    value={completedWork}
+                    onChange={(e) => setCompletedWork(e.target.value)}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    placeholder="Details of deliverables..."
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-slate-400 mb-1">Hours Worked *</label>
+                    <label className="block text-slate-500 mb-0.5">HOURS WORKED *</label>
                     <input
                       type="number"
                       required
                       value={hoursWorked}
                       onChange={(e) => setHoursWorked(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-                      placeholder="8"
+                      className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-400 mb-1">GitHub Repo Link</label>
-                    <input
-                      type="url"
-                      value={gitLink}
-                      onChange={(e) => setGitLink(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-                      placeholder="https://github.com/..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">Commit SHA / URL</label>
+                    <label className="block text-slate-500 mb-0.5">COMMIT SHA</label>
                     <input
                       type="text"
                       value={commitLink}
                       onChange={(e) => setCommitLink(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-                      placeholder="e.g. 5ae3bc8"
+                      className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                      placeholder="e.g. e50a88f"
                     />
                   </div>
                 </div>
-
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Problems / Blockers Faced *</label>
+                  <label className="block text-slate-500 mb-0.5">GITHUB REPOSITORY LINK</label>
+                  <input
+                    type="url"
+                    value={gitLink}
+                    onChange={(e) => setGitLink(e.target.value)}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    placeholder="https://github.com/..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-500 mb-0.5">PROBLEMS & BLOCKERS *</label>
                   <textarea
                     required
                     rows={2}
                     value={problemsFaced}
                     onChange={(e) => setProblemsFaced(e.target.value)}
-                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-                    placeholder="Describe any technical blockers or write 'None'"
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    placeholder="Write blockers faced or 'None'..."
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-xl bg-theme-gradient text-white text-sm font-semibold hover:opacity-90 transition-opacity shadow-md shadow-blue-500/10"
+                  className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all shadow-md mt-2"
                 >
-                  Submit Daily Report (+15 XP)
+                  Submit Report (+15 XP)
                 </button>
               </form>
             </GlassCard>
-            
-            {/* Digital Logbook Record Form */}
-            <GlassCard>
-              <h2 className="text-lg font-bold mb-4 flex items-center space-x-2">
-                <Send size={18} className="text-emerald-400" />
-                <span>Log Today's Educational Insights</span>
+          </div>
+        )}
+
+        {/* 4. DIGITAL LOGBOOK TAB */}
+        {tab === 'logbook' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <GlassCard className="lg:col-span-2 space-y-4">
+              <h2 className="text-base font-bold flex items-center space-x-2 text-blue-400 border-b border-white/5 pb-2">
+                <Send size={18} />
+                <span>My Academic Logbook History</span>
               </h2>
+              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                {logbookHistory.length === 0 ? (
+                  <p className="text-xs text-slate-500 text-center py-16">No logbook insights recorded yet.</p>
+                ) : (
+                  logbookHistory.map((l: any) => (
+                    <div key={l.id} className="p-4 bg-slate-900/60 border border-white/5 rounded-2xl space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="text-xs font-bold text-white">{new Date(l.date).toLocaleDateString()}</h4>
+                          <p className="text-xs text-slate-350 mt-1"><strong>Activities:</strong> {l.activities}</p>
+                          <p className="text-[11px] text-slate-400"><strong>Learning:</strong> {l.learning}</p>
+                          <p className="text-[11px] text-slate-400"><strong>Skills:</strong> {l.skillsLearned}</p>
+                        </div>
+                        <span className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase ${
+                          l.status === 'APPROVED' ? 'bg-green-500/10 text-green-400' : 'bg-amber-500/10 text-amber-400'
+                        }`}>
+                          {l.status}
+                        </span>
+                      </div>
+                      {l.mentorComments && (
+                        <p className="text-[10px] text-blue-400 bg-blue-500/5 p-2 rounded-lg mt-2"><strong>Mentor Comments:</strong> "{l.mentorComments}"</p>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </GlassCard>
 
-              {logbookMsg && <div className="p-3 mb-4 rounded-xl bg-slate-900 border border-white/5 text-xs text-center text-emerald-400">{logbookMsg}</div>}
-
-              <form onSubmit={handleLogbookSubmit} className="space-y-4">
+            <GlassCard className="space-y-4">
+              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest border-b border-white/5 pb-2">Log Today's Insight</h3>
+              {logbookMsg && <div className="p-3 mb-2 rounded-xl bg-slate-900 border border-white/5 text-[10px] text-center text-emerald-400 font-bold">{logbookMsg}</div>}
+              <form onSubmit={handleLogbookSubmit} className="space-y-3 text-xs">
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Summary of Activities Logged *</label>
+                  <label className="block text-slate-500 mb-0.5">SUMMARY OF ACTIVITIES *</label>
                   <input
                     type="text"
                     required
                     value={activities}
                     onChange={(e) => setActivities(e.target.value)}
-                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-                    placeholder="Short summary of work done"
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    placeholder="Short summary of work done today..."
                   />
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">Academic Learning & Concepts Gained *</label>
-                    <textarea
-                      required
-                      rows={2}
-                      value={learning}
-                      onChange={(e) => setLearning(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-                      placeholder="What concepts did you study/learn?"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">Critical Skills Exercised *</label>
-                    <textarea
-                      required
-                      rows={2}
-                      value={skillsLearned}
-                      onChange={(e) => setSkillsLearned(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-                      placeholder="e.g. JWT Auth routing, Database relationships"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-slate-500 mb-0.5">LEARNINGS & CONCEPTS GAINED *</label>
+                  <textarea
+                    required
+                    rows={2}
+                    value={learning}
+                    onChange={(e) => setLearning(e.target.value)}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    placeholder="Academic concepts or patterns learned..."
+                  />
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">Challenges & Impediments Encountered *</label>
-                    <textarea
-                      required
-                      rows={2}
-                      value={challenges}
-                      onChange={(e) => setChallenges(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-                      placeholder="Describe blockers"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">Remedial Actions / Solutions Implemented *</label>
-                    <textarea
-                      required
-                      rows={2}
-                      value={solutions}
-                      onChange={(e) => setSolutions(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-                      placeholder="How did you resolve it?"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-slate-500 mb-0.5">CRITICAL SKILLS EXERCISED *</label>
+                  <textarea
+                    required
+                    rows={2}
+                    value={skillsLearned}
+                    onChange={(e) => setSkillsLearned(e.target.value)}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    placeholder="Practical skills (e.g. schema mapping)..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-500 mb-0.5">CHALLENGES & OBSTACLES *</label>
+                  <textarea
+                    required
+                    rows={2}
+                    value={challenges}
+                    onChange={(e) => setChallenges(e.target.value)}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    placeholder="Impediments or blockers..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-500 mb-0.5">SOLUTIONS IMPLEMENTED *</label>
+                  <textarea
+                    required
+                    rows={2}
+                    value={solutions}
+                    onChange={(e) => setSolutions(e.target.value)}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    placeholder="How did you resolve it?"
+                  />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shadow-md shadow-emerald-500/10"
+                  className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-all shadow-md mt-2"
                 >
                   Log Logbook Entry (+15 XP)
                 </button>
               </form>
             </GlassCard>
-
           </div>
+        )}
 
-          {/* Gamification, Badges & AI Chatbot Column */}
-          <div className="space-y-6">
-            {/* XP & Level Panel */}
-            <GlassCard className="text-center">
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Level Progression</h3>
-              
-              {/* Circular Gauge Mock */}
-              <div className="w-32 h-32 rounded-full border-4 border-slate-800 border-t-blue-500 border-r-purple-500 mx-auto flex items-center justify-center mb-4 relative">
-                <div className="text-center">
-                  <span className="text-3xl font-extrabold text-white">{stats.xp}</span>
-                  <span className="text-[10px] text-slate-400 block">XP Earned</span>
-                </div>
-              </div>
+        {/* 5. TASK BOARD VIEW */}
+        {tab === 'tasks' && (
+          <GlassCard className="space-y-4">
+            <h2 className="text-base font-bold flex items-center space-x-2 text-blue-400 border-b border-white/5 pb-2">
+              <Code size={18} />
+              <span>Intern Sprint Task Board</span>
+            </h2>
 
-              <div className="w-full bg-slate-800 h-2.5 rounded-full mb-2 overflow-hidden border border-white/5">
-                <div 
-                  className="bg-theme-gradient h-full rounded-full transition-all duration-500" 
-                  style={{ width: `${stats.xpProgress}%` }}
-                />
-              </div>
-              
-              <div className="flex justify-between text-xs text-slate-400">
-                <span>Level {stats.level}</span>
-                <span>{stats.xpProgress}% to Level {stats.level + 1}</span>
-              </div>
-            </GlassCard>
-
-            {/* Badges Panel */}
-            <GlassCard>
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center space-x-1.5">
-                <Award size={16} className="text-amber-400" />
-                <span>Earned Badges</span>
-              </h3>
-              {stats.badges.length === 0 ? (
-                <p className="text-xs text-slate-500 text-center py-4">No badges unlocked yet. Keep logging reports and checkouts to earn rewards!</p>
-              ) : (
-                <div className="grid grid-cols-2 gap-3">
-                  {stats.badges.map((badge: any, i: number) => (
-                    <div key={i} className="p-3 bg-slate-900 border border-white/5 rounded-2xl text-center space-y-1">
-                      <div className="text-xl">🏆</div>
-                      <h4 className="text-xs font-bold text-slate-200">{badge.name}</h4>
-                      <p className="text-[9px] text-slate-500 leading-tight">{badge.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </GlassCard>
-
-            {/* System Warnings Panel */}
-            <GlassCard>
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center space-x-1.5">
-                <AlertTriangle size={16} className="text-red-400" />
-                <span>Active Warning Notifications</span>
-              </h3>
-              {stats.warnings.length === 0 ? (
-                <div className="p-3 bg-slate-900/40 border border-green-500/20 text-green-400 text-xs rounded-xl flex items-center justify-center space-x-2">
-                  <CheckCircle size={14} className="flex-shrink-0" />
-                  <span>Profile clean. No warnings registered.</span>
-                </div>
-              ) : (
-                <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {stats.warnings.map((w: any, index: number) => (
-                    <div key={index} className="p-2.5 bg-red-950/20 border border-red-500/20 rounded-xl text-xs space-y-1">
-                      <div className="flex justify-between font-semibold text-red-400">
-                        <span>{w.type}</span>
-                        <span>{new Date(w.date).toLocaleDateString()}</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+              {/* Kanban Column: Pending */}
+              <div className="p-4 bg-slate-950/40 border border-white/5 rounded-3xl space-y-3">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex justify-between">
+                  <span>To Do</span>
+                  <span className="px-1.5 py-0.5 rounded bg-slate-900 text-slate-400 font-bold text-[9px]">{tasksList.filter(t => t.status === 'PENDING').length}</span>
+                </h3>
+                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+                  {tasksList.filter(t => t.status === 'PENDING').map(task => (
+                    <div key={task.id} className="p-3.5 bg-slate-900 border border-white/5 rounded-2xl space-y-3 shadow-lg">
+                      <div>
+                        <h4 className="text-xs font-bold text-white">{task.title}</h4>
+                        <p className="text-[10px] text-slate-450 leading-normal mt-1">{task.description}</p>
                       </div>
-                      <p className="text-slate-400 text-[10px] leading-tight">{w.reason}</p>
+                      <div className="flex justify-between items-center text-[9px] pt-2 border-t border-white/5">
+                        <span className="text-red-400 font-semibold uppercase">{task.priority}</span>
+                        <button
+                          onClick={() => handleUpdateTaskStatus(task.id, 'WORKING')}
+                          className="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-750 text-white font-bold transition-colors"
+                        >
+                          Start Work
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
-              )}
-            </GlassCard>
+              </div>
 
-            {/* AI Assistant Chatbot panel */}
-            <GlassCard className="flex flex-col h-[350px]">
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center space-x-2">
-                <MessageSquare size={16} className="text-blue-400" />
-                <span>IdeaTech Assistant (ITA)</span>
-              </h3>
-              
-              {/* Message Log */}
-              <div className="flex-1 bg-slate-950/40 border border-white/5 rounded-2xl p-3 overflow-y-auto space-y-3 mb-2 max-h-[220px]">
-                {chatHistory.map((chat, i) => (
-                  <div key={i} className={`flex ${chat.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div 
-                      className={`p-2.5 rounded-2xl text-xs max-w-[85%] leading-normal ${
-                        chat.sender === 'user' 
-                          ? 'bg-blue-600 text-white rounded-br-none' 
-                          : 'bg-slate-900 text-slate-200 rounded-bl-none border border-white/5'
-                      }`}
-                    >
-                      {chat.text}
+              {/* Kanban Column: Working */}
+              <div className="p-4 bg-slate-950/40 border border-white/5 rounded-3xl space-y-3">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex justify-between">
+                  <span>In Progress</span>
+                  <span className="px-1.5 py-0.5 rounded bg-slate-900 text-slate-400 font-bold text-[9px]">{tasksList.filter(t => t.status === 'WORKING').length}</span>
+                </h3>
+                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+                  {tasksList.filter(t => t.status === 'WORKING').map(task => (
+                    <div key={task.id} className="p-3.5 bg-slate-900 border border-white/5 rounded-2xl space-y-3 shadow-lg">
+                      <div>
+                        <h4 className="text-xs font-bold text-white">{task.title}</h4>
+                        <p className="text-[10px] text-slate-450 leading-normal mt-1">{task.description}</p>
+                      </div>
+                      <div className="flex justify-between items-center text-[9px] pt-2 border-t border-white/5">
+                        <span className="text-amber-400 font-semibold uppercase">{task.priority}</span>
+                        <button
+                          onClick={() => handleUpdateTaskStatus(task.id, 'COMPLETED')}
+                          className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-750 text-white font-bold transition-colors"
+                        >
+                          Complete Task
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-                {chatLoading && (
-                  <div className="flex justify-start">
-                    <div className="p-2 bg-slate-900 border border-white/5 rounded-2xl text-xs text-slate-400 flex items-center space-x-2">
-                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
-                      <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce delay-100"></div>
-                      <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce delay-200"></div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Kanban Column: Completed */}
+              <div className="p-4 bg-slate-950/40 border border-white/5 rounded-3xl space-y-3">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex justify-between">
+                  <span>Completed</span>
+                  <span className="px-1.5 py-0.5 rounded bg-slate-900 text-slate-400 font-bold text-[9px]">{tasksList.filter(t => t.status === 'COMPLETED').length}</span>
+                </h3>
+                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+                  {tasksList.filter(t => t.status === 'COMPLETED').map(task => (
+                    <div key={task.id} className="p-3.5 bg-slate-900/40 border border-white/5 rounded-2xl space-y-2 opacity-75">
+                      <h4 className="text-xs font-bold text-slate-300 line-through">{task.title}</h4>
+                      <p className="text-[10px] text-slate-500">{task.description}</p>
+                      <div className="flex justify-between items-center text-[9px] pt-2 border-t border-white/5">
+                        <span className="text-slate-500 font-semibold uppercase">{task.priority}</span>
+                        <span className="text-emerald-400 font-bold">COMPLETED</span>
+                      </div>
                     </div>
-                  </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </GlassCard>
+        )}
+
+        {/* 6. LEAVE REQUEST MANAGEMENT */}
+        {tab === 'leaves' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <GlassCard className="lg:col-span-2 space-y-4">
+              <h2 className="text-base font-bold flex items-center space-x-2 text-blue-400 border-b border-white/5 pb-2">
+                <AlertTriangle size={18} />
+                <span>My Leave Requests</span>
+              </h2>
+              <div className="space-y-3.5 max-h-[500px] overflow-y-auto pr-1">
+                {leavesList.length === 0 ? (
+                  <p className="text-xs text-slate-500 text-center py-16">No leave applications submitted.</p>
+                ) : (
+                  leavesList.map((leave: any) => (
+                    <div key={leave.id} className="p-4 bg-slate-900/60 border border-white/5 rounded-2xl space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="text-xs font-bold text-white uppercase tracking-wider">{leave.reason} LEAVE</h4>
+                          <p className="text-xs text-slate-400 mt-1">
+                            Duration: {new Date(leave.startDate).toLocaleDateString()} to {new Date(leave.endDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase border ${
+                          leave.status === 'APPROVED' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                          leave.status === 'REJECTED' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                        }`}>
+                          {leave.status}
+                        </span>
+                      </div>
+                      <p className="text-slate-400 text-xs italic bg-slate-950/20 p-2.5 rounded-lg">"{leave.description}"</p>
+                    </div>
+                  ))
                 )}
               </div>
+            </GlassCard>
 
-              {/* Chat Input */}
-              <form onSubmit={handleChatSend} className="flex space-x-2">
-                <input
-                  type="text"
-                  value={chatMessage}
-                  onChange={(e) => setChatMessage(e.target.value)}
-                  className="flex-1 bg-slate-900 border border-white/10 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-blue-500"
-                  placeholder="Ask ITA about attendance or rules..."
-                />
+            <GlassCard className="space-y-4 h-fit">
+              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest border-b border-white/5 pb-2">Apply for Leave</h3>
+              {leaveMsg && <div className="p-3 mb-2 rounded-xl bg-slate-900 border border-white/5 text-[10px] text-center text-blue-450 font-bold">{leaveMsg}</div>}
+              <form onSubmit={handleLeaveSubmit} className="space-y-3 text-xs">
+                <div>
+                  <label className="block text-slate-500 mb-0.5">LEAVE REASON *</label>
+                  <select
+                    value={leaveForm.reason}
+                    onChange={(e) => setLeaveForm({ ...leaveForm, reason: e.target.value })}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-350 focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="MEDICAL">Medical Leave</option>
+                    <option value="EXAM">University Exam Leave</option>
+                    <option value="PERSONAL">Personal Reasons</option>
+                    <option value="EMERGENCY">Family Emergency</option>
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-500 mb-0.5">START DATE *</label>
+                    <input
+                      type="date"
+                      required
+                      value={leaveForm.startDate}
+                      onChange={(e) => setLeaveForm({ ...leaveForm, startDate: e.target.value })}
+                      className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-350 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-500 mb-0.5">END DATE *</label>
+                    <input
+                      type="date"
+                      required
+                      value={leaveForm.endDate}
+                      onChange={(e) => setLeaveForm({ ...leaveForm, endDate: e.target.value })}
+                      className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-350 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-slate-500 mb-0.5">DESCRIPTION & RATIONALE *</label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={leaveForm.description}
+                    onChange={(e) => setLeaveForm({ ...leaveForm, description: e.target.value })}
+                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-350 focus:outline-none focus:border-blue-500"
+                    placeholder="Provide full description of why leave is requested..."
+                  />
+                </div>
+
                 <button
                   type="submit"
-                  className="p-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                  className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all shadow-md mt-2"
                 >
-                  <Send size={14} />
+                  Apply Leave
                 </button>
               </form>
             </GlassCard>
           </div>
-        </div>
+        )}
+
+        {/* 7. DIGITAL CERTIFICATES COCKPIT */}
+        {tab === 'certificates' && (
+          <GlassCard className="space-y-4">
+            <h2 className="text-base font-bold flex items-center space-x-2 text-blue-400 border-b border-white/5 pb-2">
+              <Award size={18} />
+              <span>My Issued Certificates</span>
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+              {certificatesList.length === 0 ? (
+                <div className="col-span-2 text-center py-16 text-slate-550 space-y-2">
+                  <Award size={36} className="text-slate-600 mx-auto" />
+                  <p className="text-xs">No certificates generated yet.</p>
+                  <p className="text-[10px] text-slate-500">Your digital certificate is generated by admin/HR upon successful completion of your WFH internship lifecycle.</p>
+                </div>
+              ) : (
+                certificatesList.map((c) => (
+                  <div key={c.id} className="p-6 bg-slate-900 border border-white/5 rounded-3xl space-y-4 flex flex-col justify-between shadow-xl">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-start">
+                        <h4 className="text-sm font-bold text-white uppercase tracking-wider">{c.certificateType} CERTIFICATE</h4>
+                        <Award className="text-amber-400" size={18} />
+                      </div>
+                      <p className="text-xs text-slate-400 font-mono">Serial: {c.serialNumber}</p>
+                      <p className="text-xs text-slate-500">Issued On: {new Date(c.issuedAt).toLocaleDateString()}</p>
+                    </div>
+
+                    <a 
+                      href={c.pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full block py-2 rounded-xl bg-theme-gradient text-white text-xs font-bold text-center hover:opacity-90 shadow-md"
+                    >
+                      View & Download Document PDF
+                    </a>
+                  </div>
+                ))
+              )}
+            </div>
+          </GlassCard>
+        )}
       </main>
     </div>
   );
