@@ -143,7 +143,7 @@ export default function MentorDashboard() {
       <div className="flex h-screen items-center justify-center bg-slate-900 text-slate-100">
         <div className="text-center space-y-3">
           <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-xs text-slate-400">Loading Mentor portal...</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Loading Mentor portal...</p>
         </div>
       </div>
     );
@@ -179,14 +179,14 @@ export default function MentorDashboard() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="text-sm font-bold text-white">{report.user.firstName} {report.user.lastName} ({report.user.internProfile?.internId})</h4>
-                          <p className="text-[10px] text-slate-400">Logged date: {new Date(report.date).toLocaleDateString()}</p>
+                          <p className="text-[10px] text-zinc-500 dark:text-zinc-400">Logged date: {new Date(report.date).toLocaleDateString()}</p>
                         </div>
                         <span className="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-bold">
                           Pending
                         </span>
                       </div>
 
-                      <div className="text-xs space-y-1.5 bg-slate-950/20 p-3 rounded-xl text-slate-300 leading-relaxed">
+                      <div className="text-xs space-y-1.5 bg-zinc-100 dark:bg-zinc-950/40 p-3 rounded-xl text-zinc-700 dark:text-zinc-300 leading-relaxed">
                         <p><strong>Today's Tasks:</strong> {report.todayTasks}</p>
                         <p><strong>Completed:</strong> {report.completedWork}</p>
                         {report.problemsFaced && <p><strong>Blockers:</strong> <span className="text-red-400 font-semibold">{report.problemsFaced}</span></p>}
@@ -198,7 +198,7 @@ export default function MentorDashboard() {
                           type="text"
                           value={reportRemarks[report.id] || ''}
                           onChange={(e) => setReportRemarks({ ...reportRemarks, [report.id]: e.target.value })}
-                          className="flex-1 bg-slate-950/60 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-slate-200"
+                          className="flex-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                           placeholder="Feedback/remarks (optional)"
                         />
                         <button
@@ -238,14 +238,14 @@ export default function MentorDashboard() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="text-sm font-bold text-white">{log.user.firstName} {log.user.lastName} ({log.user.internProfile?.internId})</h4>
-                          <p className="text-[10px] text-slate-400">Date logged: {new Date(log.date).toLocaleDateString()}</p>
+                          <p className="text-[10px] text-zinc-500 dark:text-zinc-400">Date logged: {new Date(log.date).toLocaleDateString()}</p>
                         </div>
                         <span className="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-bold">
                           Pending
                         </span>
                       </div>
 
-                      <div className="text-xs space-y-2 bg-slate-950/20 p-3 rounded-xl text-slate-350 leading-normal">
+                      <div className="text-xs space-y-2 bg-zinc-100 dark:bg-zinc-950/40 p-3 rounded-xl text-zinc-650 dark:text-zinc-350 leading-normal">
                         <div><strong>Activities:</strong> {log.activities}</div>
                         <div><strong>Learning gained:</strong> {log.learning}</div>
                         <div><strong>Skills:</strong> {log.skillsLearned}</div>
@@ -258,7 +258,7 @@ export default function MentorDashboard() {
                           type="text"
                           value={logbookComments[log.id] || ''}
                           onChange={(e) => setLogbookComments({ ...logbookComments, [log.id]: e.target.value })}
-                          className="flex-1 bg-slate-950/60 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-slate-200"
+                          className="flex-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                           placeholder="Comments to include (optional)"
                         />
                         <button
@@ -286,7 +286,7 @@ export default function MentorDashboard() {
           {/* Sprints Scheduling Block */}
           <div className="space-y-6">
             <GlassCard>
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center space-x-1.5">
+              <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-4 flex items-center space-x-1.5">
                 <Calendar size={16} className="text-blue-400" />
                 <span>Schedule Weekly Meeting</span>
               </h3>
@@ -299,7 +299,7 @@ export default function MentorDashboard() {
 
               <form onSubmit={handleCreateMeeting} className="space-y-4">
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Meeting Title *</label>
+                  <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">Meeting Title *</label>
                   <input
                     type="text"
                     required
@@ -310,7 +310,7 @@ export default function MentorDashboard() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Meeting Agenda *</label>
+                  <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">Meeting Agenda *</label>
                   <textarea
                     required
                     rows={3}
@@ -321,21 +321,21 @@ export default function MentorDashboard() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Meeting Time *</label>
+                  <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">Meeting Time *</label>
                   <input
                     type="datetime-local"
                     required
                     value={meetingTime}
                     onChange={(e) => setMeetingTime(e.target.value)}
-                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-blue-500 text-slate-350"
+                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-blue-500 text-zinc-650 dark:text-zinc-350"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Platform *</label>
+                  <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">Platform *</label>
                   <select
                     value={meetingPlatform}
                     onChange={(e) => setMeetingPlatform(e.target.value)}
-                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-blue-500 text-slate-350"
+                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-blue-500 text-zinc-650 dark:text-zinc-350"
                   >
                     <option value="Google Meet">Google Meet</option>
                     <option value="Zoom">Zoom</option>
@@ -343,7 +343,7 @@ export default function MentorDashboard() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Meeting Video URL *</label>
+                  <label className="block text-xs text-zinc-500 dark:text-zinc-400 mb-1">Meeting Video URL *</label>
                   <input
                     type="url"
                     required

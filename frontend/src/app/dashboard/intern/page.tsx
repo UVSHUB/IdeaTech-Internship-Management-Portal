@@ -359,7 +359,7 @@ export default function InternDashboard() {
       <div className="flex h-screen items-center justify-center bg-slate-900 text-slate-100">
         <div className="text-center space-y-3">
           <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto" />
-          <p className="text-xs text-slate-400">Loading Intern Workspace...</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Loading Intern Workspace...</p>
         </div>
       </div>
     );
@@ -434,7 +434,7 @@ export default function InternDashboard() {
                     <span>Work From Home Attendance Status</span>
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                    <div className="space-y-1.5 text-xs text-slate-350">
+                    <div className="space-y-1.5 text-xs text-zinc-650 dark:text-zinc-350">
                       <p>Status: <span className="text-blue-400 font-bold">{attendanceStatus}</span></p>
                       {checkInTime && <p>Check-In time: {checkInTime}</p>}
                       {checkOutTime && <p>Check-Out time: {checkOutTime}</p>}
@@ -464,7 +464,7 @@ export default function InternDashboard() {
 
                 {/* Warning alerts list */}
                 <GlassCard>
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center space-x-1.5">
+                  <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-3 flex items-center space-x-1.5">
                     <AlertTriangle size={16} className="text-red-400" />
                     <span>System Warning Logs ({stats.warnings.length})</span>
                   </h3>
@@ -481,7 +481,7 @@ export default function InternDashboard() {
                             <span>{w.type}</span>
                             <span>{new Date(w.date).toLocaleDateString()}</span>
                           </div>
-                          <p className="text-slate-400 leading-normal">{w.reason}</p>
+                          <p className="text-zinc-500 dark:text-zinc-400 leading-normal">{w.reason}</p>
                         </div>
                       ))}
                     </div>
@@ -492,11 +492,11 @@ export default function InternDashboard() {
               {/* Right Column: Gamification progress & Assistant */}
               <div className="space-y-6">
                 <GlassCard className="text-center">
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">XP Level Progression</h3>
+                  <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-4">XP Level Progression</h3>
                   <div className="w-32 h-32 rounded-full border-4 border-slate-800 border-t-blue-500 border-r-purple-500 mx-auto flex items-center justify-center mb-4">
                     <div>
                       <span className="text-3xl font-extrabold text-white">{stats.xp}</span>
-                      <span className="text-[10px] text-slate-400 block font-semibold">XP POINTS</span>
+                      <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block font-semibold">XP POINTS</span>
                     </div>
                   </div>
                   <div className="w-full bg-slate-800 h-2 rounded-full mb-1.5 overflow-hidden">
@@ -514,7 +514,7 @@ export default function InternDashboard() {
                     <MessageSquare size={14} className="text-blue-400" />
                     <span>IdeaTech Assistant</span>
                   </h3>
-                  <div className="flex-grow bg-slate-950/40 border border-white/5 rounded-xl p-3 overflow-y-auto space-y-2 mb-2 max-h-[170px]">
+                  <div className="flex-grow bg-zinc-100 dark:bg-zinc-950/40 border border-white/5 rounded-xl p-3 overflow-y-auto space-y-2 mb-2 max-h-[170px]">
                     {chatHistory.map((chat, i) => (
                       <div key={i} className={`flex ${chat.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                         <div className={`p-2 rounded-xl text-[11px] max-w-[85%] ${chat.sender === 'user' ? 'bg-blue-600 text-white' : 'bg-slate-900 text-slate-200 border border-white/5'}`}>
@@ -559,7 +559,7 @@ export default function InternDashboard() {
                       <th className="py-2.5 text-center">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5 text-slate-350">
+                  <tbody className="divide-y divide-white/5 text-zinc-650 dark:text-zinc-350">
                     {attendanceHistory.length === 0 ? (
                       <tr>
                         <td colSpan={5} className="text-center py-12 text-slate-550">No check-in logs submitted.</td>
@@ -568,7 +568,7 @@ export default function InternDashboard() {
                       attendanceHistory.map((h: any) => (
                         <tr key={h.id}>
                           <td className="py-3 font-semibold">{new Date(h.date).toLocaleDateString()}</td>
-                          <td className="py-3 text-slate-400">{new Date(h.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                          <td className="py-3 text-zinc-500 dark:text-zinc-400">{new Date(h.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                           <td className="py-3 text-slate-450">
                             {h.checkOut ? new Date(h.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Logged Check-In Only'}
                           </td>
@@ -589,11 +589,11 @@ export default function InternDashboard() {
             </GlassCard>
 
             <GlassCard className="space-y-4 h-fit">
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest border-b border-white/5 pb-2">Record WFH Shifts</h3>
+              <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Record WFH Shifts</h3>
               <div className="space-y-4 text-xs">
-                <div className="p-3 bg-slate-900 border border-white/5 rounded-2xl text-slate-300">
+                <div className="p-3 bg-slate-900 border border-white/5 rounded-2xl text-zinc-700 dark:text-zinc-300">
                   <p className="font-semibold text-blue-400">🕒 Shifts Rules Reminder:</p>
-                  <ul className="list-disc pl-4 space-y-1 mt-2 text-slate-400">
+                  <ul className="list-disc pl-4 space-y-1 mt-2 text-zinc-500 dark:text-zinc-400">
                     <li>Clock in must be executed before **9:15 AM** to avoid late logs.</li>
                     <li>Both Clock In and Clock Out must be logged daily.</li>
                     <li>Missing check-ins/check-outs will trigger automated alerts.</li>
@@ -642,8 +642,8 @@ export default function InternDashboard() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="text-xs font-bold text-white">{new Date(rep.date).toLocaleDateString()}</h4>
-                          <p className="text-xs text-slate-350 mt-1 font-semibold">Tasks: {rep.todayTasks}</p>
-                          <p className="text-xs text-slate-400">Deliverables: {rep.completedWork}</p>
+                          <p className="text-xs text-zinc-650 dark:text-zinc-350 mt-1 font-semibold">Tasks: {rep.todayTasks}</p>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400">Deliverables: {rep.completedWork}</p>
                         </div>
                         <span className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase ${
                           rep.status === 'APPROVED' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
@@ -660,7 +660,7 @@ export default function InternDashboard() {
             </GlassCard>
 
             <GlassCard className="space-y-4">
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest border-b border-white/5 pb-2">Submit Daily Report</h3>
+              <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Submit Daily Report</h3>
               {reportMsg && <div className="p-3 mb-2 rounded-xl bg-slate-900 border border-white/5 text-[10px] text-center text-blue-400 font-bold">{reportMsg}</div>}
               <form onSubmit={handleReportSubmit} className="space-y-3 text-xs">
                 <div>
@@ -670,7 +670,7 @@ export default function InternDashboard() {
                     required
                     value={todayTasks}
                     onChange={(e) => setTodayTasks(e.target.value)}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="Short list of work items..."
                   />
                 </div>
@@ -681,7 +681,7 @@ export default function InternDashboard() {
                     required
                     value={completedWork}
                     onChange={(e) => setCompletedWork(e.target.value)}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="Details of deliverables..."
                   />
                 </div>
@@ -693,7 +693,7 @@ export default function InternDashboard() {
                       required
                       value={hoursWorked}
                       onChange={(e) => setHoursWorked(e.target.value)}
-                      className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                      className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     />
                   </div>
                   <div>
@@ -702,7 +702,7 @@ export default function InternDashboard() {
                       type="text"
                       value={commitLink}
                       onChange={(e) => setCommitLink(e.target.value)}
-                      className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                      className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                       placeholder="e.g. e50a88f"
                     />
                   </div>
@@ -713,7 +713,7 @@ export default function InternDashboard() {
                     type="url"
                     value={gitLink}
                     onChange={(e) => setGitLink(e.target.value)}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="https://github.com/..."
                   />
                 </div>
@@ -724,7 +724,7 @@ export default function InternDashboard() {
                     rows={2}
                     value={problemsFaced}
                     onChange={(e) => setProblemsFaced(e.target.value)}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="Write blockers faced or 'None'..."
                   />
                 </div>
@@ -757,9 +757,9 @@ export default function InternDashboard() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="text-xs font-bold text-white">{new Date(l.date).toLocaleDateString()}</h4>
-                          <p className="text-xs text-slate-350 mt-1"><strong>Activities:</strong> {l.activities}</p>
-                          <p className="text-[11px] text-slate-400"><strong>Learning:</strong> {l.learning}</p>
-                          <p className="text-[11px] text-slate-400"><strong>Skills:</strong> {l.skillsLearned}</p>
+                          <p className="text-xs text-zinc-650 dark:text-zinc-350 mt-1"><strong>Activities:</strong> {l.activities}</p>
+                          <p className="text-[11px] text-zinc-500 dark:text-zinc-400"><strong>Learning:</strong> {l.learning}</p>
+                          <p className="text-[11px] text-zinc-500 dark:text-zinc-400"><strong>Skills:</strong> {l.skillsLearned}</p>
                         </div>
                         <span className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase ${
                           l.status === 'APPROVED' ? 'bg-green-500/10 text-green-400' : 'bg-amber-500/10 text-amber-400'
@@ -777,7 +777,7 @@ export default function InternDashboard() {
             </GlassCard>
 
             <GlassCard className="space-y-4">
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest border-b border-white/5 pb-2">Log Today's Insight</h3>
+              <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Log Today's Insight</h3>
               {logbookMsg && <div className="p-3 mb-2 rounded-xl bg-slate-900 border border-white/5 text-[10px] text-center text-emerald-400 font-bold">{logbookMsg}</div>}
               <form onSubmit={handleLogbookSubmit} className="space-y-3 text-xs">
                 <div>
@@ -787,7 +787,7 @@ export default function InternDashboard() {
                     required
                     value={activities}
                     onChange={(e) => setActivities(e.target.value)}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="Short summary of work done today..."
                   />
                 </div>
@@ -798,7 +798,7 @@ export default function InternDashboard() {
                     rows={2}
                     value={learning}
                     onChange={(e) => setLearning(e.target.value)}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="Academic concepts or patterns learned..."
                   />
                 </div>
@@ -809,7 +809,7 @@ export default function InternDashboard() {
                     rows={2}
                     value={skillsLearned}
                     onChange={(e) => setSkillsLearned(e.target.value)}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="Practical skills (e.g. schema mapping)..."
                   />
                 </div>
@@ -820,7 +820,7 @@ export default function InternDashboard() {
                     rows={2}
                     value={challenges}
                     onChange={(e) => setChallenges(e.target.value)}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="Impediments or blockers..."
                   />
                 </div>
@@ -831,7 +831,7 @@ export default function InternDashboard() {
                     rows={2}
                     value={solutions}
                     onChange={(e) => setSolutions(e.target.value)}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="How did you resolve it?"
                   />
                 </div>
@@ -857,10 +857,10 @@ export default function InternDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
               {/* Kanban Column: Pending */}
-              <div className="p-4 bg-slate-950/40 border border-white/5 rounded-3xl space-y-3">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex justify-between">
+              <div className="p-4 bg-zinc-100 dark:bg-zinc-950/40 border border-white/5 rounded-3xl space-y-3">
+                <h3 className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest flex justify-between">
                   <span>To Do</span>
-                  <span className="px-1.5 py-0.5 rounded bg-slate-900 text-slate-400 font-bold text-[9px]">{tasksList.filter(t => t.status === 'PENDING').length}</span>
+                  <span className="px-1.5 py-0.5 rounded bg-slate-900 text-zinc-500 dark:text-zinc-400 font-bold text-[9px]">{tasksList.filter(t => t.status === 'PENDING').length}</span>
                 </h3>
                 <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
                   {tasksList.filter(t => t.status === 'PENDING').map(task => (
@@ -884,10 +884,10 @@ export default function InternDashboard() {
               </div>
 
               {/* Kanban Column: Working */}
-              <div className="p-4 bg-slate-950/40 border border-white/5 rounded-3xl space-y-3">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex justify-between">
+              <div className="p-4 bg-zinc-100 dark:bg-zinc-950/40 border border-white/5 rounded-3xl space-y-3">
+                <h3 className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest flex justify-between">
                   <span>In Progress</span>
-                  <span className="px-1.5 py-0.5 rounded bg-slate-900 text-slate-400 font-bold text-[9px]">{tasksList.filter(t => t.status === 'WORKING').length}</span>
+                  <span className="px-1.5 py-0.5 rounded bg-slate-900 text-zinc-500 dark:text-zinc-400 font-bold text-[9px]">{tasksList.filter(t => t.status === 'WORKING').length}</span>
                 </h3>
                 <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
                   {tasksList.filter(t => t.status === 'WORKING').map(task => (
@@ -911,15 +911,15 @@ export default function InternDashboard() {
               </div>
 
               {/* Kanban Column: Completed */}
-              <div className="p-4 bg-slate-950/40 border border-white/5 rounded-3xl space-y-3">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex justify-between">
+              <div className="p-4 bg-zinc-100 dark:bg-zinc-950/40 border border-white/5 rounded-3xl space-y-3">
+                <h3 className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest flex justify-between">
                   <span>Completed</span>
-                  <span className="px-1.5 py-0.5 rounded bg-slate-900 text-slate-400 font-bold text-[9px]">{tasksList.filter(t => t.status === 'COMPLETED').length}</span>
+                  <span className="px-1.5 py-0.5 rounded bg-slate-900 text-zinc-500 dark:text-zinc-400 font-bold text-[9px]">{tasksList.filter(t => t.status === 'COMPLETED').length}</span>
                 </h3>
                 <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
                   {tasksList.filter(t => t.status === 'COMPLETED').map(task => (
                     <div key={task.id} className="p-3.5 bg-slate-900/40 border border-white/5 rounded-2xl space-y-2 opacity-75">
-                      <h4 className="text-xs font-bold text-slate-300 line-through">{task.title}</h4>
+                      <h4 className="text-xs font-bold text-zinc-700 dark:text-zinc-300 line-through">{task.title}</h4>
                       <p className="text-[10px] text-slate-500">{task.description}</p>
                       <div className="flex justify-between items-center text-[9px] pt-2 border-t border-white/5">
                         <span className="text-slate-500 font-semibold uppercase">{task.priority}</span>
@@ -950,7 +950,7 @@ export default function InternDashboard() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="text-xs font-bold text-white uppercase tracking-wider">{leave.reason} LEAVE</h4>
-                          <p className="text-xs text-slate-400 mt-1">
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                             Duration: {new Date(leave.startDate).toLocaleDateString()} to {new Date(leave.endDate).toLocaleDateString()}
                           </p>
                         </div>
@@ -961,7 +961,7 @@ export default function InternDashboard() {
                           {leave.status}
                         </span>
                       </div>
-                      <p className="text-slate-400 text-xs italic bg-slate-950/20 p-2.5 rounded-lg">"{leave.description}"</p>
+                      <p className="text-zinc-500 dark:text-zinc-400 text-xs italic bg-zinc-100 dark:bg-zinc-950/40 p-2.5 rounded-lg">"{leave.description}"</p>
                     </div>
                   ))
                 )}
@@ -969,7 +969,7 @@ export default function InternDashboard() {
             </GlassCard>
 
             <GlassCard className="space-y-4 h-fit">
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest border-b border-white/5 pb-2">Apply for Leave</h3>
+              <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Apply for Leave</h3>
               {leaveMsg && <div className="p-3 mb-2 rounded-xl bg-slate-900 border border-white/5 text-[10px] text-center text-blue-450 font-bold">{leaveMsg}</div>}
               <form onSubmit={handleLeaveSubmit} className="space-y-3 text-xs">
                 <div>
@@ -977,7 +977,7 @@ export default function InternDashboard() {
                   <select
                     value={leaveForm.reason}
                     onChange={(e) => setLeaveForm({ ...leaveForm, reason: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-350 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                   >
                     <option value="MEDICAL">Medical Leave</option>
                     <option value="EXAM">University Exam Leave</option>
@@ -993,7 +993,7 @@ export default function InternDashboard() {
                       required
                       value={leaveForm.startDate}
                       onChange={(e) => setLeaveForm({ ...leaveForm, startDate: e.target.value })}
-                      className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-350 focus:outline-none focus:border-blue-500"
+                      className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     />
                   </div>
                   <div>
@@ -1003,7 +1003,7 @@ export default function InternDashboard() {
                       required
                       value={leaveForm.endDate}
                       onChange={(e) => setLeaveForm({ ...leaveForm, endDate: e.target.value })}
-                      className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-350 focus:outline-none focus:border-blue-500"
+                      className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     />
                   </div>
                 </div>
@@ -1014,7 +1014,7 @@ export default function InternDashboard() {
                     rows={4}
                     value={leaveForm.description}
                     onChange={(e) => setLeaveForm({ ...leaveForm, description: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-350 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="Provide full description of why leave is requested..."
                   />
                 </div>
@@ -1053,7 +1053,7 @@ export default function InternDashboard() {
                         <h4 className="text-sm font-bold text-white uppercase tracking-wider">{c.certificateType} CERTIFICATE</h4>
                         <Award className="text-amber-400" size={18} />
                       </div>
-                      <p className="text-xs text-slate-400 font-mono">Serial: {c.serialNumber}</p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">Serial: {c.serialNumber}</p>
                       <p className="text-xs text-slate-500">Issued On: {new Date(c.issuedAt).toLocaleDateString()}</p>
                     </div>
 

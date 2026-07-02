@@ -339,7 +339,7 @@ export default function AdminDashboard() {
       <div className="flex h-screen items-center justify-center bg-slate-900 text-slate-100">
         <div className="text-center space-y-3">
           <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto" />
-          <p className="text-xs text-slate-400">Loading System Cockpit...</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Loading System Cockpit...</p>
         </div>
       </div>
     );
@@ -437,7 +437,7 @@ export default function AdminDashboard() {
 
               {/* Attendance Pie Chart */}
               <GlassCard className="space-y-4 flex flex-col justify-between">
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Aggregate Attendance Mix</h3>
+                <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Aggregate Attendance Mix</h3>
                 {attendanceChartData.length === 0 ? (
                   <p className="text-xs text-slate-500 text-center py-16">No check-in logs submitted yet.</p>
                 ) : (
@@ -466,10 +466,10 @@ export default function AdminDashboard() {
                 )}
                 
                 <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-white/5">
-                  <div className="flex items-center space-x-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span className="text-slate-400">Present</span></div>
-                  <div className="flex items-center space-x-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span><span className="text-slate-400">Late</span></div>
-                  <div className="flex items-center space-x-1.5"><span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span><span className="text-slate-400">Half Day</span></div>
-                  <div className="flex items-center space-x-1.5"><span className="w-2.5 h-2.5 rounded-full bg-red-500"></span><span className="text-slate-400">Absent</span></div>
+                  <div className="flex items-center space-x-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span className="text-zinc-500 dark:text-zinc-400">Present</span></div>
+                  <div className="flex items-center space-x-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span><span className="text-zinc-500 dark:text-zinc-400">Late</span></div>
+                  <div className="flex items-center space-x-1.5"><span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span><span className="text-zinc-500 dark:text-zinc-400">Half Day</span></div>
+                  <div className="flex items-center space-x-1.5"><span className="w-2.5 h-2.5 rounded-full bg-red-500"></span><span className="text-zinc-500 dark:text-zinc-400">Absent</span></div>
                 </div>
               </GlassCard>
             </div>
@@ -477,7 +477,7 @@ export default function AdminDashboard() {
             {/* Audits & Engine Triggers */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <GlassCard className="lg:col-span-2 space-y-4">
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center space-x-1.5">
+                <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest flex items-center space-x-1.5">
                   <Settings size={16} />
                   <span>Activity & Safety Audit Trail</span>
                 </h3>
@@ -492,7 +492,7 @@ export default function AdminDashboard() {
                         <th className="py-2.5">Timestamp</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5 text-slate-350">
+                    <tbody className="divide-y divide-white/5 text-zinc-650 dark:text-zinc-350">
                       {stats.activityLogs.map((log: any) => (
                         <tr key={log.id}>
                           <td className="py-3 font-semibold text-white">{log.user.firstName} {log.user.lastName}</td>
@@ -514,8 +514,8 @@ export default function AdminDashboard() {
               </GlassCard>
 
               <GlassCard className="space-y-4">
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Automation Triggers</h3>
-                <p className="text-xs text-slate-400 leading-relaxed font-normal">
+                <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Automation Triggers</h3>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-normal">
                   ITIMP runs automated warning and auto-suspension routines in the background. Press below to force execute the daily audits immediately.
                 </p>
 
@@ -561,7 +561,7 @@ export default function AdminDashboard() {
                     <div className="flex justify-between items-start">
                       <div>
                         <h4 className="text-base font-bold text-white">{app.user.firstName} {app.user.lastName}</h4>
-                        <p className="text-xs text-slate-400">{app.university} ({app.degree})</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">{app.university} ({app.degree})</p>
                         <p className="text-xs text-blue-300 font-medium mt-1">Applied: {app.positionApplied} | {app.department.name}</p>
                       </div>
                       <span className="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/25 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
@@ -569,7 +569,7 @@ export default function AdminDashboard() {
                       </span>
                     </div>
 
-                    <div className="text-xs space-y-1.5 text-slate-350 bg-slate-950/40 p-3.5 rounded-xl border border-white/5">
+                    <div className="text-xs space-y-1.5 text-zinc-650 dark:text-zinc-350 bg-zinc-100 dark:bg-zinc-950/40 p-3.5 rounded-xl border border-white/5">
                       <p>📧 <strong>Email:</strong> {app.user.email}</p>
                       <p>📱 <strong>Mobile:</strong> {app.mobileNumber}</p>
                       <p>🛠️ <strong>Preferred Tech:</strong> {app.preferredTech}</p>
@@ -587,7 +587,7 @@ export default function AdminDashboard() {
                         <select
                           value={selectedMentor[app.id] || ''}
                           onChange={(e) => setSelectedMentor({ ...selectedMentor, [app.id]: e.target.value })}
-                          className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                         >
                           <option value="">Select Mentor...</option>
                           {mentors.map(m => <option key={m.id} value={m.id}>{m.firstName} {m.lastName}</option>)}
@@ -599,7 +599,7 @@ export default function AdminDashboard() {
                         <select
                           value={selectedLeader[app.id] || ''}
                           onChange={(e) => setSelectedLeader({ ...selectedLeader, [app.id]: e.target.value })}
-                          className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                         >
                           <option value="">Select Team Leader...</option>
                           {teamLeaders.map(t => <option key={t.id} value={t.id}>{t.firstName} {t.lastName}</option>)}
@@ -650,7 +650,7 @@ export default function AdminDashboard() {
                     <th className="py-3 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5 text-slate-350">
+                <tbody className="divide-y divide-white/5 text-zinc-650 dark:text-zinc-350">
                   {attendanceLogs.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="text-center py-16 text-slate-500">No attendance records logged.</td>
@@ -660,7 +660,7 @@ export default function AdminDashboard() {
                       <tr key={log.id}>
                         <td className="py-3.5 font-medium">{new Date(log.date).toLocaleDateString()}</td>
                         <td className="py-3.5 font-bold text-white">{log.user.firstName} {log.user.lastName}</td>
-                        <td className="py-3.5 text-slate-400">{new Date(log.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                        <td className="py-3.5 text-zinc-500 dark:text-zinc-400">{new Date(log.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                         <td className="py-3.5 text-slate-450">
                           {log.checkOut ? new Date(log.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Still Working'}
                         </td>
@@ -700,7 +700,7 @@ export default function AdminDashboard() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="text-sm font-bold text-white">{task.title}</h4>
-                          <p className="text-xs text-slate-400 mt-0.5">{task.description}</p>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{task.description}</p>
                         </div>
                         <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold ${
                           task.priority === 'HIGH' ? 'bg-red-500/10 text-red-400' :
@@ -711,7 +711,7 @@ export default function AdminDashboard() {
                       </div>
 
                       <div className="flex justify-between items-center text-[10px] text-slate-500 pt-2 border-t border-white/5">
-                        <span>Assignee: <strong className="text-slate-350">{task.assignee.firstName} {task.assignee.lastName}</strong></span>
+                        <span>Assignee: <strong className="text-zinc-650 dark:text-zinc-350">{task.assignee.firstName} {task.assignee.lastName}</strong></span>
                         <span>Status: <strong className={`font-bold ${task.status === 'COMPLETED' ? 'text-emerald-400' : 'text-amber-400'}`}>{task.status}</strong></span>
                         <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
                       </div>
@@ -723,7 +723,7 @@ export default function AdminDashboard() {
 
             {/* Task creation form */}
             <GlassCard className="space-y-4">
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest border-b border-white/5 pb-2">Create Sprint Task</h3>
+              <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Create Sprint Task</h3>
               <form onSubmit={handleCreateTask} className="space-y-3 text-xs">
                 <div>
                   <label className="block text-slate-500 mb-1">TASK TITLE *</label>
@@ -732,7 +732,7 @@ export default function AdminDashboard() {
                     required
                     value={taskForm.title}
                     onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="e.g. Design Settings View"
                   />
                 </div>
@@ -743,7 +743,7 @@ export default function AdminDashboard() {
                     rows={3}
                     value={taskForm.description}
                     onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="Write detailed deliverables..."
                   />
                 </div>
@@ -754,7 +754,7 @@ export default function AdminDashboard() {
                     <select
                       value={taskForm.priority}
                       onChange={(e) => setTaskForm({ ...taskForm, priority: e.target.value })}
-                      className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                      className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     >
                       <option value="LOW">Low</option>
                       <option value="MEDIUM">Medium</option>
@@ -768,7 +768,7 @@ export default function AdminDashboard() {
                       required
                       value={taskForm.dueDate}
                       onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })}
-                      className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                      className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     />
                   </div>
                 </div>
@@ -778,7 +778,7 @@ export default function AdminDashboard() {
                   <select
                     value={taskForm.assigneeId}
                     onChange={(e) => setTaskForm({ ...taskForm, assigneeId: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                   >
                     <option value="">Select Intern...</option>
                     {interns.map(i => <option key={i.id} value={i.id}>{i.firstName} {i.lastName}</option>)}
@@ -818,7 +818,7 @@ export default function AdminDashboard() {
                           {project.status}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-400">{project.description || 'No description supplied.'}</p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">{project.description || 'No description supplied.'}</p>
                       {project.githubUrl && (
                         <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-400 hover:underline block pt-1">
                           🌐 Open GitHub Repository
@@ -831,7 +831,7 @@ export default function AdminDashboard() {
             </GlassCard>
 
             <GlassCard className="space-y-4">
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest border-b border-white/5 pb-2">Register New Project</h3>
+              <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Register New Project</h3>
               <form onSubmit={handleCreateProject} className="space-y-3 text-xs">
                 <div>
                   <label className="block text-slate-500 mb-1">PROJECT NAME *</label>
@@ -840,7 +840,7 @@ export default function AdminDashboard() {
                     required
                     value={projectForm.name}
                     onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="e.g. ITIMP NextGen Dashboard"
                   />
                 </div>
@@ -851,7 +851,7 @@ export default function AdminDashboard() {
                     rows={4}
                     value={projectForm.description}
                     onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="Briefly state scope and targets..."
                   />
                 </div>
@@ -862,7 +862,7 @@ export default function AdminDashboard() {
                     type="url"
                     value={projectForm.githubUrl}
                     onChange={(e) => setProjectForm({ ...projectForm, githubUrl: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="e.g. https://github.com/..."
                   />
                 </div>
@@ -897,7 +897,7 @@ export default function AdminDashboard() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="text-sm font-bold text-white">{meeting.title}</h4>
-                          <p className="text-xs text-slate-400">{meeting.agenda}</p>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400">{meeting.agenda}</p>
                         </div>
                         <span className="text-[9px] bg-purple-500/10 text-purple-400 border border-purple-500/25 px-2 py-0.5 rounded font-bold uppercase">
                           {meeting.platform}
@@ -905,7 +905,7 @@ export default function AdminDashboard() {
                       </div>
 
                       <div className="flex justify-between items-center text-[10px] text-slate-500 pt-2 border-t border-white/5">
-                        <span>Time: <strong className="text-slate-350">{new Date(meeting.meetingTime).toLocaleString()}</strong></span>
+                        <span>Time: <strong className="text-zinc-650 dark:text-zinc-350">{new Date(meeting.meetingTime).toLocaleString()}</strong></span>
                         <a href={meeting.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline font-bold">
                           Join Meeting 🔗
                         </a>
@@ -917,7 +917,7 @@ export default function AdminDashboard() {
             </GlassCard>
 
             <GlassCard className="space-y-4">
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest border-b border-white/5 pb-2">Schedule Meeting</h3>
+              <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Schedule Meeting</h3>
               <form onSubmit={handleCreateMeeting} className="space-y-3 text-xs">
                 <div>
                   <label className="block text-slate-500 mb-1">MEETING TITLE *</label>
@@ -926,7 +926,7 @@ export default function AdminDashboard() {
                     required
                     value={meetingForm.title}
                     onChange={(e) => setMeetingForm({ ...meetingForm, title: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="e.g. Engineering Weekly Sync"
                   />
                 </div>
@@ -937,7 +937,7 @@ export default function AdminDashboard() {
                     rows={3}
                     value={meetingForm.agenda}
                     onChange={(e) => setMeetingForm({ ...meetingForm, agenda: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="State topics to be reviewed..."
                   />
                 </div>
@@ -949,7 +949,7 @@ export default function AdminDashboard() {
                     required
                     value={meetingForm.meetingTime}
                     onChange={(e) => setMeetingForm({ ...meetingForm, meetingTime: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                   />
                 </div>
 
@@ -960,7 +960,7 @@ export default function AdminDashboard() {
                     required
                     value={meetingForm.link}
                     onChange={(e) => setMeetingForm({ ...meetingForm, link: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                     placeholder="e.g. https://meet.google.com/..."
                   />
                 </div>
@@ -996,7 +996,7 @@ export default function AdminDashboard() {
                         <h4 className="text-sm font-bold text-white">
                           {leave.user.firstName} {leave.user.lastName} ({leave.user.internProfile?.internId || 'No ID'})
                         </h4>
-                        <p className="text-xs text-slate-400 mt-0.5">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                           Duration: {new Date(leave.startDate).toLocaleDateString()} to {new Date(leave.endDate).toLocaleDateString()}
                         </p>
                         <p className="text-xs text-purple-400 font-bold uppercase mt-1">Reason: {leave.reason}</p>
@@ -1011,7 +1011,7 @@ export default function AdminDashboard() {
                       </span>
                     </div>
 
-                    <p className="text-slate-350 text-xs leading-normal bg-slate-950/30 p-3 rounded-xl border border-white/5 italic">
+                    <p className="text-zinc-650 dark:text-zinc-350 text-xs leading-normal bg-zinc-100 dark:bg-zinc-950/40 p-3 rounded-xl border border-white/5 italic">
                       "{leave.description}"
                     </p>
 
@@ -1060,7 +1060,7 @@ export default function AdminDashboard() {
                       <th className="py-2.5 text-right">PDF File</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5 text-slate-350">
+                  <tbody className="divide-y divide-white/5 text-zinc-650 dark:text-zinc-350">
                     {usersList.flatMap(u => u.certificates || []).length === 0 ? (
                       <tr>
                         <td colSpan={5} className="text-center py-16 text-slate-500">No certificates issued yet.</td>
@@ -1086,14 +1086,14 @@ export default function AdminDashboard() {
             </GlassCard>
 
             <GlassCard className="space-y-4">
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest border-b border-white/5 pb-2">Generate Certificate</h3>
+              <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Generate Certificate</h3>
               <form onSubmit={handleGenerateCertificate} className="space-y-4 text-xs">
                 <div>
                   <label className="block text-slate-500 mb-1">SELECT ACTIVE INTERN *</label>
                   <select
                     value={certificateForm.userId}
                     onChange={(e) => setCertificateForm({ ...certificateForm, userId: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                   >
                     <option value="">Select Intern...</option>
                     {interns.map(i => <option key={i.id} value={i.id}>{i.firstName} {i.lastName}</option>)}
@@ -1105,7 +1105,7 @@ export default function AdminDashboard() {
                   <select
                     value={certificateForm.certificateType}
                     onChange={(e) => setCertificateForm({ ...certificateForm, certificateType: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-slate-300 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                   >
                     <option value="COMPLETION">Completion Certificate</option>
                     <option value="EXPERIENCE">Experience Letter</option>

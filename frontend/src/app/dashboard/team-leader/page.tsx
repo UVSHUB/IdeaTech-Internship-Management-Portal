@@ -127,7 +127,7 @@ export default function TeamLeaderDashboard() {
       <div className="flex h-screen items-center justify-center bg-slate-900 text-slate-100">
         <div className="text-center space-y-3">
           <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-xs text-slate-400">Loading Leader board...</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Loading Leader board...</p>
         </div>
       </div>
     );
@@ -157,7 +157,7 @@ export default function TeamLeaderDashboard() {
               <div className="flex items-center space-x-2">
                 <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
                 <span className="font-semibold text-white">Active Project:</span>
-                <span className="text-slate-350">{projects[0]?.name || 'IdeaTech Core Portal Development'}</span>
+                <span className="text-zinc-650 dark:text-zinc-350">{projects[0]?.name || 'IdeaTech Core Portal Development'}</span>
               </div>
               <div className="text-xs text-blue-400 font-semibold">{tasks.length} Total Sprint Tasks</div>
             </GlassCard>
@@ -168,13 +168,13 @@ export default function TeamLeaderDashboard() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
                   <h3 className="text-xs font-bold text-slate-450 uppercase tracking-wider">Pending</h3>
-                  <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.2 rounded font-bold">{getTasksByStatus('PENDING').length}</span>
+                  <span className="text-[10px] bg-slate-800 text-zinc-500 dark:text-zinc-400 px-1.5 py-0.2 rounded font-bold">{getTasksByStatus('PENDING').length}</span>
                 </div>
                 <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
                   {getTasksByStatus('PENDING').map(t => (
                     <div key={t.id} className="p-3 bg-slate-900/80 border-t-2 border-t-blue-500 rounded-xl space-y-2">
                       <h4 className="text-xs font-bold text-white leading-normal truncate">{t.title}</h4>
-                      <p className="text-[10px] text-slate-400 line-clamp-2">{t.description}</p>
+                      <p className="text-[10px] text-zinc-500 dark:text-zinc-400 line-clamp-2">{t.description}</p>
                       <div className="flex justify-between text-[9px] text-slate-500">
                         <span>Due: {new Date(t.dueDate).toLocaleDateString()}</span>
                         <span className="font-bold text-blue-400">{t.priority}</span>
@@ -189,13 +189,13 @@ export default function TeamLeaderDashboard() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
                   <h3 className="text-xs font-bold text-slate-450 uppercase tracking-wider">Working</h3>
-                  <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.2 rounded font-bold">{getTasksByStatus('WORKING').length}</span>
+                  <span className="text-[10px] bg-slate-800 text-zinc-500 dark:text-zinc-400 px-1.5 py-0.2 rounded font-bold">{getTasksByStatus('WORKING').length}</span>
                 </div>
                 <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
                   {getTasksByStatus('WORKING').map(t => (
                     <div key={t.id} className="p-3 bg-slate-900/80 border-t-2 border-t-purple-500 rounded-xl space-y-2">
                       <h4 className="text-xs font-bold text-white leading-normal truncate">{t.title}</h4>
-                      <p className="text-[10px] text-slate-400 line-clamp-2">{t.description}</p>
+                      <p className="text-[10px] text-zinc-500 dark:text-zinc-400 line-clamp-2">{t.description}</p>
                       <div className="w-full bg-slate-950 h-1 rounded overflow-hidden mt-1">
                         <div className="bg-purple-500 h-full" style={{ width: `${t.progress}%` }}></div>
                       </div>
@@ -213,13 +213,13 @@ export default function TeamLeaderDashboard() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
                   <h3 className="text-xs font-bold text-slate-450 uppercase tracking-wider">Needs Review</h3>
-                  <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.2 rounded font-bold">{getTasksByStatus('COMPLETED').length}</span>
+                  <span className="text-[10px] bg-slate-800 text-zinc-500 dark:text-zinc-400 px-1.5 py-0.2 rounded font-bold">{getTasksByStatus('COMPLETED').length}</span>
                 </div>
                 <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
                   {getTasksByStatus('COMPLETED').map(t => (
                     <div key={t.id} className="p-3 bg-slate-900/80 border-t-2 border-t-emerald-500 rounded-xl space-y-2">
                       <h4 className="text-xs font-bold text-white leading-normal truncate">{t.title}</h4>
-                      <p className="text-[10px] text-slate-400 line-clamp-2">{t.description}</p>
+                      <p className="text-[10px] text-zinc-500 dark:text-zinc-400 line-clamp-2">{t.description}</p>
                       <div className="text-[9px] text-slate-500">Assignee: {t.assignee.firstName}</div>
                       
                       <div className="flex space-x-1.5 pt-1 border-t border-white/5">
@@ -245,13 +245,13 @@ export default function TeamLeaderDashboard() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
                   <h3 className="text-xs font-bold text-slate-450 uppercase tracking-wider">Rejected</h3>
-                  <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.2 rounded font-bold">{getTasksByStatus('REJECTED').length}</span>
+                  <span className="text-[10px] bg-slate-800 text-zinc-500 dark:text-zinc-400 px-1.5 py-0.2 rounded font-bold">{getTasksByStatus('REJECTED').length}</span>
                 </div>
                 <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
                   {getTasksByStatus('REJECTED').map(t => (
                     <div key={t.id} className="p-3 bg-slate-900/80 border-t-2 border-t-red-500 rounded-xl space-y-2">
                       <h4 className="text-xs font-bold text-red-400 leading-normal truncate">{t.title}</h4>
-                      <p className="text-[10px] text-slate-400 line-clamp-2">{t.description}</p>
+                      <p className="text-[10px] text-zinc-500 dark:text-zinc-400 line-clamp-2">{t.description}</p>
                       <div className="text-[9px] text-slate-500 border-t border-white/5 pt-1.5">Assignee: {t.assignee.firstName}</div>
                     </div>
                   ))}
@@ -266,7 +266,7 @@ export default function TeamLeaderDashboard() {
             
             {/* Create Task Card */}
             <GlassCard>
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center space-x-1.5">
+              <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-3 flex items-center space-x-1.5">
                 <PlusCircle size={16} className="text-blue-400" />
                 <span>Assign New Task</span>
               </h3>
@@ -305,7 +305,7 @@ export default function TeamLeaderDashboard() {
                     required
                     value={assigneeId}
                     onChange={(e) => setAssigneeId(e.target.value)}
-                    className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-slate-350 focus:outline-none"
+                    className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-650 dark:text-zinc-350 focus:outline-none"
                   >
                     <option value="">Select Intern...</option>
                     {interns.map(i => <option key={i.id} value={i.id}>{i.firstName} {i.lastName}</option>)}
@@ -318,7 +318,7 @@ export default function TeamLeaderDashboard() {
                     <select
                       value={priority}
                       onChange={(e) => setPriority(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-slate-350 focus:outline-none"
+                      className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-650 dark:text-zinc-350 focus:outline-none"
                     >
                       <option value="LOW">Low</option>
                       <option value="MEDIUM">Medium</option>
@@ -330,7 +330,7 @@ export default function TeamLeaderDashboard() {
                     <select
                       value={projectId}
                       onChange={(e) => setProjectId(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-slate-350 focus:outline-none"
+                      className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-650 dark:text-zinc-350 focus:outline-none"
                     >
                       <option value="">Choose...</option>
                       {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -345,7 +345,7 @@ export default function TeamLeaderDashboard() {
                     required
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-slate-350 focus:outline-none"
+                    className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-650 dark:text-zinc-350 focus:outline-none"
                   />
                 </div>
 
@@ -360,7 +360,7 @@ export default function TeamLeaderDashboard() {
 
             {/* Team Members List */}
             <GlassCard>
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Project Team Members</h3>
+              <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-3">Project Team Members</h3>
               <div className="space-y-2">
                 {interns.map(intern => (
                   <div key={intern.id} className="flex items-center space-x-2 bg-slate-900/40 p-2.5 rounded-xl border border-white/5">

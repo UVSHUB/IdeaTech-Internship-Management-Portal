@@ -145,7 +145,7 @@ export default function HRDashboard() {
       <div className="flex h-screen items-center justify-center bg-slate-900 text-slate-100">
         <div className="text-center space-y-3">
           <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-xs text-slate-400">Loading HR metrics...</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Loading HR metrics...</p>
         </div>
       </div>
     );
@@ -164,32 +164,32 @@ export default function HRDashboard() {
         {/* Counts Panel Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <GlassCard className="p-4 text-center">
-            <h4 className="text-slate-400 text-xs font-semibold uppercase">Total Applications</h4>
+            <h4 className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase">Total Applications</h4>
             <h2 className="text-2xl font-bold mt-2 text-white">{stats.counts.total}</h2>
           </GlassCard>
           
           <GlassCard className="p-4 text-center border-l-2 border-l-blue-500">
-            <h4 className="text-slate-400 text-xs font-semibold uppercase">Active Interns</h4>
+            <h4 className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase">Active Interns</h4>
             <h2 className="text-2xl font-bold mt-2 text-blue-400">{stats.counts.active}</h2>
           </GlassCard>
 
           <GlassCard className="p-4 text-center border-l-2 border-l-amber-500">
-            <h4 className="text-slate-400 text-xs font-semibold uppercase">Warnings</h4>
+            <h4 className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase">Warnings</h4>
             <h2 className="text-2xl font-bold mt-2 text-amber-400">{stats.counts.warning}</h2>
           </GlassCard>
 
           <GlassCard className="p-4 text-center border-l-2 border-l-red-500">
-            <h4 className="text-slate-400 text-xs font-semibold uppercase">Terminated</h4>
+            <h4 className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase">Terminated</h4>
             <h2 className="text-2xl font-bold mt-2 text-red-500">{stats.counts.terminated}</h2>
           </GlassCard>
 
           <GlassCard className="p-4 text-center border-l-2 border-l-green-500">
-            <h4 className="text-slate-400 text-xs font-semibold uppercase">Completed</h4>
+            <h4 className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase">Completed</h4>
             <h2 className="text-2xl font-bold mt-2 text-green-400">{stats.counts.completed}</h2>
           </GlassCard>
 
           <GlassCard className="p-4 text-center">
-            <h4 className="text-slate-400 text-xs font-semibold uppercase">Task Complete Rate</h4>
+            <h4 className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase">Task Complete Rate</h4>
             <h2 className="text-2xl font-bold mt-2 text-white">{stats.tasks.completionRate}%</h2>
           </GlassCard>
         </div>
@@ -213,7 +213,7 @@ export default function HRDashboard() {
                     <div className="flex justify-between items-start">
                       <div>
                         <h4 className="text-sm font-bold text-white">{app.user.firstName} {app.user.lastName}</h4>
-                        <p className="text-xs text-slate-400">{app.university} | {app.degree}</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">{app.university} | {app.degree}</p>
                         <p className="text-[10px] text-slate-500 mt-0.5">Applied: {app.positionApplied} ({app.department.name})</p>
                       </div>
                       <span className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full font-bold">
@@ -227,7 +227,7 @@ export default function HRDashboard() {
                         <select
                           value={selectedMentor[app.id] || ''}
                           onChange={(e) => setSelectedMentor({ ...selectedMentor, [app.id]: e.target.value })}
-                          className="w-full bg-slate-950/60 border border-white/10 rounded-lg px-2 py-1 text-xs text-slate-350"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-lg px-2 py-1 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                         >
                           <option value="">Select Mentor...</option>
                           {mentors.map(m => <option key={m.id} value={m.id}>{m.firstName} {m.lastName}</option>)}
@@ -239,7 +239,7 @@ export default function HRDashboard() {
                         <select
                           value={selectedLeader[app.id] || ''}
                           onChange={(e) => setSelectedLeader({ ...selectedLeader, [app.id]: e.target.value })}
-                          className="w-full bg-slate-950/60 border border-white/10 rounded-lg px-2 py-1 text-xs text-slate-350"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-lg px-2 py-1 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                         >
                           <option value="">Select Team Leader...</option>
                           {teamLeaders.map(t => <option key={t.id} value={t.id}>{t.firstName} {t.lastName}</option>)}
@@ -286,7 +286,7 @@ export default function HRDashboard() {
                         <h4 className="text-xs font-bold text-white">
                           {leave.user.firstName} {leave.user.lastName} ({leave.user.internProfile?.internId || 'No ID'})
                         </h4>
-                        <p className="text-[10px] text-slate-400 mt-0.5">
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                           Dates: {new Date(leave.startDate).toLocaleDateString()} to {new Date(leave.endDate).toLocaleDateString()}
                         </p>
                         <p className="text-[10px] text-purple-400 font-semibold uppercase mt-0.5">Reason: {leave.reason}</p>
@@ -301,7 +301,7 @@ export default function HRDashboard() {
                       </span>
                     </div>
 
-                    <p className="text-slate-400 text-xs leading-normal bg-slate-950/20 p-2 rounded-lg italic">
+                    <p className="text-zinc-500 dark:text-zinc-400 text-xs leading-normal bg-zinc-100 dark:bg-zinc-950/40 p-2 rounded-lg italic">
                       "{leave.description}"
                     </p>
 
@@ -332,11 +332,11 @@ export default function HRDashboard() {
         {/* Department and University Distribution Tables */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <GlassCard>
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Department Distribution</h3>
+            <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-4">Department Distribution</h3>
             <div className="space-y-3">
               {stats.departments.map((d: any, i: number) => (
                 <div key={i} className="flex justify-between items-center bg-slate-900/40 p-3 rounded-xl border border-white/5">
-                  <span className="text-sm text-slate-350">{d.name}</span>
+                  <span className="text-sm text-zinc-650 dark:text-zinc-350">{d.name}</span>
                   <span className="text-xs bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full font-bold">{d.count} Interns</span>
                 </div>
               ))}
@@ -344,11 +344,11 @@ export default function HRDashboard() {
           </GlassCard>
 
           <GlassCard>
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Top Feeder Universities</h3>
+            <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-4">Top Feeder Universities</h3>
             <div className="space-y-3">
               {stats.universities.map((u: any, i: number) => (
                 <div key={i} className="flex justify-between items-center bg-slate-900/40 p-3 rounded-xl border border-white/5">
-                  <span className="text-sm text-slate-350 truncate max-w-xs">{u.name}</span>
+                  <span className="text-sm text-zinc-650 dark:text-zinc-350 truncate max-w-xs">{u.name}</span>
                   <span className="text-xs bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full font-bold">{u.count} Interns</span>
                 </div>
               ))}
