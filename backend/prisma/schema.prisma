@@ -111,7 +111,7 @@ model InternProfile {
   id                 String       @id @default(auto()) @map("_id") @db.ObjectId
   userId             String       @unique @db.ObjectId
   user               User         @relation("UserToProfile", fields: [userId], references: [id], onDelete: Cascade)
-  internId           String?      @unique // e.g. IT-2026-0001
+  internId           String?              // e.g. IT-2026-0001
   nic                String
   dob                DateTime
   university         String
