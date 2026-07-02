@@ -5,11 +5,11 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:5000/api/:path*', // Proxy to Express backend
+        destination: 'http://localhost:5001/api/:path*', // Proxy to Express backend
       },
       {
         source: '/uploads/:path*',
-        destination: 'http://localhost:5000/uploads/:path*', // Proxy to serve uploads
+        destination: 'http://localhost:5001/uploads/:path*', // Proxy to serve uploads
       },
     ];
   },
