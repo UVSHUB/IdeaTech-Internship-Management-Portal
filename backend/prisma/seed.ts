@@ -4,28 +4,37 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  console.log('🌱 Seeding MongoDB database...');
 
-  // Hash a default password
+  // Hash default password
   const defaultPasswordHash = await bcrypt.hash('password123', 10);
 
   // 1. Create Departments
   const engDept = await prisma.department.upsert({
     where: { name: 'Engineering' },
     update: {},
-    create: { name: 'Engineering' },
+    create: { 
+      id: '60d5ec49f30f513904a43e51', 
+      name: 'Engineering' 
+    },
   });
 
   const qaDept = await prisma.department.upsert({
     where: { name: 'Quality Assurance' },
     update: {},
-    create: { name: 'Quality Assurance' },
+    create: { 
+      id: '60d5ec49f30f513904a43e52', 
+      name: 'Quality Assurance' 
+    },
   });
 
   const designDept = await prisma.department.upsert({
     where: { name: 'UI/UX Design' },
     update: {},
-    create: { name: 'UI/UX Design' },
+    create: { 
+      id: '60d5ec49f30f513904a43e53', 
+      name: 'UI/UX Design' 
+    },
   });
 
   console.log('Created departments.');
@@ -36,6 +45,7 @@ async function main() {
     where: { email: 'admin@ideatech.lk' },
     update: {},
     create: {
+      id: '60d5ec49f30f513904a43e61',
       email: 'admin@ideatech.lk',
       passwordHash: defaultPasswordHash,
       firstName: 'Samantha',
@@ -49,6 +59,7 @@ async function main() {
     where: { email: 'hr@ideatech.lk' },
     update: {},
     create: {
+      id: '60d5ec49f30f513904a43e62',
       email: 'hr@ideatech.lk',
       passwordHash: defaultPasswordHash,
       firstName: 'Dilani',
@@ -62,6 +73,7 @@ async function main() {
     where: { email: 'tl@ideatech.lk' },
     update: {},
     create: {
+      id: '60d5ec49f30f513904a43e63',
       email: 'tl@ideatech.lk',
       passwordHash: defaultPasswordHash,
       firstName: 'Roshan',
@@ -75,6 +87,7 @@ async function main() {
     where: { email: 'mentor@ideatech.lk' },
     update: {},
     create: {
+      id: '60d5ec49f30f513904a43e64',
       email: 'mentor@ideatech.lk',
       passwordHash: defaultPasswordHash,
       firstName: 'Kasun',
@@ -90,6 +103,7 @@ async function main() {
     where: { email: 'intern@ideatech.lk' },
     update: {},
     create: {
+      id: '60d5ec49f30f513904a43e65',
       email: 'intern@ideatech.lk',
       passwordHash: defaultPasswordHash,
       firstName: 'Lahiru',
@@ -103,6 +117,7 @@ async function main() {
     where: { userId: activeInternUser.id },
     update: {},
     create: {
+      id: '60d5ec49f30f513904a43f01',
       userId: activeInternUser.id,
       internId: 'IT-2026-0001',
       nic: '200112345678',
@@ -138,6 +153,7 @@ async function main() {
     where: { email: 'candidate@ideatech.lk' },
     update: {},
     create: {
+      id: '60d5ec49f30f513904a43e66',
       email: 'candidate@ideatech.lk',
       passwordHash: defaultPasswordHash,
       firstName: 'Priya',
@@ -150,6 +166,7 @@ async function main() {
     where: { userId: candidateUser.id },
     update: {},
     create: {
+      id: '60d5ec49f30f513904a43f02',
       userId: candidateUser.id,
       nic: '200287654321',
       dob: new Date('2002-09-20'),
@@ -173,6 +190,7 @@ async function main() {
     where: { name: 'IdeaTech Core Portal Development' },
     update: {},
     create: {
+      id: '60d5ec49f30f513904a43e71',
       name: 'IdeaTech Core Portal Development',
       description: 'Building the state-of-the-art internship portal dashboard.',
       githubUrl: 'https://github.com/ideatech-pvt/itimp',
@@ -267,7 +285,7 @@ async function main() {
 
   console.log('Created sample attendance history.');
 
-  console.log('🎉 Seeding completed successfully!');
+  console.log('🎉 MongoDB Seeding completed successfully!');
 }
 
 main()
