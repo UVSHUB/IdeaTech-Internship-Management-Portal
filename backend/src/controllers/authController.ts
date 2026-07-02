@@ -149,22 +149,22 @@ export async function login(req: Request, res: Response) {
       { expiresIn: '8h' }
     );
 
-    // Track active timestamp if Intern
+    // Track active timestamp if Intern (asynchronously without awaiting)
     if (user.role === 'INTERN' && user.internProfile) {
-      await prisma.internProfile.update({
+      prisma.internProfile.update({
         where: { id: user.internProfile.id },
         data: { lastActive: new Date() },
-      });
+      }).catch(err => console.error('Failed to update lastActive:', err));
     }
 
-    // Audit Log
-    await prisma.activityLog.create({
+    // Audit Log (asynchronously without awaiting)
+    prisma.activityLog.create({
       data: {
         userId: user.id,
         action: 'LOGIN',
         details: `User logged in successfully as ${user.role}.`,
       },
-    });
+    }).catch(err => console.error('Failed to create activity log:', err));
 
     return res.json({
       token,
@@ -424,22 +424,22 @@ export async function googleLogin(req: Request, res: Response) {
       { expiresIn: '8h' }
     );
 
-    // Track active timestamp if Intern
+    // Track active timestamp if Intern (asynchronously without awaiting)
     if (user.role === 'INTERN' && user.internProfile) {
-      await prisma.internProfile.update({
+      prisma.internProfile.update({
         where: { id: user.internProfile.id },
         data: { lastActive: new Date() },
-      });
+      }).catch(err => console.error('Failed to update lastActive:', err));
     }
 
-    // Audit Log
-    await prisma.activityLog.create({
+    // Audit Log (asynchronously without awaiting)
+    prisma.activityLog.create({
       data: {
         userId: user.id,
         action: 'GOOGLE_LOGIN',
         details: `User logged in successfully via Google Sign-In as ${user.role}.`,
       },
-    });
+    }).catch(err => console.error('Failed to create activity log:', err));
 
     return res.json({
       token,

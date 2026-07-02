@@ -54,30 +54,39 @@ export default function AdminDashboard() {
   const [triggerMsg, setTriggerMsg] = useState('');
 
   useEffect(() => {
-    fetchAllData();
-  }, [tab]);
+    if (token) {
+      fetchBaseData();
+    }
+  }, [token]);
 
-  const fetchAllData = async () => {
+  useEffect(() => {
+    fetchTabSpecificData();
+  }, [tab, token]);
+
+  const fetchBaseData = async () => {
     if (!token) return;
-    setLoading(true);
     try {
-      // 1. Fetch default stats anyway for global counts
       const statsRes = await fetch('/api/analytics/dashboard', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (statsRes.ok) {
         setStats(await statsRes.json());
       }
-
-      // 2. Fetch all system users (required for assignment dropdowns and certificate generation)
       const usersRes = await fetch('/api/users/list', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (usersRes.ok) {
         setUsersList(await usersRes.json());
       }
+    } catch (err) {
+      console.error('Error loading base stats:', err);
+    }
+  };
 
-      // 3. Tab-Specific Fetches
+  const fetchTabSpecificData = async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
       if (tab === 'applications') {
         const res = await fetch('/api/auth/pending-applications', {
           headers: { 'Authorization': `Bearer ${token}` },
@@ -114,6 +123,10 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchAllData = async () => {
+    await Promise.all([fetchBaseData(), fetchTabSpecificData()]);
   };
 
   // Applications Actions

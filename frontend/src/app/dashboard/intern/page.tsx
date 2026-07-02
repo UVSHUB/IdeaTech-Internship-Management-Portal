@@ -64,14 +64,17 @@ export default function InternDashboard() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      fetchInternData();
+    if (token) {
+      fetchBaseData();
     }
-  }, [user, tab]);
+  }, [token]);
 
-  const fetchInternData = async () => {
+  useEffect(() => {
+    fetchTabSpecificData();
+  }, [tab, token]);
+
+  const fetchBaseData = async () => {
     if (!token) return;
-    setLoading(true);
     try {
       // 1. Fetch main metrics & warnings
       const res = await fetch('/api/analytics/intern', {
@@ -107,8 +110,16 @@ export default function InternDashboard() {
           setAttendanceStatus('Not Checked In');
         }
       }
+    } catch (err) {
+      console.error('Error loading base intern stats:', err);
+    }
+  };
 
-      // 3. Tab-Specific Fetches
+  const fetchTabSpecificData = async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      // Tab-Specific Fetches
       if (tab === 'reports') {
         const rRes = await fetch('/api/reports/my', {
           headers: { 'Authorization': `Bearer ${token}` }
@@ -139,12 +150,15 @@ export default function InternDashboard() {
         });
         if (cRes.ok) setCertificatesList(await cRes.json());
       }
-
     } catch (error) {
-      console.error(error);
+      console.error("Error loading tab data:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchInternData = async () => {
+    await Promise.all([fetchBaseData(), fetchTabSpecificData()]);
   };
 
   // Clock In
