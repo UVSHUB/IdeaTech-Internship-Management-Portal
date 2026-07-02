@@ -390,7 +390,7 @@ export default function InternDashboard() {
             {/* Stats Row Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-900 dark:border-l-zinc-100">
-                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><Award size={22} /></div>
+                <div className="p-3 bg-zinc-500/10 text-zinc-600 dark:text-zinc-300 rounded-2xl"><Award size={22} /></div>
                 <div>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Current Level</p>
                   <h3 className="text-2xl font-bold">Level {stats.level}</h3>
@@ -398,7 +398,7 @@ export default function InternDashboard() {
               </GlassCard>
 
               <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-700 dark:border-l-zinc-300">
-                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><Zap size={22} /></div>
+                <div className="p-3 bg-zinc-500/10 text-zinc-600 dark:text-zinc-300 rounded-2xl"><Zap size={22} /></div>
                 <div>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Active Streak</p>
                   <h3 className="text-2xl font-bold">{stats.streak} Days</h3>
@@ -406,7 +406,7 @@ export default function InternDashboard() {
               </GlassCard>
 
               <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-500 dark:border-l-zinc-500">
-                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><CheckCircle size={22} /></div>
+                <div className="p-3 bg-zinc-500/10 text-zinc-600 dark:text-zinc-300 rounded-2xl"><CheckCircle size={22} /></div>
                 <div>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Completion Progress</p>
                   <h3 className="text-2xl font-bold">{stats.completionProgress}%</h3>
@@ -414,7 +414,7 @@ export default function InternDashboard() {
               </GlassCard>
 
               <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-300 dark:border-l-zinc-700">
-                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><Clock size={22} /></div>
+                <div className="p-3 bg-zinc-500/10 text-zinc-600 dark:text-zinc-300 rounded-2xl"><Clock size={22} /></div>
                 <div>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Remaining Days</p>
                   <h3 className="text-2xl font-bold">{stats.remainingDays} Days</h3>
@@ -434,7 +434,7 @@ export default function InternDashboard() {
                     <span>Work From Home Attendance Status</span>
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                    <div className="space-y-1.5 text-xs text-zinc-650 dark:text-zinc-350">
+                    <div className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
                       <p>Status: <span className="text-blue-400 font-bold">{attendanceStatus}</span></p>
                       {checkInTime && <p>Check-In time: {checkInTime}</p>}
                       {checkOutTime && <p>Check-Out time: {checkOutTime}</p>}
@@ -502,7 +502,7 @@ export default function InternDashboard() {
                   <div className="w-full bg-slate-800 h-2 rounded-full mb-1.5 overflow-hidden">
                     <div className="bg-theme-gradient h-full rounded-full" style={{ width: `${stats.xpProgress}%` }} />
                   </div>
-                  <div className="flex justify-between text-[10px] text-slate-450">
+                  <div className="flex justify-between text-[10px] text-zinc-500">
                     <span>Level {stats.level}</span>
                     <span>{stats.xpProgress}% to Level {stats.level + 1}</span>
                   </div>
@@ -510,7 +510,7 @@ export default function InternDashboard() {
 
                 {/* AI Assistant chat panel */}
                 <GlassCard className="flex flex-col h-[280px]">
-                  <h3 className="text-xs font-bold text-slate-450 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
+                  <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
                     <MessageSquare size={14} className="text-blue-400" />
                     <span>IdeaTech Assistant</span>
                   </h3>
@@ -559,17 +559,17 @@ export default function InternDashboard() {
                       <th className="py-2.5 text-center">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5 text-zinc-650 dark:text-zinc-350">
+                  <tbody className="divide-y divide-white/5 text-zinc-600 dark:text-zinc-400">
                     {attendanceHistory.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="text-center py-12 text-slate-550">No check-in logs submitted.</td>
+                        <td colSpan={5} className="text-center py-12 text-zinc-500">No check-in logs submitted.</td>
                       </tr>
                     ) : (
                       attendanceHistory.map((h: any) => (
                         <tr key={h.id}>
                           <td className="py-3 font-semibold">{new Date(h.date).toLocaleDateString()}</td>
                           <td className="py-3 text-zinc-500 dark:text-zinc-400">{new Date(h.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
-                          <td className="py-3 text-slate-450">
+                          <td className="py-3 text-zinc-500">
                             {h.checkOut ? new Date(h.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Logged Check-In Only'}
                           </td>
                           <td className="py-3 font-mono">{h.workingHours ? `${h.workingHours.toFixed(2)} hrs` : '-'}</td>
@@ -642,7 +642,7 @@ export default function InternDashboard() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="text-xs font-bold text-white">{new Date(rep.date).toLocaleDateString()}</h4>
-                          <p className="text-xs text-zinc-650 dark:text-zinc-350 mt-1 font-semibold">Tasks: {rep.todayTasks}</p>
+                          <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 font-semibold">Tasks: {rep.todayTasks}</p>
                           <p className="text-xs text-zinc-500 dark:text-zinc-400">Deliverables: {rep.completedWork}</p>
                         </div>
                         <span className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase ${
@@ -757,7 +757,7 @@ export default function InternDashboard() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="text-xs font-bold text-white">{new Date(l.date).toLocaleDateString()}</h4>
-                          <p className="text-xs text-zinc-650 dark:text-zinc-350 mt-1"><strong>Activities:</strong> {l.activities}</p>
+                          <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1"><strong>Activities:</strong> {l.activities}</p>
                           <p className="text-[11px] text-zinc-500 dark:text-zinc-400"><strong>Learning:</strong> {l.learning}</p>
                           <p className="text-[11px] text-zinc-500 dark:text-zinc-400"><strong>Skills:</strong> {l.skillsLearned}</p>
                         </div>
@@ -867,7 +867,7 @@ export default function InternDashboard() {
                     <div key={task.id} className="p-3.5 bg-slate-900 border border-white/5 rounded-2xl space-y-3 shadow-lg">
                       <div>
                         <h4 className="text-xs font-bold text-white">{task.title}</h4>
-                        <p className="text-[10px] text-slate-450 leading-normal mt-1">{task.description}</p>
+                        <p className="text-[10px] text-zinc-500 leading-normal mt-1">{task.description}</p>
                       </div>
                       <div className="flex justify-between items-center text-[9px] pt-2 border-t border-white/5">
                         <span className="text-red-400 font-semibold uppercase">{task.priority}</span>
@@ -894,7 +894,7 @@ export default function InternDashboard() {
                     <div key={task.id} className="p-3.5 bg-slate-900 border border-white/5 rounded-2xl space-y-3 shadow-lg">
                       <div>
                         <h4 className="text-xs font-bold text-white">{task.title}</h4>
-                        <p className="text-[10px] text-slate-450 leading-normal mt-1">{task.description}</p>
+                        <p className="text-[10px] text-zinc-500 leading-normal mt-1">{task.description}</p>
                       </div>
                       <div className="flex justify-between items-center text-[9px] pt-2 border-t border-white/5">
                         <span className="text-amber-400 font-semibold uppercase">{task.priority}</span>
@@ -1040,7 +1040,7 @@ export default function InternDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
               {certificatesList.length === 0 ? (
-                <div className="col-span-2 text-center py-16 text-slate-550 space-y-2">
+                <div className="col-span-2 text-center py-16 text-zinc-500 space-y-2">
                   <Award size={36} className="text-slate-600 mx-auto" />
                   <p className="text-xs">No certificates generated yet.</p>
                   <p className="text-[10px] text-slate-500">Your digital certificate is generated by admin/HR upon successful completion of your WFH internship lifecycle.</p>

@@ -136,15 +136,15 @@ export default function Sidebar({ activeTab }: SidebarProps) {
                   className="w-11 h-11 object-contain dark:invert"
                 />
               ) : (
-                <div className="w-9 h-9 rounded-xl bg-theme-gradient flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20">
+                <div className="w-9 h-9 rounded-xl bg-zinc-900 dark:bg-white flex items-center justify-center font-bold text-white dark:text-zinc-950 shadow-lg">
                   IT
                 </div>
               )}
               <div>
-                <h1 className="font-bold tracking-wider text-sm bg-clip-text text-transparent bg-theme-gradient">
+                <h1 className="font-bold tracking-wider text-sm text-zinc-900 dark:text-zinc-100">
                   IDEATECH
                 </h1>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400">ITIMP Portal</p>
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-400">ITIMP Portal</p>
               </div>
             </div>
 
@@ -158,11 +158,11 @@ export default function Sidebar({ activeTab }: SidebarProps) {
                     onClick={() => handleNav(link.path)}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                       isActive
-                        ? 'bg-theme-gradient text-white shadow-lg shadow-blue-500/10'
-                        : 'text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/40 hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-950 shadow-md'
+                        : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/40 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                   >
-                    <link.icon size={18} className={isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'} />
+                    <link.icon size={18} className={isActive ? 'text-white dark:text-zinc-950' : 'text-zinc-400 dark:text-zinc-500'} />
                     <span>{link.name}</span>
                   </button>
                 );
@@ -174,14 +174,14 @@ export default function Sidebar({ activeTab }: SidebarProps) {
           <div className="space-y-4 pt-6 border-t border-slate-200/50 dark:border-slate-800/50">
             {/* User profile capsule */}
             <div className="flex items-center space-x-3 px-2 py-1">
-              <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-800 dark:text-slate-200 font-semibold border border-slate-350/20">
+              <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-800 dark:text-slate-200 font-semibold border border-zinc-300/20">
                 {user.firstName.charAt(0).toUpperCase()}
               </div>
               <div className="overflow-hidden">
                 <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
                   {user.firstName} {user.lastName}
                 </p>
-                <p className="text-[9px] font-bold text-zinc-500 dark:text-zinc-450 uppercase tracking-widest truncate">
+                <p className="text-[9px] font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-widest truncate">
                   {user.role.replace('_', ' ')}
                 </p>
               </div>

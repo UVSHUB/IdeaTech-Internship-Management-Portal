@@ -336,7 +336,7 @@ export default function HRDashboard() {
             <div className="space-y-3">
               {stats.departments.map((d: any, i: number) => (
                 <div key={i} className="flex justify-between items-center bg-slate-900/40 p-3 rounded-xl border border-white/5">
-                  <span className="text-sm text-zinc-650 dark:text-zinc-350">{d.name}</span>
+                  <span className="text-sm text-zinc-600 dark:text-zinc-400">{d.name}</span>
                   <span className="text-xs bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full font-bold">{d.count} Interns</span>
                 </div>
               ))}
@@ -348,7 +348,7 @@ export default function HRDashboard() {
             <div className="space-y-3">
               {stats.universities.map((u: any, i: number) => (
                 <div key={i} className="flex justify-between items-center bg-slate-900/40 p-3 rounded-xl border border-white/5">
-                  <span className="text-sm text-zinc-650 dark:text-zinc-350 truncate max-w-xs">{u.name}</span>
+                  <span className="text-sm text-zinc-600 dark:text-zinc-400 truncate max-w-xs">{u.name}</span>
                   <span className="text-xs bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full font-bold">{u.count} Interns</span>
                 </div>
               ))}

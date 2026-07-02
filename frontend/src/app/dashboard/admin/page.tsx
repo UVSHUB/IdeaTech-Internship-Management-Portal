@@ -377,7 +377,7 @@ export default function AdminDashboard() {
             {/* Counts row */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-900 dark:border-l-zinc-100">
-                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><Activity size={20} /></div>
+                <div className="p-3 bg-zinc-500/10 text-zinc-600 dark:text-zinc-300 rounded-2xl"><Activity size={20} /></div>
                 <div>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Total Database Records</p>
                   <h3 className="text-2xl font-bold">{stats.counts.total}</h3>
@@ -385,7 +385,7 @@ export default function AdminDashboard() {
               </GlassCard>
               
               <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-700 dark:border-l-zinc-300">
-                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><CheckSquare size={20} /></div>
+                <div className="p-3 bg-zinc-500/10 text-zinc-600 dark:text-zinc-300 rounded-2xl"><CheckSquare size={20} /></div>
                 <div>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Task Completion Rate</p>
                   <h3 className="text-2xl font-bold">{stats.tasks.completionRate}%</h3>
@@ -393,7 +393,7 @@ export default function AdminDashboard() {
               </GlassCard>
 
               <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-500 dark:border-l-zinc-500">
-                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><ShieldAlert size={20} /></div>
+                <div className="p-3 bg-zinc-500/10 text-zinc-600 dark:text-zinc-300 rounded-2xl"><ShieldAlert size={20} /></div>
                 <div>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Active Warning Alerts</p>
                   <h3 className="text-2xl font-bold">{stats.counts.warning}</h3>
@@ -401,7 +401,7 @@ export default function AdminDashboard() {
               </GlassCard>
 
               <GlassCard className="flex items-center space-x-4 border-l-4 border-l-zinc-300 dark:border-l-zinc-700">
-                <div className="p-3 bg-zinc-500/10 text-zinc-650 dark:text-zinc-300 rounded-2xl"><Clock size={20} /></div>
+                <div className="p-3 bg-zinc-500/10 text-zinc-600 dark:text-zinc-300 rounded-2xl"><Clock size={20} /></div>
                 <div>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase">Auto-Terminations</p>
                   <h3 className="text-2xl font-bold">{stats.counts.terminated}</h3>
@@ -492,14 +492,14 @@ export default function AdminDashboard() {
                         <th className="py-2.5">Timestamp</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5 text-zinc-650 dark:text-zinc-350">
+                    <tbody className="divide-y divide-white/5 text-zinc-600 dark:text-zinc-400">
                       {stats.activityLogs.map((log: any) => (
                         <tr key={log.id}>
                           <td className="py-3 font-semibold text-white">{log.user.firstName} {log.user.lastName}</td>
                           <td className="py-3">
                             <span className={`px-1.5 py-0.5 rounded font-bold text-[9px] ${
                               log.action.includes('TERMINATION') ? 'bg-red-500/10 text-red-400' :
-                              log.action.includes('APPROVE') ? 'bg-blue-500/10 text-blue-400' : 'bg-slate-800 text-slate-450'
+                              log.action.includes('APPROVE') ? 'bg-blue-500/10 text-blue-400' : 'bg-slate-800 text-zinc-500'
                             }`}>
                               {log.action}
                             </span>
@@ -569,7 +569,7 @@ export default function AdminDashboard() {
                       </span>
                     </div>
 
-                    <div className="text-xs space-y-1.5 text-zinc-650 dark:text-zinc-350 bg-zinc-100 dark:bg-zinc-950/40 p-3.5 rounded-xl border border-white/5">
+                    <div className="text-xs space-y-1.5 text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-950/40 p-3.5 rounded-xl border border-white/5">
                       <p>📧 <strong>Email:</strong> {app.user.email}</p>
                       <p>📱 <strong>Mobile:</strong> {app.mobileNumber}</p>
                       <p>🛠️ <strong>Preferred Tech:</strong> {app.preferredTech}</p>
@@ -650,7 +650,7 @@ export default function AdminDashboard() {
                     <th className="py-3 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5 text-zinc-650 dark:text-zinc-350">
+                <tbody className="divide-y divide-white/5 text-zinc-600 dark:text-zinc-400">
                   {attendanceLogs.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="text-center py-16 text-slate-500">No attendance records logged.</td>
@@ -661,7 +661,7 @@ export default function AdminDashboard() {
                         <td className="py-3.5 font-medium">{new Date(log.date).toLocaleDateString()}</td>
                         <td className="py-3.5 font-bold text-white">{log.user.firstName} {log.user.lastName}</td>
                         <td className="py-3.5 text-zinc-500 dark:text-zinc-400">{new Date(log.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
-                        <td className="py-3.5 text-slate-450">
+                        <td className="py-3.5 text-zinc-500">
                           {log.checkOut ? new Date(log.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Still Working'}
                         </td>
                         <td className="py-3.5 font-mono">{log.workingHours ? `${log.workingHours.toFixed(2)} hrs` : '-'}</td>
@@ -711,7 +711,7 @@ export default function AdminDashboard() {
                       </div>
 
                       <div className="flex justify-between items-center text-[10px] text-slate-500 pt-2 border-t border-white/5">
-                        <span>Assignee: <strong className="text-zinc-650 dark:text-zinc-350">{task.assignee.firstName} {task.assignee.lastName}</strong></span>
+                        <span>Assignee: <strong className="text-zinc-600 dark:text-zinc-400">{task.assignee.firstName} {task.assignee.lastName}</strong></span>
                         <span>Status: <strong className={`font-bold ${task.status === 'COMPLETED' ? 'text-emerald-400' : 'text-amber-400'}`}>{task.status}</strong></span>
                         <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
                       </div>
@@ -905,7 +905,7 @@ export default function AdminDashboard() {
                       </div>
 
                       <div className="flex justify-between items-center text-[10px] text-slate-500 pt-2 border-t border-white/5">
-                        <span>Time: <strong className="text-zinc-650 dark:text-zinc-350">{new Date(meeting.meetingTime).toLocaleString()}</strong></span>
+                        <span>Time: <strong className="text-zinc-600 dark:text-zinc-400">{new Date(meeting.meetingTime).toLocaleString()}</strong></span>
                         <a href={meeting.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline font-bold">
                           Join Meeting 🔗
                         </a>
@@ -1011,7 +1011,7 @@ export default function AdminDashboard() {
                       </span>
                     </div>
 
-                    <p className="text-zinc-650 dark:text-zinc-350 text-xs leading-normal bg-zinc-100 dark:bg-zinc-950/40 p-3 rounded-xl border border-white/5 italic">
+                    <p className="text-zinc-600 dark:text-zinc-400 text-xs leading-normal bg-zinc-100 dark:bg-zinc-950/40 p-3 rounded-xl border border-white/5 italic">
                       "{leave.description}"
                     </p>
 
@@ -1060,7 +1060,7 @@ export default function AdminDashboard() {
                       <th className="py-2.5 text-right">PDF File</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5 text-zinc-650 dark:text-zinc-350">
+                  <tbody className="divide-y divide-white/5 text-zinc-600 dark:text-zinc-400">
                     {usersList.flatMap(u => u.certificates || []).length === 0 ? (
                       <tr>
                         <td colSpan={5} className="text-center py-16 text-slate-500">No certificates issued yet.</td>
@@ -1071,7 +1071,7 @@ export default function AdminDashboard() {
                           <td className="py-3.5 font-bold text-white">{cert.user.firstName} {cert.user.lastName}</td>
                           <td className="py-3.5 font-semibold text-purple-400 uppercase tracking-wider">{cert.certificateType}</td>
                           <td className="py-3.5 font-mono text-amber-400">{cert.serialNumber}</td>
-                          <td className="py-3.5 text-slate-450">{new Date(cert.issuedAt).toLocaleDateString()}</td>
+                          <td className="py-3.5 text-zinc-500">{new Date(cert.issuedAt).toLocaleDateString()}</td>
                           <td className="py-3.5 text-right">
                             <a href={cert.pdfUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline font-bold">
                               Open Certificate PDF

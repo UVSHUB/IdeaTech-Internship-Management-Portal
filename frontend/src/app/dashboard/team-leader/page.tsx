@@ -157,7 +157,7 @@ export default function TeamLeaderDashboard() {
               <div className="flex items-center space-x-2">
                 <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
                 <span className="font-semibold text-white">Active Project:</span>
-                <span className="text-zinc-650 dark:text-zinc-350">{projects[0]?.name || 'IdeaTech Core Portal Development'}</span>
+                <span className="text-zinc-600 dark:text-zinc-400">{projects[0]?.name || 'IdeaTech Core Portal Development'}</span>
               </div>
               <div className="text-xs text-blue-400 font-semibold">{tasks.length} Total Sprint Tasks</div>
             </GlassCard>
@@ -167,7 +167,7 @@ export default function TeamLeaderDashboard() {
               {/* Column 1: Pending */}
               <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
-                  <h3 className="text-xs font-bold text-slate-450 uppercase tracking-wider">Pending</h3>
+                  <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Pending</h3>
                   <span className="text-[10px] bg-slate-800 text-zinc-500 dark:text-zinc-400 px-1.5 py-0.2 rounded font-bold">{getTasksByStatus('PENDING').length}</span>
                 </div>
                 <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
@@ -188,7 +188,7 @@ export default function TeamLeaderDashboard() {
               {/* Column 2: Working */}
               <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
-                  <h3 className="text-xs font-bold text-slate-450 uppercase tracking-wider">Working</h3>
+                  <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Working</h3>
                   <span className="text-[10px] bg-slate-800 text-zinc-500 dark:text-zinc-400 px-1.5 py-0.2 rounded font-bold">{getTasksByStatus('WORKING').length}</span>
                 </div>
                 <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
@@ -212,7 +212,7 @@ export default function TeamLeaderDashboard() {
               {/* Column 3: Completed */}
               <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
-                  <h3 className="text-xs font-bold text-slate-450 uppercase tracking-wider">Needs Review</h3>
+                  <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Needs Review</h3>
                   <span className="text-[10px] bg-slate-800 text-zinc-500 dark:text-zinc-400 px-1.5 py-0.2 rounded font-bold">{getTasksByStatus('COMPLETED').length}</span>
                 </div>
                 <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
@@ -244,7 +244,7 @@ export default function TeamLeaderDashboard() {
               {/* Column 4: Rejected */}
               <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
-                  <h3 className="text-xs font-bold text-slate-450 uppercase tracking-wider">Rejected</h3>
+                  <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Rejected</h3>
                   <span className="text-[10px] bg-slate-800 text-zinc-500 dark:text-zinc-400 px-1.5 py-0.2 rounded font-bold">{getTasksByStatus('REJECTED').length}</span>
                 </div>
                 <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
@@ -305,7 +305,7 @@ export default function TeamLeaderDashboard() {
                     required
                     value={assigneeId}
                     onChange={(e) => setAssigneeId(e.target.value)}
-                    className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-650 dark:text-zinc-350 focus:outline-none"
+                    className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 focus:outline-none"
                   >
                     <option value="">Select Intern...</option>
                     {interns.map(i => <option key={i.id} value={i.id}>{i.firstName} {i.lastName}</option>)}
@@ -318,7 +318,7 @@ export default function TeamLeaderDashboard() {
                     <select
                       value={priority}
                       onChange={(e) => setPriority(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-650 dark:text-zinc-350 focus:outline-none"
+                      className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 focus:outline-none"
                     >
                       <option value="LOW">Low</option>
                       <option value="MEDIUM">Medium</option>
@@ -330,7 +330,7 @@ export default function TeamLeaderDashboard() {
                     <select
                       value={projectId}
                       onChange={(e) => setProjectId(e.target.value)}
-                      className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-650 dark:text-zinc-350 focus:outline-none"
+                      className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 focus:outline-none"
                     >
                       <option value="">Choose...</option>
                       {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -345,7 +345,7 @@ export default function TeamLeaderDashboard() {
                     required
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-650 dark:text-zinc-350 focus:outline-none"
+                    className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 focus:outline-none"
                   />
                 </div>
 

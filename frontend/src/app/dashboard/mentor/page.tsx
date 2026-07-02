@@ -245,7 +245,7 @@ export default function MentorDashboard() {
                         </span>
                       </div>
 
-                      <div className="text-xs space-y-2 bg-zinc-100 dark:bg-zinc-950/40 p-3 rounded-xl text-zinc-650 dark:text-zinc-350 leading-normal">
+                      <div className="text-xs space-y-2 bg-zinc-100 dark:bg-zinc-950/40 p-3 rounded-xl text-zinc-600 dark:text-zinc-400 leading-normal">
                         <div><strong>Activities:</strong> {log.activities}</div>
                         <div><strong>Learning gained:</strong> {log.learning}</div>
                         <div><strong>Skills:</strong> {log.skillsLearned}</div>
@@ -327,7 +327,7 @@ export default function MentorDashboard() {
                     required
                     value={meetingTime}
                     onChange={(e) => setMeetingTime(e.target.value)}
-                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-blue-500 text-zinc-650 dark:text-zinc-350"
+                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-blue-500 text-zinc-600 dark:text-zinc-400"
                   />
                 </div>
                 <div>
@@ -335,7 +335,7 @@ export default function MentorDashboard() {
                   <select
                     value={meetingPlatform}
                     onChange={(e) => setMeetingPlatform(e.target.value)}
-                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-blue-500 text-zinc-650 dark:text-zinc-350"
+                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-blue-500 text-zinc-600 dark:text-zinc-400"
                   >
                     <option value="Google Meet">Google Meet</option>
                     <option value="Zoom">Zoom</option>

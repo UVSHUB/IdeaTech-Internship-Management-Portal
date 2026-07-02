@@ -124,10 +124,10 @@ export default function LoginPage() {
         {/* Admin Quick Login Pill */}
         <div className="mb-6 p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <ShieldAlert size={16} className="text-zinc-650 dark:text-zinc-300" />
+            <ShieldAlert size={16} className="text-zinc-600 dark:text-zinc-300" />
             <div className="text-left">
-              <span className="text-[10px] text-zinc-500 dark:text-zinc-450 block font-bold uppercase tracking-wider">Admin Sandbox</span>
-              <span className="text-[11px] text-zinc-850 dark:text-zinc-300 font-medium">vibodhasilvaulindu@gmail.com</span>
+              <span className="text-[10px] text-zinc-500 dark:text-zinc-500 block font-bold uppercase tracking-wider">Admin Sandbox</span>
+              <span className="text-[11px] text-zinc-800 dark:text-zinc-300 font-medium">vibodhasilvaulindu@gmail.com</span>
             </div>
           </div>
           <button
@@ -147,7 +147,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-[11px] text-zinc-500 dark:text-zinc-450 mb-1 font-semibold tracking-wider">EMAIL ADDRESS</label>
+            <label className="block text-[11px] text-zinc-500 dark:text-zinc-500 mb-1 font-semibold tracking-wider">EMAIL ADDRESS</label>
             <div className="relative">
               <Mail className="absolute left-3.5 top-3 text-zinc-400 dark:text-zinc-500" size={14} />
               <input
@@ -163,7 +163,7 @@ export default function LoginPage() {
 
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="block text-[11px] text-zinc-500 dark:text-zinc-450 mb-1 font-semibold tracking-wider">PASSWORD</label>
+              <label className="block text-[11px] text-zinc-500 dark:text-zinc-500 mb-1 font-semibold tracking-wider">PASSWORD</label>
               <button
                 type="button"
                 onClick={() => setError('Use your seeded password (e.g. Ulindu_2004 for admin, password123 for others).')}
@@ -244,13 +244,13 @@ export default function LoginPage() {
 
               <form onSubmit={handleGoogleSubmit} className="space-y-3">
                 <div>
-                  <label className="block text-[10px] text-zinc-550 mb-1">GOOGLE EMAIL</label>
+                  <label className="block text-[10px] text-zinc-500 mb-1">GOOGLE EMAIL</label>
                   <input
                     type="email"
                     required
                     value={googleEmail}
                     onChange={(e) => setGoogleEmail(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-zinc-350 focus:outline-none focus:border-zinc-500"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-zinc-400 focus:outline-none focus:border-zinc-500"
                     placeholder="e.g. name@gmail.com"
                   />
                 </div>

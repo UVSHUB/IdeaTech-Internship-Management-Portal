@@ -66,7 +66,7 @@ export default function VerifyCertificatePage() {
             </div>
             <div>
               <h2 className="text-lg font-bold text-red-400">Verification Failed</h2>
-              <p className="text-xs text-slate-450 mt-1 leading-normal px-6">{error}</p>
+              <p className="text-xs text-zinc-500 mt-1 leading-normal px-6">{error}</p>
             </div>
             <button 
               onClick={() => window.location.reload()}
