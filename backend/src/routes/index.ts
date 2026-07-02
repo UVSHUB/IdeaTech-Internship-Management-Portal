@@ -70,6 +70,7 @@ import {
 import {
   chatSupport,
   triggerWeeklyFeedback,
+  getProjectAIAdvice,
 } from '../controllers/chatbotController';
 
 const router = Router();
@@ -219,6 +220,11 @@ router.get(
   '/chatbot/feedback/:internId',
   authorizeRoles(['SUPER_ADMIN', 'MENTOR', 'TEAM_LEADER']),
   triggerWeeklyFeedback as any
+);
+router.get(
+  '/projects/:projectId/ai-advise',
+  authorizeRoles(['SUPER_ADMIN', 'MENTOR', 'TEAM_LEADER']),
+  getProjectAIAdvice as any
 );
 
 // General User Profile management (Fetch active notifications or user details)

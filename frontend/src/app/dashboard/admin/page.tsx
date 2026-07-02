@@ -42,6 +42,12 @@ export default function AdminDashboard() {
   const [meetingForm, setMeetingForm] = useState({ title: '', agenda: '', meetingTime: '', platform: 'Google Meet', link: '' });
   const [certificateForm, setCertificateForm] = useState({ userId: '', certificateType: 'COMPLETION' });
 
+  // Project member assigner and AI Advisor states
+  const [selectedProjectMembers, setSelectedProjectMembers] = useState<Record<string, string>>({});
+  const [aiAdviceModalOpen, setAiAdviceModalOpen] = useState(false);
+  const [aiAdviceText, setAiAdviceText] = useState('');
+  const [aiAdviceLoading, setAiAdviceLoading] = useState(false);
+
   // Execution states
   const [submitting, setSubmitting] = useState(false);
   const [triggering, setTriggering] = useState(false);
@@ -266,6 +272,61 @@ export default function AdminDashboard() {
       alert('Network error.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleAddMember = async (e: React.FormEvent, projectId: string) => {
+    e.preventDefault();
+    const userId = selectedProjectMembers[projectId];
+    if (!userId) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/projects/member', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ projectId, userId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSelectedProjectMembers({ ...selectedProjectMembers, [projectId]: '' });
+        // Refresh projects list
+        const projRes = await fetch('/api/projects', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (projRes.ok) setProjectsList(await projRes.json());
+        alert('Member added successfully!');
+      } else {
+        alert(data.message || 'Failed to add member.');
+      }
+    } catch (err) {
+      alert('Connection error.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const triggerProjectAIAdvice = async (projectId: string) => {
+    setAiAdviceLoading(true);
+    setAiAdviceText('');
+    setAiAdviceModalOpen(true);
+    try {
+      const res = await fetch(`/api/projects/${projectId}/ai-advise`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAiAdviceText(data.advice);
+      } else {
+        setAiAdviceText(`Error: ${data.message || 'Could not fetch AI advice.'}`);
+      }
+    } catch (err) {
+      setAiAdviceText('Failed to reach AI service.');
+    } finally {
+      setAiAdviceLoading(false);
     }
   };
 
@@ -806,24 +867,80 @@ export default function AdminDashboard() {
                 <span>Active Portal Projects</span>
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-6">
                 {projectsList.length === 0 ? (
-                  <p className="col-span-2 text-xs text-slate-500 text-center py-16">No active projects registered.</p>
+                  <p className="col-span-3 text-xs text-zinc-500 text-center py-16">No active projects registered.</p>
                 ) : (
                   projectsList.map((project: any) => (
-                    <div key={project.id} className="p-4 bg-slate-900/60 border border-white/5 rounded-2xl space-y-3">
+                    <div key={project.id} className="p-5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-2xl space-y-4 shadow-sm relative overflow-hidden">
                       <div className="flex justify-between items-start">
-                        <h4 className="text-sm font-bold text-white">{project.name}</h4>
-                        <span className="text-[9px] bg-blue-500/10 text-blue-400 border border-blue-500/25 px-2 py-0.5 rounded font-bold uppercase">
+                        <div>
+                          <h4 className="text-base font-bold text-zinc-900 dark:text-white">{project.name}</h4>
+                          <span className="text-[10px] text-zinc-500 dark:text-zinc-450 block mt-0.5">ID: {project.id}</span>
+                        </div>
+                        <span className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/25 px-2 py-0.5 rounded font-bold uppercase">
                           {project.status}
                         </span>
                       </div>
+
                       <p className="text-xs text-zinc-500 dark:text-zinc-400">{project.description || 'No description supplied.'}</p>
+
                       {project.githubUrl && (
-                        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-400 hover:underline block pt-1">
-                          🌐 Open GitHub Repository
+                        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-500 hover:underline flex items-center space-x-1 font-bold">
+                          <span>🌐 Open GitHub Repository</span>
                         </a>
                       )}
+
+                      {/* Members Section */}
+                      <div className="pt-3.5 border-t border-zinc-200 dark:border-zinc-800">
+                        <h5 className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Team Members ({project.members?.length || 0})</h5>
+                        {project.members && project.members.length > 0 ? (
+                          <div className="flex flex-wrap gap-1.5 mb-3.5">
+                            {project.members.map((m: any) => (
+                              <span key={m.id} className="text-[10px] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 px-2 py-0.5 rounded-full text-zinc-700 dark:text-zinc-300 font-medium">
+                                {m.user.firstName} {m.user.lastName} <span className="text-[8px] text-zinc-500 uppercase font-bold">({m.user.role.replace('_', ' ')})</span>
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-[10px] text-zinc-500 italic mb-3.5">No members assigned to this project.</p>
+                        )}
+
+                        {/* Assign Member Form */}
+                        <form onSubmit={(e) => handleAddMember(e, project.id)} className="flex items-center space-x-2">
+                          <select
+                            value={selectedProjectMembers[project.id] || ''}
+                            onChange={(e) => setSelectedProjectMembers({ ...selectedProjectMembers, [project.id]: e.target.value })}
+                            className="flex-grow bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-[11px] text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500"
+                          >
+                            <option value="">Select Member to Assign...</option>
+                            {usersList.map((u: any) => (
+                              <option key={u.id} value={u.id}>
+                                {u.firstName} {u.lastName} ({u.role.replace('_', ' ')})
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            type="submit"
+                            disabled={submitting}
+                            className="px-3.5 py-1.5 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-950 text-[10px] font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-sm"
+                          >
+                            Assign
+                          </button>
+                        </form>
+                      </div>
+
+                      {/* AI Sprint Advisor Button */}
+                      <div className="pt-3 border-t border-zinc-200 dark:border-zinc-850 flex justify-between items-center">
+                        <span className="text-[10px] text-zinc-500 font-bold uppercase">{project.tasks?.length || 0} Tasks Assigned</span>
+                        <button
+                          type="button"
+                          onClick={() => triggerProjectAIAdvice(project.id)}
+                          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-[10px] font-bold transition-all shadow-sm"
+                        >
+                          <span>✨ AI Sprint Advisor</span>
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}
@@ -1125,6 +1242,46 @@ export default function AdminDashboard() {
           </div>
         )}
       </main>
+
+      {/* AI Sprint Advisor Modal */}
+      <AnimatePresence>
+        {aiAdviceModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-xs z-50 p-4">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-2xl rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 bg-white dark:bg-zinc-900 shadow-2xl space-y-4 text-zinc-900 dark:text-zinc-100 max-h-[85vh] flex flex-col"
+            >
+              <div className="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-3">
+                <div className="flex items-center space-x-2 text-blue-500">
+                  <span className="text-xl">✨</span>
+                  <h3 className="text-base font-bold">Gemini AI Project Sprint Advisor</h3>
+                </div>
+                <button
+                  onClick={() => setAiAdviceModalOpen(false)}
+                  className="text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-bold"
+                >
+                  Close
+                </button>
+              </div>
+
+              <div className="flex-grow overflow-y-auto pr-1 text-xs leading-relaxed space-y-2.5 whitespace-pre-wrap">
+                {aiAdviceLoading ? (
+                  <div className="flex flex-col items-center justify-center py-12 space-y-3">
+                    <div className="w-8 h-8 rounded-full border-4 border-zinc-200 dark:border-zinc-800 border-t-blue-500 animate-spin"></div>
+                    <p className="text-zinc-500 text-[11px]">Consulting Gemini AI Sprint Advisor...</p>
+                  </div>
+                ) : (
+                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                    {aiAdviceText}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

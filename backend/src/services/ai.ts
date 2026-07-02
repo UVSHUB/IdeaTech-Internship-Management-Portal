@@ -205,3 +205,61 @@ export async function getChatbotResponse(
 
   return `Hello ${internDetails.name}! I am the IdeaTech Assistant. How can I help you today? You can ask me about attendance rules, daily reports, task deadlines, levels/XP, or leave requests.`;
 }
+
+/**
+ * AI Project Health & Sprint advice
+ */
+export async function analyzeProjectSprint(
+  projectName: string,
+  projectDesc: string,
+  members: Array<{ name: string; role: string }>,
+  tasks: Array<{ title: string; priority: string; status: string; assigneeName: string }>
+): Promise<string> {
+  const membersSummary = members.map(m => `- ${m.name} (${m.role})`).join('\n');
+  const tasksSummary = tasks.map(t => `- Task: ${t.title} [Priority: ${t.priority}, Status: ${t.status}, Assigned to: ${t.assigneeName}]`).join('\n');
+
+  const prompt = `You are a Senior Project Manager and Agile Coach at IdeaTech (PVT) LTD.
+  Analyze the current progress of this Work-from-Home intern project:
+  
+  [PROJECT DETAILS]
+  Name: ${projectName}
+  Description: ${projectDesc || 'No description supplied.'}
+  
+  [TEAM MEMBERS]
+  ${membersSummary || 'No members assigned.'}
+  
+  [TASKS IN SPRINT]
+  ${tasksSummary || 'No tasks assigned.'}
+  
+  Please provide:
+  1. Sprint Health Score (out of 100) and brief status.
+  2. Potential Risks (e.g. bottleneck members, high priority tasks pending, communication gap).
+  3. Actionable Recommendations for the team to complete this sprint successfully while working from home.
+  
+  Format in clean, professional Markdown. Limit to 200 words. Tone should be expert, constructive, and motivating.`;
+
+  try {
+    if (GEMINI_API_KEY) {
+      return await callGemini(prompt);
+    }
+  } catch (err) {
+    console.warn('Falling back to rule-based project sprint advice due to Gemini API failure or absence.');
+  }
+
+  // Fallback Rule-Based Sprint Review
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(t => t.status === 'COMPLETED').length;
+  const completionRate = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+  return `### AI Project Sprint Review: ${projectName}
+  
+**Sprint Health Score:** **${completionRate}%** (Based on tasks completed: ${completedTasks}/${totalTasks})
+
+**Potential Risks:**
+- Working-from-home communication issues might delay outstanding tasks.
+- Ensure that high-priority items are unblocked by mentors.
+
+**Actionable Recommendations:**
+- Schedule a short daily standup on Google Meet to sync on task progress.
+- Make sure completed tasks are committed to the GitHub repository and reviewed quickly.`;
+}
