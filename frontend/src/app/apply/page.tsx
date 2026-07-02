@@ -11,6 +11,7 @@ export default function ApplyPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [logoError, setLogoError] = useState(false);
 
   // Form Fields State
   const [formData, setFormData] = useState({
@@ -109,9 +110,18 @@ export default function ApplyPage() {
         className="w-full max-w-3xl rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 bg-white dark:bg-zinc-900 shadow-2xl relative z-10"
       >
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-950 mb-3 font-bold text-lg border border-zinc-200">
-            IT
-          </div>
+          {!logoError ? (
+            <img 
+              src="/logo.png" 
+              alt="Logo" 
+              onError={() => setLogoError(true)} 
+              className="w-12 h-12 object-contain mx-auto mb-3"
+            />
+          ) : (
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-950 mb-3 font-bold text-lg border border-zinc-200 mx-auto">
+              IT
+            </div>
+          )}
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">IdeaTech Internship Application</h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">IdeaTech (PVT) LTD | Internship Lifecycle Portal</p>
         </div>

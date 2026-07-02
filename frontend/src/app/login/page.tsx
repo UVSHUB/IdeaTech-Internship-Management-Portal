@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [logoError, setLogoError] = useState(false);
 
   // Google Login Modal State
   const [googleModalOpen, setGoogleModalOpen] = useState(false);
@@ -104,9 +105,18 @@ export default function LoginPage() {
         className="w-full max-w-md rounded-2xl border border-zinc-800 p-8 bg-zinc-900/60 shadow-2xl relative z-10"
       >
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white text-zinc-950 mb-3 font-bold text-lg border border-zinc-200">
-            IT
-          </div>
+          {!logoError ? (
+            <img 
+              src="/logo.png" 
+              alt="Logo" 
+              onError={() => setLogoError(true)} 
+              className="w-12 h-12 object-contain mx-auto mb-3"
+            />
+          ) : (
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white text-zinc-950 mb-3 font-bold text-lg border border-zinc-200 mx-auto">
+              IT
+            </div>
+          )}
           <h1 className="text-2xl font-bold tracking-tight">Welcome Back</h1>
           <p className="text-xs text-zinc-400 mt-1">IdeaTech Internship Management Portal (ITIMP)</p>
         </div>

@@ -34,6 +34,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
 
   if (!user) return null;
 
@@ -127,9 +128,18 @@ export default function Sidebar({ activeTab }: SidebarProps) {
           {/* Header logo */}
           <div>
             <div className="flex items-center space-x-3 mb-8 px-2">
-              <div className="w-9 h-9 rounded-xl bg-theme-gradient flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20">
-                IT
-              </div>
+              {!logoError ? (
+                <img 
+                  src="/logo.png" 
+                  alt="Logo" 
+                  onError={() => setLogoError(true)} 
+                  className="w-9 h-9 object-contain"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-xl bg-theme-gradient flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20">
+                  IT
+                </div>
+              )}
               <div>
                 <h1 className="font-bold tracking-wider text-sm bg-clip-text text-transparent bg-theme-gradient">
                   IDEATECH
