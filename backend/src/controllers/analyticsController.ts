@@ -45,7 +45,7 @@ export async function getDashboardStats(req: AuthenticatedRequest, res: Response
       _count: true,
       orderBy: {
         _count: {
-          desc: true,
+          id: 'desc',
         },
       },
       take: 5,
