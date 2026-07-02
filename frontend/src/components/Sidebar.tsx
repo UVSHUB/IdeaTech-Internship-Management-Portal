@@ -133,7 +133,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
                   src="/logo.png" 
                   alt="Logo" 
                   onError={() => setLogoError(true)} 
-                  className="w-9 h-9 object-contain"
+                  className="w-11 h-11 object-contain dark:invert"
                 />
               ) : (
                 <div className="w-9 h-9 rounded-xl bg-theme-gradient flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20">

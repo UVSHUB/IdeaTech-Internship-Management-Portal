@@ -110,7 +110,7 @@ export default function LoginPage() {
               src="/logo.png" 
               alt="Logo" 
               onError={() => setLogoError(true)} 
-              className="w-12 h-12 object-contain mx-auto mb-3"
+              className="w-20 h-20 object-contain mx-auto mb-3 dark:invert"
             />
           ) : (
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white text-zinc-950 mb-3 font-bold text-lg border border-zinc-200 mx-auto">
