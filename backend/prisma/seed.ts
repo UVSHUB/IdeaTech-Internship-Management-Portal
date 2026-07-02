@@ -180,6 +180,9 @@ async function main() {
       preferredTech: 'Node.js',
       availability: 'August 2026',
       status: 'PENDING',
+      mobileNumber: '+94779876543',
+      address: 'No 12, Galle Road, Colombo 03',
+      emergencyContact: '+94715555555 (Mother)',
     },
   });
 
