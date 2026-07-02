@@ -97,12 +97,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-zinc-950 text-zinc-100 relative">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 relative">
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-md rounded-2xl border border-zinc-800 p-8 bg-zinc-900/60 shadow-2xl relative z-10"
+        className="w-full max-w-md rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8 bg-zinc-50 dark:bg-zinc-900/60 shadow-xl dark:shadow-2xl relative z-10"
       >
         <div className="text-center mb-6">
           {!logoError ? (
@@ -117,45 +117,45 @@ export default function LoginPage() {
               IT
             </div>
           )}
-          <h1 className="text-2xl font-bold tracking-tight">Welcome Back</h1>
-          <p className="text-xs text-zinc-400 mt-1">IdeaTech Internship Management Portal (ITIMP)</p>
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Welcome Back</h1>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">IdeaTech Internship Management Portal (ITIMP)</p>
         </div>
 
         {/* Admin Quick Login Pill */}
-        <div className="mb-6 p-3.5 rounded-xl bg-zinc-950 border border-zinc-800 flex justify-between items-center">
+        <div className="mb-6 p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <ShieldAlert size={16} className="text-zinc-300" />
+            <ShieldAlert size={16} className="text-zinc-650 dark:text-zinc-300" />
             <div className="text-left">
-              <span className="text-[10px] text-zinc-550 block font-bold uppercase tracking-wider">Admin Sandbox</span>
-              <span className="text-[11px] text-zinc-300 font-medium">vibodhasilvaulindu@gmail.com</span>
+              <span className="text-[10px] text-zinc-500 dark:text-zinc-450 block font-bold uppercase tracking-wider">Admin Sandbox</span>
+              <span className="text-[11px] text-zinc-850 dark:text-zinc-300 font-medium">vibodhasilvaulindu@gmail.com</span>
             </div>
           </div>
           <button
             type="button"
             onClick={handleAdminQuickLogin}
-            className="px-3 py-1.5 rounded-lg bg-white text-zinc-950 hover:bg-zinc-200 text-[10px] font-bold transition-colors shadow-sm"
+            className="px-3 py-1.5 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-[10px] font-bold transition-colors shadow-sm"
           >
             Quick Login
           </button>
         </div>
 
         {error && (
-          <div className="p-3 mb-4 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300 text-xs text-center leading-relaxed">
+          <div className="p-3 mb-4 rounded-xl bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-300 text-xs text-center leading-relaxed">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-[11px] text-zinc-450 mb-1 font-semibold tracking-wider">EMAIL ADDRESS</label>
+            <label className="block text-[11px] text-zinc-500 dark:text-zinc-450 mb-1 font-semibold tracking-wider">EMAIL ADDRESS</label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-3 text-zinc-500" size={14} />
+              <Mail className="absolute left-3.5 top-3 text-zinc-400 dark:text-zinc-500" size={14} />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-zinc-500 transition-colors"
+                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                 placeholder="e.g. name@domain.com"
               />
             </div>
@@ -163,23 +163,23 @@ export default function LoginPage() {
 
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="block text-[11px] text-zinc-450 font-semibold tracking-wider">PASSWORD</label>
+              <label className="block text-[11px] text-zinc-500 dark:text-zinc-450 mb-1 font-semibold tracking-wider">PASSWORD</label>
               <button
                 type="button"
                 onClick={() => setError('Use your seeded password (e.g. Ulindu_2004 for admin, password123 for others).')}
-                className="text-[10px] text-zinc-400 hover:underline"
+                className="text-[10px] text-zinc-500 dark:text-zinc-400 hover:underline"
               >
                 Forgot Password?
               </button>
             </div>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-3 text-zinc-500" size={14} />
+              <Lock className="absolute left-3.5 top-3 text-zinc-400 dark:text-zinc-500" size={14} />
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-zinc-500 transition-colors"
+                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -189,7 +189,7 @@ export default function LoginPage() {
             type="submit"
             id="login-submit-btn"
             disabled={loading}
-            className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-sm transition-colors mt-6 shadow-md shadow-black/10"
+            className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-sm transition-colors mt-6 shadow-md shadow-black/10"
           >
             {loading ? <span>Authenticating Session...</span> : (
               <>
@@ -201,24 +201,24 @@ export default function LoginPage() {
         </form>
 
         <div className="relative flex py-4 items-center">
-          <div className="flex-grow border-t border-zinc-800"></div>
-          <span className="flex-shrink mx-4 text-[9px] text-zinc-500 uppercase tracking-widest">or login with</span>
-          <div className="flex-grow border-t border-zinc-800"></div>
+          <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
+          <span className="flex-shrink mx-4 text-[9px] text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">or login with</span>
+          <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
         </div>
 
         {/* Google OAuth Simulation trigger */}
         <button
           type="button"
           onClick={() => setGoogleModalOpen(true)}
-          className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-900 text-zinc-300 font-semibold text-xs transition-colors border border-zinc-800 shadow-sm"
+          className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-700 dark:text-zinc-300 font-semibold text-xs transition-colors border border-zinc-250 dark:border-zinc-800 shadow-sm"
         >
-          <Chrome size={13} className="text-zinc-300" />
+          <Chrome size={13} className="text-zinc-500 dark:text-zinc-300" />
           <span>Google Workspace SSO</span>
         </button>
 
-        <div className="text-center mt-6 text-xs text-zinc-400">
+        <div className="text-center mt-6 text-xs text-zinc-500 dark:text-zinc-400">
           Not registered yet?{' '}
-          <button onClick={() => router.push('/apply')} className="text-zinc-200 font-semibold hover:underline">
+          <button onClick={() => router.push('/apply')} className="text-zinc-950 dark:text-zinc-200 font-semibold hover:underline">
             Submit Internship Form
           </button>
         </div>
