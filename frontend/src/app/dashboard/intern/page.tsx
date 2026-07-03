@@ -8,7 +8,7 @@ import GlassCard from '@/components/GlassCard';
 import { motion } from 'framer-motion';
 import { 
   Award, Zap, Calendar, AlertTriangle, MessageSquare, 
-  Send, CheckCircle, Clock, MapPin, Code, Loader2, Play 
+  Send, CheckCircle, Clock, MapPin, Code, Loader2, Play, FolderGit2
 } from 'lucide-react';
 
 export default function InternDashboard() {
