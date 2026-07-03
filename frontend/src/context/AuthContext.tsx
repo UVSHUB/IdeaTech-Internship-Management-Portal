@@ -100,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       router.push('/dashboard/admin');
     } else if (userData.role === 'HR_MANAGER') {
       router.push('/dashboard/hr');
-    } else if (userData.role === 'TEAM_LEADER') {
+    } else if (userData.role === 'TEAM_LEADER' || userData.role === 'PROJECT_MANAGER') {
       router.push('/dashboard/team-leader');
     } else if (userData.role === 'MENTOR') {
       router.push('/dashboard/mentor');

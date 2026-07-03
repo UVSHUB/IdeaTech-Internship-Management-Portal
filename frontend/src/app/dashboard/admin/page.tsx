@@ -42,6 +42,8 @@ export default function AdminDashboard() {
   const [projectForm, setProjectForm] = useState({ name: '', description: '', githubUrl: '' });
   const [meetingForm, setMeetingForm] = useState({ title: '', agenda: '', meetingTime: '', platform: 'Google Meet', link: '' });
   const [certificateForm, setCertificateForm] = useState({ userId: '', certificateType: 'COMPLETION' });
+  const [staffForm, setStaffForm] = useState({ firstName: '', lastName: '', email: '', password: '', role: 'TEAM_LEADER' });
+  const [staffMsg, setStaffMsg] = useState('');
 
   // Project member assigner and AI Advisor states
   const [selectedProjectMembers, setSelectedProjectMembers] = useState<Record<string, string>>({});
@@ -390,6 +392,36 @@ export default function AdminDashboard() {
       }
     } catch {
       alert('Network error.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleRegisterStaff = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!staffForm.firstName || !staffForm.lastName || !staffForm.email || !staffForm.password || !staffForm.role) return;
+    setSubmitting(true);
+    setStaffMsg('');
+    try {
+      const res = await fetch('/api/auth/register-staff', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(staffForm),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setStaffMsg('✅ Staff member registered successfully!');
+        setStaffForm({ firstName: '', lastName: '', email: '', password: '', role: 'TEAM_LEADER' });
+        // Refresh users list so they can be assigned to projects immediately
+        fetchBaseData();
+      } else {
+        setStaffMsg(`❌ ${data.message || 'Failed to register staff.'}`);
+      }
+    } catch (err) {
+      setStaffMsg('❌ Network error.');
     } finally {
       setSubmitting(false);
     }
@@ -1306,6 +1338,142 @@ export default function AdminDashboard() {
                   className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all shadow-md"
                 >
                   Generate & Download Certificate
+                </button>
+              </form>
+            </GlassCard>
+          </div>
+        )}
+
+        {/* 9. STAFF REGISTRATION VIEW */}
+        {tab === 'staff' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <GlassCard className="lg:col-span-2 space-y-4">
+              <h2 className="text-lg font-bold flex items-center space-x-2 text-blue-400 border-b border-white/5 pb-2">
+                <Users size={20} />
+                <span>Active Staff & Project Leaders Directory</span>
+              </h2>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-white/5 text-slate-500 uppercase font-semibold">
+                      <th className="py-2.5">Name</th>
+                      <th className="py-2.5">Email</th>
+                      <th className="py-2.5">Role</th>
+                      <th className="py-2.5 text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5 text-zinc-600 dark:text-zinc-400">
+                    {usersList.filter(u => ['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR'].includes(u.role)).length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="text-center py-16 text-slate-500">No staff members found.</td>
+                      </tr>
+                    ) : (
+                      usersList.filter(u => ['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR'].includes(u.role)).map((staff: any) => (
+                        <tr key={staff.id}>
+                          <td className="py-3 font-bold text-white">{staff.firstName} {staff.lastName}</td>
+                          <td className="py-3 font-mono text-zinc-500">{staff.email}</td>
+                          <td className="py-3 text-zinc-650 dark:text-zinc-400">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              staff.role === 'SUPER_ADMIN' ? 'bg-red-500/10 text-red-400' :
+                              staff.role === 'PROJECT_MANAGER' ? 'bg-amber-500/10 text-amber-450 border border-amber-500/25' :
+                              staff.role === 'TEAM_LEADER' ? 'bg-blue-500/10 text-blue-400' :
+                              'bg-zinc-500/10 text-zinc-400'
+                            }`}>
+                              {staff.role.replace('_', ' ')}
+                            </span>
+                          </td>
+                          <td className="py-3 text-center">
+                            <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-450 rounded text-[9px] font-bold">
+                              ACTIVE
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </GlassCard>
+
+            <GlassCard className="space-y-4">
+              <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Register Staff Member</h3>
+              <form onSubmit={handleRegisterStaff} className="space-y-4 text-xs">
+                {staffMsg && (
+                  <div className={`p-3 rounded-xl text-xs font-semibold ${staffMsg.startsWith('✅') ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                    {staffMsg}
+                  </div>
+                )}
+                
+                <div>
+                  <label className="block text-slate-550 mb-1">FIRST NAME *</label>
+                  <input
+                    type="text"
+                    required
+                    value={staffForm.firstName}
+                    onChange={(e) => setStaffForm({ ...staffForm, firstName: e.target.value })}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
+                    placeholder="e.g. Ruwan"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-550 mb-1">LAST NAME *</label>
+                  <input
+                    type="text"
+                    required
+                    value={staffForm.lastName}
+                    onChange={(e) => setStaffForm({ ...staffForm, lastName: e.target.value })}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
+                    placeholder="e.g. Perera"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-550 mb-1">EMAIL ADDRESS *</label>
+                  <input
+                    type="email"
+                    required
+                    value={staffForm.email}
+                    onChange={(e) => setStaffForm({ ...staffForm, email: e.target.value })}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
+                    placeholder="e.g. ruwan@ideatech.lk"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-550 mb-1">PASSWORD *</label>
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    value={staffForm.password}
+                    onChange={(e) => setStaffForm({ ...staffForm, password: e.target.value })}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
+                    placeholder="••••••••"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-550 mb-1">DESIGNATED ROLE *</label>
+                  <select
+                    value={staffForm.role}
+                    onChange={(e) => setStaffForm({ ...staffForm, role: e.target.value })}
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
+                  >
+                    <option value="PROJECT_MANAGER">Project Manager (PM)</option>
+                    <option value="TEAM_LEADER">Team Leader</option>
+                    <option value="MENTOR">Mentor / Supervisor</option>
+                    <option value="HR_MANAGER">HR Manager</option>
+                  </select>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all shadow-md"
+                >
+                  {submitting ? 'Registering Staff...' : 'Create Staff Member'}
                 </button>
               </form>
             </GlassCard>

@@ -465,3 +465,49 @@ export async function googleLogin(req: Request, res: Response) {
     return res.status(500).json({ message: 'Internal server error.', error: error.message });
   }
 }
+
+/**
+ * Admin: Register Staff Member (Team Lead, PM, Mentor)
+ */
+export async function registerStaff(req: Request, res: Response) {
+  try {
+    const { email, password, firstName, lastName, role } = req.body;
+
+    if (!['TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR', 'HR_MANAGER'].includes(role)) {
+      return res.status(400).json({ message: 'Invalid staff role specified.' });
+    }
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email is already registered.' });
+    }
+
+    const bcrypt = require('bcryptjs');
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        email,
+        passwordHash,
+        firstName,
+        lastName,
+        role: role as any,
+      },
+    });
+
+    return res.status(201).json({
+      message: `${role.replace('_', ' ')} registered successfully!`,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+      },
+    });
+  } catch (error: any) {
+    console.error('Register staff error:', error);
+    return res.status(500).json({ message: 'Internal server error.', error: error.message });
+  }
+}

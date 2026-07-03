@@ -21,7 +21,8 @@ import {
   Moon,
   Menu,
   X,
-  User
+  User,
+  Users
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -44,6 +45,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
     let roleSlug = role.toLowerCase().replace('_', '-');
     if (role === 'SUPER_ADMIN') roleSlug = 'admin';
     if (role === 'HR_MANAGER') roleSlug = 'hr';
+    if (role === 'PROJECT_MANAGER') roleSlug = 'team-leader';
 
     const base = [
       { name: 'Dashboard', icon: LayoutDashboard, path: `/dashboard/${roleSlug}` }
@@ -59,6 +61,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
         { name: 'Meetings', icon: CalendarRange, path: '/dashboard/admin/meetings' },
         { name: 'Leave Requests', icon: FileText, path: '/dashboard/admin/leaves' },
         { name: 'Certificates', icon: Award, path: '/dashboard/admin/certificates' },
+        { name: 'Staff Management', icon: Users, path: '/dashboard/admin/staff' },
       ];
     }
 
@@ -72,7 +75,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
       ];
     }
 
-    if (role === 'TEAM_LEADER') {
+    if (role === 'TEAM_LEADER' || role === 'PROJECT_MANAGER') {
       return [
         ...base,
         { name: 'Task Board', icon: CheckSquare, path: '/dashboard/team-leader/tasks' },

@@ -9,6 +9,7 @@ import {
   approveIntern,
   rejectIntern,
   googleLogin,
+  registerStaff,
 } from '../controllers/authController';
 
 import {
@@ -99,6 +100,12 @@ router.get('/departments', async (req: Request, res: Response) => {
 // ==========================================
 router.use(authenticateToken as any);
 
+router.post(
+  '/auth/register-staff',
+  authorizeRoles(['SUPER_ADMIN']),
+  registerStaff as any
+);
+
 // Auth - Admin approvals
 router.post(
   '/auth/approve/:profileId',
@@ -137,7 +144,7 @@ router.post('/attendance/checkout', authorizeRoles(['INTERN']), checkOut as any)
 router.get('/attendance/my', authorizeRoles(['INTERN']), getMyAttendance as any);
 router.get(
   '/attendance/reports',
-  authorizeRoles(['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'MENTOR']),
+  authorizeRoles(['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR']),
   getAttendanceReports as any
 );
 
@@ -145,13 +152,13 @@ router.get(
 router.post('/reports/submit', authorizeRoles(['INTERN']), upload.single('screenshot'), submitReport as any);
 router.post(
   '/reports/review/:reportId',
-  authorizeRoles(['SUPER_ADMIN', 'MENTOR', 'TEAM_LEADER']),
+  authorizeRoles(['SUPER_ADMIN', 'MENTOR', 'TEAM_LEADER', 'PROJECT_MANAGER']),
   reviewReport as any
 );
 router.get('/reports/my', authorizeRoles(['INTERN']), getMyReports as any);
 router.get(
   '/reports/pending',
-  authorizeRoles(['SUPER_ADMIN', 'MENTOR', 'TEAM_LEADER']),
+  authorizeRoles(['SUPER_ADMIN', 'MENTOR', 'TEAM_LEADER', 'PROJECT_MANAGER']),
   getPendingReports as any
 );
 
@@ -170,35 +177,35 @@ router.get(
 );
 
 // Tasks & Projects
-router.post('/tasks', authorizeRoles(['SUPER_ADMIN', 'TEAM_LEADER']), createTask as any);
+router.post('/tasks', authorizeRoles(['SUPER_ADMIN', 'TEAM_LEADER', 'PROJECT_MANAGER']), createTask as any);
 router.get('/tasks', getTasks as any);
 router.post('/tasks/update/:taskId', authorizeRoles(['INTERN']), updateTaskStatus as any);
 router.post(
   '/tasks/review/:taskId',
-  authorizeRoles(['SUPER_ADMIN', 'TEAM_LEADER', 'MENTOR']),
+  authorizeRoles(['SUPER_ADMIN', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR']),
   reviewTask as any
 );
 
 router.post('/projects', authorizeRoles(['SUPER_ADMIN']), createProject as any);
 router.get('/projects', getProjects as any);
-router.post('/projects/member', authorizeRoles(['SUPER_ADMIN', 'TEAM_LEADER']), addProjectMember as any);
+router.post('/projects/member', authorizeRoles(['SUPER_ADMIN', 'TEAM_LEADER', 'PROJECT_MANAGER']), addProjectMember as any);
 
 // Meetings
 router.post(
   '/meetings',
-  authorizeRoles(['SUPER_ADMIN', 'TEAM_LEADER', 'MENTOR']),
+  authorizeRoles(['SUPER_ADMIN', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR']),
   createMeeting as any
 );
 router.get('/meetings', getMeetings as any);
 router.post('/meetings/join/:meetingId', authorizeRoles(['INTERN']), joinMeeting as any);
 router.post(
   '/meetings/grade/:meetingId/:userId',
-  authorizeRoles(['SUPER_ADMIN', 'TEAM_LEADER', 'MENTOR']),
+  authorizeRoles(['SUPER_ADMIN', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR']),
   gradeParticipation as any
 );
 router.post(
   '/meetings/attendance/:meetingId',
-  authorizeRoles(['SUPER_ADMIN', 'TEAM_LEADER', 'MENTOR']),
+  authorizeRoles(['SUPER_ADMIN', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR']),
   updateAttendance as any
 );
 
@@ -224,12 +231,12 @@ router.get('/analytics/intern', authorizeRoles(['INTERN']), getInternStats as an
 router.post('/chatbot/chat', authorizeRoles(['INTERN']), chatSupport as any);
 router.get(
   '/chatbot/feedback/:internId',
-  authorizeRoles(['SUPER_ADMIN', 'MENTOR', 'TEAM_LEADER']),
+  authorizeRoles(['SUPER_ADMIN', 'MENTOR', 'TEAM_LEADER', 'PROJECT_MANAGER']),
   triggerWeeklyFeedback as any
 );
 router.get(
   '/projects/:projectId/ai-advise',
-  authorizeRoles(['SUPER_ADMIN', 'MENTOR', 'TEAM_LEADER']),
+  authorizeRoles(['SUPER_ADMIN', 'MENTOR', 'TEAM_LEADER', 'PROJECT_MANAGER']),
   getProjectAIAdvice as any
 );
 
@@ -276,7 +283,7 @@ router.post('/users/notifications/read', async (req: Request | any, res: Respons
 // Admin list of active users to help with assignments
 router.get(
   '/users/list',
-  authorizeRoles(['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER']),
+  authorizeRoles(['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER']),
   async (req: Request, res: Response) => {
     try {
       const users = await prisma.user.findMany({
