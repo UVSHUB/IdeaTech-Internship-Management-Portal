@@ -47,6 +47,7 @@ import {
   joinMeeting,
   gradeParticipation,
   getMeetings,
+  updateAttendance,
 } from '../controllers/meetingController';
 
 import {
@@ -194,6 +195,11 @@ router.post(
   '/meetings/grade/:meetingId/:userId',
   authorizeRoles(['SUPER_ADMIN', 'TEAM_LEADER', 'MENTOR']),
   gradeParticipation as any
+);
+router.post(
+  '/meetings/attendance/:meetingId',
+  authorizeRoles(['SUPER_ADMIN', 'TEAM_LEADER', 'MENTOR']),
+  updateAttendance as any
 );
 
 // Leaves

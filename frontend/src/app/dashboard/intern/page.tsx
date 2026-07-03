@@ -27,6 +27,7 @@ export default function InternDashboard() {
   const [tasksList, setTasksList] = useState<any[]>([]);
   const [leavesList, setLeavesList] = useState<any[]>([]);
   const [certificatesList, setCertificatesList] = useState<any[]>([]);
+  const [meetingsList, setMeetingsList] = useState<any[]>([]);
 
   // Clock state
   const [checkInTime, setCheckInTime] = useState<string | null>(null);
@@ -110,8 +111,38 @@ export default function InternDashboard() {
           setAttendanceStatus('Not Checked In');
         }
       }
+
+      // 3. Fetch scheduled sprint meetings
+      const meetRes = await fetch('/api/meetings', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (meetRes.ok) {
+        setMeetingsList(await meetRes.json());
+      }
     } catch (err) {
       console.error('Error loading base intern stats:', err);
+    }
+  };
+
+  const handleJoinMeeting = async (meetingId: string, meetLink: string) => {
+    try {
+      const res = await fetch(`/api/meetings/join/${meetingId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (res.ok) {
+        window.open(meetLink, '_blank');
+        fetchBaseData();
+      } else {
+        const data = await res.json();
+        alert(data.message || 'Failed to log meeting attendance.');
+        window.open(meetLink, '_blank');
+      }
+    } catch {
+      window.open(meetLink, '_blank');
     }
   };
 
@@ -398,6 +429,47 @@ export default function InternDashboard() {
           </div>
         </div>
 
+        {/* Active Meeting Popup Banner */}
+        {(() => {
+          const now = new Date();
+          const activeMeeting = meetingsList?.find((m: any) => {
+            const mTime = new Date(m.meetingTime);
+            const diffMinutes = (mTime.getTime() - now.getTime()) / (60 * 1000);
+            // active if scheduled starts in next 30 mins or started in last 90 mins
+            return diffMinutes >= -90 && diffMinutes <= 30;
+          });
+
+          if (!activeMeeting) return null;
+
+          const hasAttended = activeMeeting.myAttendance?.joinedAt;
+
+          return (
+            <div className="bg-zinc-900 border border-zinc-700 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-white shadow-lg animate-pulse">
+              <div className="space-y-1">
+                <span className="text-[10px] bg-red-600 text-white font-bold uppercase px-2 py-0.5 rounded-full">🔴 Live Sprint Meeting</span>
+                <h4 className="text-sm font-bold">{activeMeeting.title}</h4>
+                <p className="text-xs text-zinc-400">{activeMeeting.agenda || 'No agenda supplied.'}</p>
+                <p className="text-[10px] text-zinc-500">Scheduled: {new Date(activeMeeting.meetingTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+              </div>
+
+              <div>
+                {hasAttended ? (
+                  <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 px-4 py-2 rounded-xl font-bold block text-center">
+                    ✓ Attendance Logged
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => handleJoinMeeting(activeMeeting.id, activeMeeting.link)}
+                    className="px-5 py-2.5 bg-white text-zinc-950 hover:bg-zinc-200 transition-colors font-bold text-xs rounded-xl shadow-md flex items-center space-x-1.5"
+                  >
+                    <span>✨ Join Google Meet & Clock Attendance</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* 1. DEFAULT OVERVIEW VIEW */}
         {!tab && (
           <>
@@ -639,6 +711,48 @@ export default function InternDashboard() {
                 </div>
               </div>
             </GlassCard>
+
+            {/* Meeting Attendance Requirement */}
+            {(() => {
+              const totalMeets = meetingsList.length;
+              const attendedMeets = meetingsList.filter((m: any) => m.myAttendance?.joinedAt).length;
+              const rate = totalMeets > 0 ? Math.round((attendedMeets / totalMeets) * 100) : 100;
+              const isBelowThreshold = rate < 80;
+
+              return (
+                <GlassCard className="space-y-3">
+                  <h3 className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Sprint Meetings Attendance</h3>
+                  <div className="flex justify-between items-center pt-1">
+                    <span className="text-xs text-zinc-500">Attendance Rate:</span>
+                    <span className={`text-base font-bold ${isBelowThreshold ? 'text-red-500' : 'text-emerald-500'}`}>
+                      {rate}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-[10px] text-zinc-500">
+                    <span>Target Threshold:</span>
+                    <span className="font-bold text-zinc-700 dark:text-zinc-300">80% Required</span>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="w-full bg-zinc-200 dark:bg-zinc-800 h-2 rounded-full overflow-hidden mt-1">
+                    <div 
+                      className={`h-full ${isBelowThreshold ? 'bg-red-500' : 'bg-emerald-500'}`}
+                      style={{ width: `${Math.min(rate, 100)}%` }}
+                    />
+                  </div>
+
+                  {isBelowThreshold ? (
+                    <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-[10px] text-red-400 leading-normal font-semibold">
+                      ⚠️ Warning: Your meeting attendance is below the 80% threshold. Please join all scheduled sprint meetings.
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-[10px] text-emerald-450 leading-normal">
+                      ✓ Good Standing: Your meeting attendance meets the portal requirement.
+                    </div>
+                  )}
+                </GlassCard>
+              );
+            })()}
           </div>
         )}
 

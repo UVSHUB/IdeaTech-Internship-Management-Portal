@@ -201,3 +201,39 @@ export async function getMeetings(req: AuthenticatedRequest, res: Response) {
     return res.status(500).json({ message: 'Internal server error.' });
   }
 }
+
+/**
+ * Admin/TL/Mentor: Manually override/update Meeting Attendance
+ */
+export async function updateAttendance(req: AuthenticatedRequest, res: Response) {
+  try {
+    const { meetingId } = req.params;
+    const { userId, attended } = req.body; // attended: boolean
+
+    const attendance = await prisma.meetingAttendance.upsert({
+      where: {
+        meetingId_userId: { meetingId, userId },
+      },
+      update: {
+        joinedAt: attended ? new Date() : null,
+        late: false,
+        participationScore: attended ? 8.0 : 0.0,
+      },
+      create: {
+        meetingId,
+        userId,
+        joinedAt: attended ? new Date() : null,
+        late: false,
+        participationScore: attended ? 8.0 : 0.0,
+      },
+    });
+
+    return res.json({
+      message: 'Meeting attendance updated successfully.',
+      attendance,
+    });
+  } catch (error: any) {
+    console.error('Update meeting attendance error:', error);
+    return res.status(500).json({ message: 'Internal server error.', error: error.message });
+  }
+}

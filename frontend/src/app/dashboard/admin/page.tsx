@@ -344,6 +344,30 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleToggleMeetingAttendance = async (meetingId: string, userId: string, currentStatus: boolean) => {
+    try {
+      const res = await fetch(`/api/meetings/attendance/${meetingId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userId, attended: !currentStatus }),
+      });
+      if (res.ok) {
+        // Refresh meetings data
+        const meetRes = await fetch('/api/meetings', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (meetRes.ok) setMeetingsList(await meetRes.json());
+      } else {
+        alert('Failed to update attendance.');
+      }
+    } catch {
+      alert('Error communicating with database.');
+    }
+  };
+
   const handleCreateMeeting = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!meetingForm.title || !meetingForm.meetingTime || !meetingForm.link) return;
@@ -1040,6 +1064,38 @@ export default function AdminDashboard() {
                         <a href={meeting.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline font-bold">
                           Join Meeting 🔗
                         </a>
+                      </div>
+
+                      {/* Manual Attendance Overrides */}
+                      <div className="mt-3 pt-3 border-t border-zinc-200 dark:border-zinc-800">
+                        <h5 className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Manual Attendance Overrides</h5>
+                        {meeting.attendance && meeting.attendance.length > 0 ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px]">
+                            {meeting.attendance.map((att: any) => {
+                              const isPresent = !!att.joinedAt;
+                              return (
+                                <div key={att.id} className="flex items-center justify-between p-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-lg">
+                                  <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                                    {att.user?.firstName} {att.user?.lastName}
+                                  </span>
+                                  <label className="flex items-center space-x-1.5 cursor-pointer">
+                                    <input 
+                                      type="checkbox"
+                                      checked={isPresent}
+                                      onChange={() => handleToggleMeetingAttendance(meeting.id, att.userId, isPresent)}
+                                      className="rounded bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-800 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
+                                    />
+                                    <span className={`text-[8.5px] font-bold uppercase ${isPresent ? 'text-emerald-500' : 'text-zinc-500'}`}>
+                                      {isPresent ? 'Present' : 'Absent'}
+                                    </span>
+                                  </label>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <p className="text-[9px] text-zinc-500 italic">No attendance log initialized for this meeting.</p>
+                        )}
                       </div>
                     </div>
                   ))
