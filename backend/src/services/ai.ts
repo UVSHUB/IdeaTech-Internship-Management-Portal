@@ -1,4 +1,3 @@
-import fetch from 'node-fetch'; // Fallback to import if needed, but in Node 25 global fetch is available.
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const MODEL_NAME = 'gemini-1.5-flash';

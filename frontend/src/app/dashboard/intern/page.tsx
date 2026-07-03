@@ -28,6 +28,17 @@ export default function InternDashboard() {
   const [leavesList, setLeavesList] = useState<any[]>([]);
   const [certificatesList, setCertificatesList] = useState<any[]>([]);
   const [meetingsList, setMeetingsList] = useState<any[]>([]);
+  const [commits, setCommits] = useState<any[]>([]);
+  const [scorecards, setScorecards] = useState<any[]>([]);
+  const [workingHours, setWorkingHours] = useState<any[]>([]);
+  const [hoursPlanner, setHoursPlanner] = useState<Record<string, { startTime: string, endTime: string }>>({
+    Monday: { startTime: '09:00', endTime: '17:00' },
+    Tuesday: { startTime: '09:00', endTime: '17:00' },
+    Wednesday: { startTime: '09:00', endTime: '17:00' },
+    Thursday: { startTime: '09:00', endTime: '17:00' },
+    Friday: { startTime: '09:00', endTime: '17:00' },
+  });
+  const [hoursPlannerMsg, setHoursPlannerMsg] = useState('');
 
   // Clock state
   const [checkInTime, setCheckInTime] = useState<string | null>(null);
@@ -119,8 +130,72 @@ export default function InternDashboard() {
       if (meetRes.ok) {
         setMeetingsList(await meetRes.json());
       }
+
+      // 4. Fetch GitHub commits
+      const commitRes = await fetch('/api/github/commits', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (commitRes.ok) {
+        setCommits(await commitRes.json());
+      }
+
+      // 5. Fetch Weekly AI Scorecards
+      const scRes = await fetch('/api/weekly-scorecard/my', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (scRes.ok) {
+        setScorecards(await scRes.json());
+      }
+
+      // 6. Fetch Working Hours Plan
+      const whRes = await fetch('/api/working-hours/plan', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (whRes.ok) {
+        const whData = await whRes.json();
+        setWorkingHours(whData);
+        // Map workingHours to form state
+        if (whData.length > 0) {
+          const mapped: any = { ...hoursPlanner };
+          whData.forEach((w: any) => {
+            mapped[w.dayOfWeek] = { startTime: w.startTime, endTime: w.endTime };
+          });
+          setHoursPlanner(mapped);
+        }
+      }
     } catch (err) {
       console.error('Error loading base intern stats:', err);
+    }
+  };
+
+  const handleSaveHoursPlan = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setHoursPlannerMsg('');
+    try {
+      const plans = Object.entries(hoursPlanner).map(([dayOfWeek, times]) => ({
+        dayOfWeek,
+        startTime: times.startTime,
+        endTime: times.endTime,
+      }));
+      const res = await fetch('/api/working-hours/plan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ plans }),
+      });
+      if (res.ok) {
+        setHoursPlannerMsg('✅ Flexible hours plan saved successfully!');
+        const whRes = await fetch('/api/working-hours/plan', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (whRes.ok) setWorkingHours(await whRes.json());
+      } else {
+        setHoursPlannerMsg('❌ Failed to save working hours plan.');
+      }
+    } catch {
+      setHoursPlannerMsg('❌ Network error.');
     }
   };
 
@@ -576,6 +651,42 @@ export default function InternDashboard() {
                     </div>
                   )}
                 </GlassCard>
+
+                {/* GitHub Commit Activity Feed */}
+                <GlassCard>
+                  <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-3 flex items-center space-x-1.5">
+                    <FolderGit2 size={16} className="text-blue-400" />
+                    <span>Real-time GitHub Commit Feed ({commits.length})</span>
+                  </h3>
+                  {commits.length === 0 ? (
+                    <div className="p-4 bg-zinc-950/40 border border-zinc-800 rounded-xl text-center text-xs text-zinc-500 italic">
+                      No recent commits fetched. Make sure your GitHub username is set on your profile.
+                    </div>
+                  ) : (
+                    <div className="space-y-3.5 max-h-[300px] overflow-y-auto pr-1">
+                      {commits.map((commit: any, index: number) => (
+                        <div key={commit.id || index} className="p-3 bg-zinc-950/20 border border-white/5 rounded-xl text-xs flex justify-between items-start gap-4">
+                          <div className="space-y-1">
+                            <p className="font-semibold text-zinc-200">{commit.message}</p>
+                            <div className="flex items-center space-x-2 text-[10px] text-zinc-500">
+                              <span className="font-mono bg-zinc-800 text-zinc-400 px-1 py-0.2 rounded">{commit.sha.substring(0, 7)}</span>
+                              <span>•</span>
+                              <span>{new Date(commit.date).toLocaleString()}</span>
+                            </div>
+                          </div>
+                          <a 
+                            href={commit.htmlUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="px-2.5 py-1 bg-zinc-850 hover:bg-zinc-800 text-zinc-300 rounded font-bold text-[10px] border border-white/5 whitespace-nowrap animate-pulse"
+                          >
+                            View Commit 🔗
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </GlassCard>
               </div>
 
               {/* Right Column: Gamification progress & Assistant */}
@@ -753,6 +864,119 @@ export default function InternDashboard() {
                 </GlassCard>
               );
             })()}
+
+            {/* Weekly Performance Scorecard */}
+            <GlassCard className="space-y-3">
+              <h3 className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">AI Weekly Performance Scorecards</h3>
+              {scorecards.length === 0 ? (
+                <p className="text-[10px] text-zinc-500 italic">No scorecards generated yet. Your mentor will generate one soon.</p>
+              ) : (
+                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                  {scorecards.map((sc: any) => (
+                    <div key={sc.id} className="p-3 bg-zinc-950/45 border border-white/5 rounded-xl space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-zinc-500 font-mono">Week Ending: {new Date(sc.weekEnd).toLocaleDateString()}</span>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                          sc.score >= 80 ? 'bg-emerald-500/10 text-emerald-400' :
+                          sc.score >= 50 ? 'bg-amber-500/10 text-amber-400' :
+                          'bg-red-500/10 text-red-400'
+                        }`}>
+                          Score: {sc.score}/100
+                        </span>
+                      </div>
+                      <p className="text-[10.5px] text-zinc-650 dark:text-zinc-300 leading-normal"><strong className="text-zinc-450">Feedback:</strong> "{sc.summary}"</p>
+                      <p className="text-[10px] text-blue-400 bg-blue-500/5 p-2 rounded-lg leading-normal">💡 <strong className="text-blue-300">Recommendation:</strong> {sc.areasOfImp}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </GlassCard>
+
+            {/* Flexible WFH Hours Planner */}
+            <GlassCard className="space-y-3">
+              <h3 className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Flexible WFH Shift Planner</h3>
+              {hoursPlannerMsg && (
+                <p className={`text-[10px] font-bold ${hoursPlannerMsg.startsWith('✅') ? 'text-emerald-450' : 'text-red-455'}`}>
+                  {hoursPlannerMsg}
+                </p>
+              )}
+              <form onSubmit={handleSaveHoursPlan} className="space-y-2 text-[11px]">
+                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => (
+                  <div key={day} className="flex justify-between items-center gap-2">
+                    <span className="font-semibold text-zinc-600 dark:text-zinc-400 w-16">{day}</span>
+                    <div className="flex items-center space-x-1">
+                      <input
+                        type="time"
+                        value={hoursPlanner[day]?.startTime || '09:00'}
+                        onChange={(e) => setHoursPlanner({
+                          ...hoursPlanner,
+                          [day]: { ...hoursPlanner[day], startTime: e.target.value }
+                        })}
+                        className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded px-1.5 py-0.5 text-zinc-900 dark:text-zinc-100 text-[10px]"
+                      />
+                      <span className="text-zinc-500">-</span>
+                      <input
+                        type="time"
+                        value={hoursPlanner[day]?.endTime || '17:00'}
+                        onChange={(e) => setHoursPlanner({
+                          ...hoursPlanner,
+                          [day]: { ...hoursPlanner[day], endTime: e.target.value }
+                        })}
+                        className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded px-1.5 py-0.5 text-zinc-900 dark:text-zinc-100 text-[10px]"
+                      />
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="submit"
+                  className="w-full py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] shadow-sm transition-colors mt-2"
+                >
+                  Save Weekly Shift Plan
+                </button>
+              </form>
+            </GlassCard>
+
+            {/* WFH Hours Analytics Grid */}
+            <GlassCard className="space-y-3">
+              <h3 className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Shift Analytics (Planned vs. Actual)</h3>
+              <div className="space-y-2.5 text-[10.5px]">
+                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day, idx) => {
+                  const plan = hoursPlanner[day] || { startTime: '09:00', endTime: '17:00' };
+                  const [pStartH, pStartM] = plan.startTime.split(':').map(Number);
+                  const [pEndH, pEndM] = plan.endTime.split(':').map(Number);
+                  const plannedHours = Math.max(0, (pEndH - pStartH) + (pEndM - pStartM) / 65);
+
+                  // Find attendance record for this day of the current week
+                  const today = new Date();
+                  const currentDayIndex = today.getDay();
+                  const targetDayOffset = (idx + 1) - currentDayIndex;
+                  const targetDate = new Date();
+                  targetDate.setDate(today.getDate() + targetDayOffset);
+                  
+                  const record = attendanceHistory.find(h => new Date(h.date).toDateString() === targetDate.toDateString());
+                  const actualHours = record?.workingHours || (record ? 8 : 0);
+
+                  return (
+                    <div key={day} className="space-y-1">
+                      <div className="flex justify-between text-[9.5px]">
+                        <span className="font-semibold text-zinc-700 dark:text-zinc-300">{day}</span>
+                        <span className="text-zinc-500">Planned: {plannedHours.toFixed(1)}h | Actual: {actualHours.toFixed(1)}h</span>
+                      </div>
+                      <div className="flex space-x-1.5 items-center">
+                        {/* Planned Bar */}
+                        <div className="flex-1 bg-zinc-200 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                          <div className="bg-zinc-550 dark:bg-zinc-500 h-full" style={{ width: `${Math.min(100, (plannedHours / 12) * 100)}%` }} />
+                        </div>
+                        {/* Actual Bar */}
+                        <div className="flex-1 bg-zinc-200 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                          <div className="bg-blue-500 h-full" style={{ width: `${Math.min(100, (actualHours / 12) * 100)}%` }} />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </GlassCard>
           </div>
         )}
 

@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
 });
 
 // File filters
-const fileFilter = (req: any, file: Express.RayFile | any, cb: any) => {
+const fileFilter = (req: any, file: Express.Multer.File | any, cb: any) => {
   const allowedExtensions = ['.pdf', '.jpg', '.jpeg', '.png', '.zip', '.doc', '.docx'];
   const ext = path.extname(file.originalname).toLowerCase();
   

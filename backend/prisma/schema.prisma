@@ -97,6 +97,9 @@ model User {
   notifications      Notification[]
   activityLogs       ActivityLog[]
   projectMembers     ProjectMember[]
+  githubCommits      GithubCommit[]
+  weeklyReports      WeeklyPerformanceReport[]
+  workingHoursPlans  WorkingHoursPlan[]
   
   // Mentor & Team Lead mappings to interns
   mentorInterns      InternProfile[]     @relation("MentorToInterns")
@@ -358,4 +361,39 @@ model ActivityLog {
   details   String?
   ipAddress String?
   createdAt DateTime @default(now())
+}
+
+model GithubCommit {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sha       String   @unique
+  message   String
+  htmlUrl   String
+  date      DateTime
+  createdAt DateTime @default(now())
+}
+
+model WeeklyPerformanceReport {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekStart   DateTime
+  weekEnd     DateTime
+  score       Float
+  summary     String
+  areasOfImp  String
+  generatedAt DateTime @default(now())
+}
+
+model WorkingHoursPlan {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dayOfWeek String   // e.g. "Monday", "Tuesday", etc.
+  startTime String   // e.g. "09:00"
+  endTime   String   // e.g. "17:00"
+  createdAt DateTime @default(now())
+
+  @@unique([userId, dayOfWeek])
 }

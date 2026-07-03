@@ -75,6 +75,10 @@ import {
   getProjectAIAdvice,
 } from '../controllers/chatbotController';
 
+import { fetchUserCommits } from '../controllers/githubController';
+import { generateWeeklyScorecard, getWeeklyScorecards } from '../controllers/scorecardController';
+import { saveWorkingHoursPlan, getWorkingHoursPlan } from '../controllers/workingHoursController';
+
 const router = Router();
 
 // ==========================================
@@ -310,6 +314,37 @@ router.post(
       return res.status(500).json({ message: 'Checks failed.', error: error.message });
     }
   }
+);
+
+// GitHub Commit Tracking
+router.get(
+  '/github/commits/:userId?',
+  authorizeRoles(['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR', 'INTERN']),
+  fetchUserCommits as any
+);
+
+// AI Weekly Scorecards
+router.post(
+  '/weekly-scorecard/generate/:userId',
+  authorizeRoles(['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR']),
+  generateWeeklyScorecard as any
+);
+router.get(
+  '/weekly-scorecard/my/:userId?',
+  authorizeRoles(['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR', 'INTERN']),
+  getWeeklyScorecards as any
+);
+
+// Flexible Working Hours Planner
+router.post(
+  '/working-hours/plan',
+  authorizeRoles(['INTERN']),
+  saveWorkingHoursPlan as any
+);
+router.get(
+  '/working-hours/plan/:userId?',
+  authorizeRoles(['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR', 'INTERN']),
+  getWorkingHoursPlan as any
 );
 
 export default router;

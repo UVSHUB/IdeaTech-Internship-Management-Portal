@@ -7,7 +7,7 @@ export interface AuthenticatedRequest extends Request {
   user?: {
     id: string;
     email: string;
-    role: 'SUPER_ADMIN' | 'HR_MANAGER' | 'TEAM_LEADER' | 'MENTOR' | 'INTERN';
+    role: 'SUPER_ADMIN' | 'HR_MANAGER' | 'TEAM_LEADER' | 'PROJECT_MANAGER' | 'MENTOR' | 'INTERN';
     firstName: string;
     lastName: string;
   };
@@ -30,7 +30,7 @@ export function authenticateToken(req: AuthenticatedRequest, res: Response, next
   }
 }
 
-export function authorizeRoles(roles: Array<'SUPER_ADMIN' | 'HR_MANAGER' | 'TEAM_LEADER' | 'MENTOR' | 'INTERN'>) {
+export function authorizeRoles(roles: Array<'SUPER_ADMIN' | 'HR_MANAGER' | 'TEAM_LEADER' | 'PROJECT_MANAGER' | 'MENTOR' | 'INTERN'>) {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ message: 'Unauthorized. User context missing.' });
