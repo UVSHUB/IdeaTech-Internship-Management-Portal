@@ -51,8 +51,10 @@ enum ApprovalStatus {
 }
 
 enum LeaveReason {
-  MEDICAL
+  ONE_DAY
+  STUDY
   EXAM
+  MEDICAL
   PERSONAL
   VACATION
   EMERGENCY
@@ -161,6 +163,7 @@ model Project {
   updatedAt   DateTime        @updatedAt
   members     ProjectMember[]
   tasks       Task[]
+  dailyReports DailyReport[]
 }
 
 model ProjectMember {
@@ -228,6 +231,9 @@ model DailyReport {
   
   reviewedById  String?        @db.ObjectId
   reviewedBy    User?          @relation("ReportReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  projectId     String?        @db.ObjectId
+  project       Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt

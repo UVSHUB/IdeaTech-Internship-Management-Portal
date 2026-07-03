@@ -232,7 +232,10 @@ router.get('/users/me', async (req: Request | any, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
-      include: { internProfile: { include: { department: true } } },
+      include: { 
+        internProfile: { include: { department: true } },
+        projectMembers: { include: { project: true } }
+      },
     });
     return res.json(user);
   } catch (error) {

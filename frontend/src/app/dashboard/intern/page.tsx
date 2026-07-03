@@ -452,6 +452,9 @@ export default function InternDashboard() {
                       <p>Status: <span className="text-blue-400 font-bold">{attendanceStatus}</span></p>
                       {checkInTime && <p>Check-In time: {checkInTime}</p>}
                       {checkOutTime && <p>Check-Out time: {checkOutTime}</p>}
+                      <p className="text-[10px] text-zinc-500 italic mt-2">
+                        💡 WFH Flexi-Hours: Check in when starting your self-study/development work and check out when finished. Attendance must be logged daily.
+                      </p>
                     </div>
                     <div className="flex space-x-3">
                       <button
@@ -608,9 +611,9 @@ export default function InternDashboard() {
                 <div className="p-3 bg-slate-900 border border-white/5 rounded-2xl text-zinc-700 dark:text-zinc-300">
                   <p className="font-semibold text-blue-400">🕒 Shifts Rules Reminder:</p>
                   <ul className="list-disc pl-4 space-y-1 mt-2 text-zinc-500 dark:text-zinc-400">
-                    <li>Clock in must be executed before **9:15 AM** to avoid late logs.</li>
+                    <li>Work-from-home shifts are flexible: clock in when you start and out when done.</li>
                     <li>Both Clock In and Clock Out must be logged daily.</li>
-                    <li>Missing check-ins/check-outs will trigger automated alerts.</li>
+                    <li>Ensure you log shifts every day of your internship.</li>
                   </ul>
                 </div>
 
@@ -675,6 +678,17 @@ export default function InternDashboard() {
 
             <GlassCard className="space-y-4">
               <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Submit Daily Report</h3>
+              {user?.projectMembers?.[0]?.project ? (
+                <div className="p-3 mb-3 bg-zinc-950/45 border border-emerald-550/20 rounded-2xl text-[10.5px] text-zinc-400 leading-normal">
+                  <span className="font-bold text-emerald-400 uppercase block mb-1">👥 Group Project: {user.projectMembers[0].project.name}</span>
+                  This is a <strong>Group Daily Report</strong>. Only one member of your project group needs to submit this report daily on behalf of the entire group.
+                </div>
+              ) : (
+                <div className="p-3 mb-3 bg-zinc-950/45 border border-zinc-800 rounded-2xl text-[10.5px] text-zinc-500 leading-normal">
+                  <span className="font-bold text-zinc-500 uppercase block mb-1">ℹ️ Individual Mode</span>
+                  You are not currently assigned to any project group. This report will submit individually.
+                </div>
+              )}
               {reportMsg && <div className="p-3 mb-2 rounded-xl bg-slate-900 border border-white/5 text-[10px] text-center text-blue-400 font-bold">{reportMsg}</div>}
               <form onSubmit={handleReportSubmit} className="space-y-3 text-xs">
                 <div>
@@ -792,6 +806,10 @@ export default function InternDashboard() {
 
             <GlassCard className="space-y-4">
               <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Log Today's Insight</h3>
+              <div className="p-3 mb-3 bg-zinc-950/45 border border-zinc-800 rounded-2xl text-[10.5px] text-zinc-500 leading-normal">
+                <span className="font-bold text-zinc-400 uppercase block mb-1">📝 Individual Logbook</span>
+                This logbook is <strong>individual</strong>. Every intern must submit their own logbook entry daily to record personal study progress and learnings.
+              </div>
               {logbookMsg && <div className="p-3 mb-2 rounded-xl bg-slate-900 border border-white/5 text-[10px] text-center text-emerald-400 font-bold">{logbookMsg}</div>}
               <form onSubmit={handleLogbookSubmit} className="space-y-3 text-xs">
                 <div>
@@ -963,7 +981,7 @@ export default function InternDashboard() {
                     <div key={leave.id} className="p-4 bg-slate-900/60 border border-white/5 rounded-2xl space-y-2">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h4 className="text-xs font-bold text-white uppercase tracking-wider">{leave.reason} LEAVE</h4>
+                          <h4 className="text-xs font-bold text-white uppercase tracking-wider">{leave.reason.replace('_', ' ')} LEAVE</h4>
                           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                             Duration: {new Date(leave.startDate).toLocaleDateString()} to {new Date(leave.endDate).toLocaleDateString()}
                           </p>
@@ -993,9 +1011,12 @@ export default function InternDashboard() {
                     onChange={(e) => setLeaveForm({ ...leaveForm, reason: e.target.value })}
                     className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
                   >
-                    <option value="MEDICAL">Medical Leave</option>
+                    <option value="ONE_DAY">One Day Leave</option>
+                    <option value="STUDY">Study Leave</option>
                     <option value="EXAM">University Exam Leave</option>
+                    <option value="MEDICAL">Medical Leave</option>
                     <option value="PERSONAL">Personal Reasons</option>
+                    <option value="VACATION">Vacation Leave</option>
                     <option value="EMERGENCY">Family Emergency</option>
                   </select>
                 </div>

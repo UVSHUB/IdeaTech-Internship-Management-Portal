@@ -289,7 +289,7 @@ export default function HRDashboard() {
                         <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                           Dates: {new Date(leave.startDate).toLocaleDateString()} to {new Date(leave.endDate).toLocaleDateString()}
                         </p>
-                        <p className="text-[10px] text-purple-400 font-semibold uppercase mt-0.5">Reason: {leave.reason}</p>
+                        <p className="text-[10px] text-purple-400 font-semibold uppercase mt-0.5">Reason: {leave.reason.replace('_', ' ')}</p>
                       </div>
 
                       <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold ${

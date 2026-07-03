@@ -114,7 +114,10 @@ export async function login(req: Request, res: Response) {
 
     const user = await prisma.user.findUnique({
       where: { email },
-      include: { internProfile: true },
+      include: { 
+        internProfile: true,
+        projectMembers: { include: { project: true } }
+      },
     });
 
     if (!user) {
@@ -175,6 +178,7 @@ export async function login(req: Request, res: Response) {
         firstName: user.firstName,
         lastName: user.lastName,
         internProfile: user.internProfile,
+        projectMembers: user.projectMembers,
       },
     });
   } catch (error) {
@@ -392,7 +396,10 @@ export async function googleLogin(req: Request, res: Response) {
     // Check if user exists in the database
     const user = await prisma.user.findUnique({
       where: { email },
-      include: { internProfile: true },
+      include: { 
+        internProfile: true,
+        projectMembers: { include: { project: true } }
+      },
     });
 
     if (!user) {
@@ -450,6 +457,7 @@ export async function googleLogin(req: Request, res: Response) {
         firstName: user.firstName,
         lastName: user.lastName,
         internProfile: user.internProfile,
+        projectMembers: user.projectMembers,
       },
     });
   } catch (error: any) {

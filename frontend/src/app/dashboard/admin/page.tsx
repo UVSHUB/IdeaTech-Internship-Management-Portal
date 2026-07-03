@@ -1130,7 +1130,7 @@ export default function AdminDashboard() {
                         <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                           Duration: {new Date(leave.startDate).toLocaleDateString()} to {new Date(leave.endDate).toLocaleDateString()}
                         </p>
-                        <p className="text-xs text-purple-400 font-bold uppercase mt-1">Reason: {leave.reason}</p>
+                        <p className="text-xs text-purple-400 font-bold uppercase mt-1">Reason: {leave.reason.replace('_', ' ')}</p>
                       </div>
 
                       <span className={`text-[9px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${

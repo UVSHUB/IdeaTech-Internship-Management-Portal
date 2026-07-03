@@ -33,6 +33,27 @@ export async function submitReport(req: AuthenticatedRequest, res: Response) {
       return res.status(400).json({ message: 'Daily report already submitted for today.' });
     }
 
+    // Identify project group membership
+    const member = await prisma.projectMember.findFirst({
+      where: { userId },
+    });
+
+    if (member) {
+      // Check if another group member has already submitted the daily report today
+      const existingGroupReport = await prisma.dailyReport.findFirst({
+        where: {
+          projectId: member.projectId,
+          date,
+        },
+      });
+
+      if (existingGroupReport) {
+        return res.status(400).json({
+          message: 'A group daily report has already been submitted for your project group today by another member.'
+        });
+      }
+    }
+
     const report = await prisma.dailyReport.create({
       data: {
         userId,
@@ -46,6 +67,7 @@ export async function submitReport(req: AuthenticatedRequest, res: Response) {
         demoLink,
         screenshotUrl: req.file ? `/uploads/screenshots/${req.file.filename}` : (screenshotUrl || null),
         status: 'PENDING',
+        projectId: member ? member.projectId : null,
       },
     });
 

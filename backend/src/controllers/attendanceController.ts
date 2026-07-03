@@ -29,14 +29,8 @@ export async function checkIn(req: AuthenticatedRequest, res: Response) {
       return res.status(400).json({ message: 'Already checked in for today.' });
     }
 
-    // Determine status (standard start: 9:00 AM, grace period until 9:15 AM)
-    let status: 'PRESENT' | 'LATE' = 'PRESENT';
-    const hour = now.getHours();
-    const minute = now.getMinutes();
-    
-    if (hour > 9 || (hour === 9 && minute > 15)) {
-      status = 'LATE';
-    }
+    // Determine status (always PRESENT for flexible work-from-home interns)
+    const status = 'PRESENT';
 
     const attendance = await prisma.attendance.create({
       data: {
