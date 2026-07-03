@@ -22,7 +22,8 @@ import {
   Menu,
   X,
   User,
-  Users
+  Users,
+  ShieldAlert
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -60,8 +61,9 @@ export default function Sidebar({ activeTab }: SidebarProps) {
         { name: 'Projects', icon: FolderGit2, path: '/dashboard/admin/projects' },
         { name: 'Meetings', icon: CalendarRange, path: '/dashboard/admin/meetings' },
         { name: 'Leave Requests', icon: FileText, path: '/dashboard/admin/leaves' },
-        { name: 'Certificates', icon: Award, path: '/dashboard/admin/certificates' },
-        { name: 'Staff Management', icon: Users, path: '/dashboard/admin/staff' },
+        {name: 'Certificates', icon: Award, path: '/dashboard/admin/certificates'},
+        {name: 'Staff Management', icon: Users, path: '/dashboard/admin/staff'},
+        {name: 'Command Center', icon: ShieldAlert, path: '/dashboard/admin/command'},
       ];
     }
 

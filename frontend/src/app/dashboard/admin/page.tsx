@@ -120,11 +120,89 @@ export default function AdminDashboard() {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         if (res.ok) setLeavesList(await res.json());
+      } else if (tab === 'command') {
+        await fetchCommandCenterData();
       }
     } catch (err) {
       console.error("Error loading data:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Command Center Actions
+  const [dailyStandupDigest, setDailyStandupDigest] = useState('');
+  const [loadingDigest, setLoadingDigest] = useState(false);
+  const [inactiveInterns, setInactiveInterns] = useState<any[]>([]);
+  const [awardingBadge, setAwardingBadge] = useState(false);
+  const [badgeForm, setBadgeForm] = useState({ userId: '', badgeName: 'Agile Champion' });
+
+  const fetchCommandCenterData = async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      const auditRes = await fetch('/api/analytics/inactivity-audit', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (auditRes.ok) setInactiveInterns(await auditRes.json());
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGenerateStandupDigest = async () => {
+    setLoadingDigest(true);
+    setDailyStandupDigest('');
+    try {
+      const res = await fetch('/api/analytics/daily-digest', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setDailyStandupDigest(data.digest);
+      } else {
+        alert('Failed to generate daily standup digest.');
+      }
+    } catch {
+      alert('Error connecting to backend.');
+    } finally {
+      setLoadingDigest(false);
+    }
+  };
+
+  const handleAwardBadgeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!badgeForm.userId || !badgeForm.badgeName) {
+      alert('Please select an intern and select a badge.');
+      return;
+    }
+    setAwardingBadge(true);
+    try {
+      const res = await fetch('/api/analytics/award-badge', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          userId: badgeForm.userId,
+          badgeName: badgeForm.badgeName
+        })
+      });
+      if (res.ok) {
+        alert(`🏆 Badge "${badgeForm.badgeName}" successfully awarded!`);
+        setBadgeForm({ userId: '', badgeName: 'Agile Champion' });
+        fetchBaseData(); // Refresh usersList (to update XP/badges)
+      } else {
+        const data = await res.json();
+        alert(data.message || 'Failed to award badge.');
+      }
+    } catch {
+      alert('Error connecting to backend.');
+    } finally {
+      setAwardingBadge(false);
     }
   };
 
@@ -1477,6 +1555,165 @@ export default function AdminDashboard() {
                 </button>
               </form>
             </GlassCard>
+          </div>
+        )}
+
+        {tab === 'command' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column: AI Standup Summarizer & Inactivity Audits */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Daily standup digest */}
+              <GlassCard className="space-y-4">
+                <div className="flex justify-between items-center border-b border-white/5 pb-3">
+                  <div>
+                    <h2 className="text-base font-bold text-white flex items-center space-x-2">
+                      <span>✨ AI WFH Daily Standup Digest</span>
+                    </h2>
+                    <p className="text-[10px] text-zinc-500 mt-0.5">Aggregates and summarizes all daily reports submitted today using Gemini AI.</p>
+                  </div>
+                  <button
+                    onClick={handleGenerateStandupDigest}
+                    disabled={loadingDigest}
+                    className="px-4 py-2 bg-blue-650 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-colors"
+                  >
+                    {loadingDigest ? 'Generating Standup Digest...' : 'Compile Standup Digest'}
+                  </button>
+                </div>
+
+                {dailyStandupDigest ? (
+                  <div className="p-4 bg-zinc-950/40 border border-zinc-800 rounded-2xl text-xs text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                    {dailyStandupDigest}
+                  </div>
+                ) : (
+                  <div className="p-12 text-center text-zinc-500 italic text-xs">
+                    No digest compiled. Click the button above to aggregate today's standup submissions.
+                  </div>
+                )}
+              </GlassCard>
+
+              {/* Inactivity Slackness Audit */}
+              <GlassCard className="space-y-4">
+                <div>
+                  <h2 className="text-base font-bold text-white flex items-center space-x-2">
+                    <ShieldAlert size={18} className="text-red-450" />
+                    <span>Inactivity & Slackness Audit List</span>
+                  </h2>
+                  <p className="text-[10px] text-zinc-500 mt-0.5">Interns in ACTIVE status who have not logged any check-ins, tasks, or commits in the last 48 hours.</p>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="border-b border-white/5 text-slate-500 uppercase font-semibold">
+                        <th className="py-2.5">Intern Name</th>
+                        <th className="py-2.5">Email</th>
+                        <th className="py-2.5">Last Active Timestamp</th>
+                        <th className="py-2.5 text-center">Alert Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5 text-zinc-400">
+                      {inactiveInterns.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="text-center py-8 text-zinc-500 italic">No inactive interns flagged. Remote team is highly active!</td>
+                        </tr>
+                      ) : (
+                        inactiveInterns.map((profile: any) => (
+                          <tr key={profile.id}>
+                            <td className="py-3 font-semibold text-white">{profile.user?.firstName} {profile.user?.lastName}</td>
+                            <td className="py-3 font-mono">{profile.user?.email}</td>
+                            <td className="py-3 text-red-400 font-bold">{new Date(profile.lastActive).toLocaleString()}</td>
+                            <td className="py-3 text-center">
+                              <button
+                                onClick={async () => {
+                                  alert(`⚠️ Inactivity warning notification sent to ${profile.user?.firstName}!`);
+                                }}
+                                className="px-2.5 py-1 bg-red-650/10 hover:bg-red-650/20 text-red-400 rounded-lg border border-red-500/20 text-[10px] font-bold"
+                              >
+                                Send Alert Notice 🚨
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </GlassCard>
+            </div>
+
+            {/* Right Column: Gamification Console (Award Badges) */}
+            <div className="space-y-6">
+              {/* Award Badge Console */}
+              <GlassCard className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Award Achievement Badges</h3>
+                  <p className="text-[10px] text-zinc-500 mt-1">Reward interns with profile badges and grant them **+50 XP** points.</p>
+                </div>
+                <form onSubmit={handleAwardBadgeSubmit} className="space-y-4 text-xs">
+                  <div>
+                    <label className="block text-slate-500 mb-1">SELECT INTERN *</label>
+                    <select
+                      value={badgeForm.userId}
+                      onChange={(e) => setBadgeForm({ ...badgeForm, userId: e.target.value })}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-zinc-150 focus:outline-none"
+                    >
+                      <option value="">-- Choose Intern --</option>
+                      {usersList
+                        .filter((u: any) => u.role === 'INTERN')
+                        .map((intern: any) => (
+                          <option key={intern.id} value={intern.id}>
+                            {intern.firstName} {intern.lastName} (XP: {intern.internProfile?.xp || 0})
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-500 mb-1">CHOOSE BADGE TITLE *</label>
+                    <select
+                      value={badgeForm.badgeName}
+                      onChange={(e) => setBadgeForm({ ...badgeForm, badgeName: e.target.value })}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-zinc-150 focus:outline-none"
+                    >
+                      <option value="Agile Champion">⚡ Agile Champion</option>
+                      <option value="Bug Exterminator">🐛 Bug Exterminator</option>
+                      <option value="Star Performer">🌟 Star Performer</option>
+                      <option value="Code Crafter">💻 Code Crafter</option>
+                      <option value="Team Player">🤝 Team Player</option>
+                    </select>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={awardingBadge}
+                    className="w-full py-2 bg-blue-600 hover:bg-blue-750 text-white rounded-xl font-bold transition-all shadow-md text-xs"
+                  >
+                    {awardingBadge ? 'Awarding Badge...' : 'Award Badge & Grant +50 XP'}
+                  </button>
+                </form>
+              </GlassCard>
+
+              {/* XP Leaderboard widget */}
+              <GlassCard className="space-y-4">
+                <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">XP Performance Leaderboard</h3>
+                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                  {usersList
+                    .filter((u: any) => u.role === 'INTERN' && u.internProfile)
+                    .sort((a, b) => (b.internProfile?.xp || 0) - (a.internProfile?.xp || 0))
+                    .map((u, i) => (
+                      <div key={u.id} className="flex justify-between items-center bg-zinc-950/20 p-2.5 rounded-xl border border-white/5">
+                        <div className="flex items-center space-x-2 text-xs">
+                          <span className="font-bold text-blue-450">#{i + 1}</span>
+                          <span className="font-semibold text-white">{u.firstName} {u.lastName}</span>
+                        </div>
+                        <span className="text-[10.5px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+                          {u.internProfile?.xp || 0} XP
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              </GlassCard>
+            </div>
           </div>
         )}
       </main>

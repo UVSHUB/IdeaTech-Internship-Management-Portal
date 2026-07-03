@@ -262,3 +262,43 @@ export async function analyzeProjectSprint(
 - Schedule a short daily standup on Google Meet to sync on task progress.
 - Make sure completed tasks are committed to the GitHub repository and reviewed quickly.`;
 }
+
+export async function summarizeDailyStandups(
+  reports: Array<{ internName: string; completedWork: string; problemsFaced: string; hoursWorked: number }>
+): Promise<string> {
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  const summaryInput = reports
+    .map(r => `- Intern: ${r.internName} (${r.hoursWorked} hrs). Completed: ${r.completedWork}. Blockers: ${r.problemsFaced || 'None'}`)
+    .join('\n');
+
+  const prompt = `You are a Senior engineering manager. Generate a concise, bulleted daily standup digest for the WFH team based on today's reports:
+  
+  ${summaryInput || 'No daily reports submitted today.'}
+  
+  Provide:
+  1. Key Accomplishments (executive high-level overview).
+  2. Priority Alerts & Blockers (list names and specific impediments to resolve).
+  3. Overall Project Status.
+  
+  Keep it clean, in markdown formatting, and under 200 words.`;
+
+  try {
+    if (GEMINI_API_KEY) {
+      return await callGemini(prompt);
+    }
+  } catch (err) {
+    console.warn('AI Daily standup digest fallback triggered.');
+  }
+
+  return `### Daily Standup Summary (Rule-Based Fallback)
+  
+**Key Accomplishments:**
+- Active progress logged by **${reports.length}** interns today.
+- Cumulative WFH effort today is **${reports.reduce((acc, r) => acc + r.hoursWorked, 0)} hours**.
+
+**Priority Alerts & Blockers:**
+${reports.filter(r => r.problemsFaced && r.problemsFaced.toLowerCase() !== 'none').map(r => `- **${r.internName}**: ${r.problemsFaced}`).join('\n') || '- No blockers logged today.'}
+
+**Overall Project Status:**
+- Team is actively developing milestones. Ensure blocker requests are unblocked by team leaders.`;
+}

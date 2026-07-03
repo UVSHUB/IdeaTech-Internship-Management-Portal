@@ -78,6 +78,7 @@ import {
 import { fetchUserCommits } from '../controllers/githubController';
 import { generateWeeklyScorecard, getWeeklyScorecards } from '../controllers/scorecardController';
 import { saveWorkingHoursPlan, getWorkingHoursPlan } from '../controllers/workingHoursController';
+import { getDailyStandupDigest, getInactivityAudit, awardBadge } from '../controllers/adminAnalyticsController';
 
 const router = Router();
 
@@ -345,6 +346,23 @@ router.get(
   '/working-hours/plan/:userId?',
   authorizeRoles(['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR', 'INTERN']),
   getWorkingHoursPlan as any
+);
+
+// Admin Command & WFH Analytics Routes
+router.get(
+  '/analytics/daily-digest',
+  authorizeRoles(['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER']),
+  getDailyStandupDigest as any
+);
+router.get(
+  '/analytics/inactivity-audit',
+  authorizeRoles(['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER']),
+  getInactivityAudit as any
+);
+router.post(
+  '/analytics/award-badge',
+  authorizeRoles(['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER']),
+  awardBadge as any
 );
 
 export default router;

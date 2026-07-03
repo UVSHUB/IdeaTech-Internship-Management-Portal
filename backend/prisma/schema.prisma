@@ -146,6 +146,7 @@ model InternProfile {
   lastActive         DateTime     @default(now())
   qrCodeUrl          String?
   idCardUrl          String?
+  badges             String[]
   
   // Supervisor assignments
   mentorId           String?      @db.ObjectId

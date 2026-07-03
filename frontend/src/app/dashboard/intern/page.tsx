@@ -706,6 +706,24 @@ export default function InternDashboard() {
                     <span>Level {stats.level}</span>
                     <span>{stats.xpProgress}% to Level {stats.level + 1}</span>
                   </div>
+
+                  {/* Badges Feed */}
+                  {stats.badges && stats.badges.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-white/5 space-y-2">
+                      <h4 className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider text-left">Earned Profile Badges ({stats.badges.length})</h4>
+                      <div className="flex flex-wrap gap-1.5 justify-start">
+                        {stats.badges.map((badge: any, index: number) => (
+                          <span 
+                            key={index} 
+                            title={badge.desc}
+                            className="px-2 py-0.5 bg-zinc-800 text-[10px] text-zinc-350 rounded border border-white/5 font-semibold"
+                          >
+                            {badge.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </GlassCard>
 
                 {/* AI Assistant chat panel */}

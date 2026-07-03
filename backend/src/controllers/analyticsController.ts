@@ -131,6 +131,10 @@ export async function getInternStats(req: AuthenticatedRequest, res: Response) {
     if (currentLevel >= 3) badges.push({ name: '🎓 Contributor', desc: 'Graduated to level 3' });
     if (currentLevel >= 5) badges.push({ name: '🚀 Senior Intern', desc: 'Graduated to level 5' });
 
+    // Append custom badges awarded by admin
+    const customBadges = (intern.badges || []).map((b: string) => ({ name: b.startsWith('🏆') ? b : `🏆 ${b}`, desc: 'Awarded by Admin' }));
+    const allBadges = [...badges, ...customBadges];
+
     return res.json({
       level: currentLevel,
       xp: currentXp,
@@ -140,7 +144,7 @@ export async function getInternStats(req: AuthenticatedRequest, res: Response) {
       completionProgress: intern.completionProgress,
       remainingDays: intern.remainingDays,
       warningCount: intern.warningCount,
-      badges,
+      badges: allBadges,
       warnings: warnings.map(w => ({ date: w.date, type: w.type, reason: w.reason })),
       stats: {
         attendanceCount: attendanceHistory.length,
