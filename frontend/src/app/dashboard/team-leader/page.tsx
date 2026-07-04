@@ -209,7 +209,7 @@ export default function TeamLeaderDashboard() {
         </div>
 
         {/* Task Dashboard Column Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div id="task-board" className="grid grid-cols-1 lg:grid-cols-4 gap-6 scroll-mt-24">
           
           {/* Sprints & Kanban Board Columns (occupies 3 cols) */}
           <div className="lg:col-span-3 space-y-6">

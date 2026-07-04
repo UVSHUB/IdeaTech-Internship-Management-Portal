@@ -231,7 +231,7 @@ export default function ApplyPage() {
                     required
                     value={formData.dob}
                     onChange={handleInputChange}
-                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 focus:outline-none focus:border-zinc-500 transition-colors"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 focus:outline-none focus:border-zinc-500 transition-colors [color-scheme:light] dark:[color-scheme:dark]"
                   />
                 </div>
               </div>

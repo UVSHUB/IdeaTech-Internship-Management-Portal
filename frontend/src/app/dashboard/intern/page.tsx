@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { useParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import GlassCard from '@/components/GlassCard';
 import { motion } from 'framer-motion';
@@ -12,13 +12,28 @@ import {
 } from 'lucide-react';
 
 export default function InternDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-screen items-center justify-center bg-slate-900 text-slate-100">
+        <div className="text-center space-y-3">
+          <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto" />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Loading Intern Workspace...</p>
+        </div>
+      </div>
+    }>
+      <InternDashboardInner />
+    </Suspense>
+  );
+}
+
+function InternDashboardInner() {
   const { user, token, refreshUser } = useAuth();
-  const params = useParams();
-  const tab = params?.tab as string | undefined; // undefined (Overview), 'attendance', 'reports', 'logbook', 'tasks', 'leaves', 'certificates'
+  const searchParams = useSearchParams();
+  const tab = searchParams?.get('tab') ?? undefined; // undefined (Overview), 'attendance', 'reports', 'logbook', 'tasks', 'leaves', 'certificates'
 
   // Metrics loading
   const [stats, setStats] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [tabLoading, setTabLoading] = useState(false);
 
   // Tab-Specific Lists
   const [attendanceHistory, setAttendanceHistory] = useState<any[]>([]);
@@ -223,7 +238,7 @@ export default function InternDashboard() {
 
   const fetchTabSpecificData = async () => {
     if (!token) return;
-    setLoading(true);
+    setTabLoading(true);
     try {
       // Tab-Specific Fetches
       if (tab === 'reports') {
@@ -259,7 +274,7 @@ export default function InternDashboard() {
     } catch (error) {
       console.error("Error loading tab data:", error);
     } finally {
-      setLoading(false);
+      setTabLoading(false);
     }
   };
 
@@ -474,7 +489,7 @@ export default function InternDashboard() {
     }
   };
 
-  if (loading || !stats) {
+  if (!stats) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-900 text-slate-100">
         <div className="text-center space-y-3">
@@ -498,9 +513,12 @@ export default function InternDashboard() {
               Intern ID: <strong className="text-white">{user?.internProfile?.internId || 'Awaiting ID'}</strong> | Department: {user?.internProfile?.department?.name}
             </p>
           </div>
-          <div className="hidden md:flex items-center space-x-3 bg-white/10 px-5 py-3 rounded-2xl border border-white/10 backdrop-blur-sm">
-            <Calendar size={18} />
-            <span className="text-sm font-semibold text-white">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</span>
+          <div className="flex items-center space-x-3">
+            {tabLoading && <Loader2 className="w-5 h-5 text-white animate-spin" />}
+            <div className="hidden md:flex items-center space-x-3 bg-white/10 px-5 py-3 rounded-2xl border border-white/10 backdrop-blur-sm">
+              <Calendar size={18} />
+              <span className="text-sm font-semibold text-white">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</span>
+            </div>
           </div>
         </div>
 
@@ -695,7 +713,7 @@ export default function InternDashboard() {
                   <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-4">XP Level Progression</h3>
                   <div className="w-32 h-32 rounded-full border-4 border-slate-800 border-t-blue-500 border-r-purple-500 mx-auto flex items-center justify-center mb-4">
                     <div>
-                      <span className="text-3xl font-extrabold text-white">{stats.xp}</span>
+                      <span className="text-3xl font-extrabold text-zinc-900 dark:text-white">{stats.xp}</span>
                       <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block font-semibold">XP POINTS</span>
                     </div>
                   </div>

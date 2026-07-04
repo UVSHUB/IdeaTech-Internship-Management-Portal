@@ -198,7 +198,7 @@ export default function HRDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* Section: Pending Registrations */}
-          <GlassCard className="space-y-4">
+          <GlassCard id="applications" className="space-y-4 scroll-mt-24">
             <h2 className="text-base font-bold flex items-center space-x-2 text-blue-400">
               <UserCheck size={18} />
               <span>Pending Internship Applications ({applications.length})</span>
@@ -269,7 +269,7 @@ export default function HRDashboard() {
           </GlassCard>
 
           {/* Section: Leave Approvals */}
-          <GlassCard className="space-y-4">
+          <GlassCard id="leave-approvals" className="space-y-4 scroll-mt-24">
             <h2 className="text-base font-bold flex items-center space-x-2 text-purple-400">
               <FileText size={18} />
               <span>Intern Leave Requests ({leaves.filter(l => l.status === 'PENDING').length})</span>

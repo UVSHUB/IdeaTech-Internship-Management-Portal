@@ -164,7 +164,7 @@ export default function MentorDashboard() {
           
           {/* Daily Reports Review */}
           <div className="lg:col-span-2 space-y-6">
-            <GlassCard className="space-y-4">
+            <GlassCard id="report-reviews" className="space-y-4 scroll-mt-24">
               <h2 className="text-base font-bold flex items-center space-x-2 text-blue-400">
                 <FileText size={18} />
                 <span>Pending Daily Reports ({reports.length})</span>
@@ -223,7 +223,7 @@ export default function MentorDashboard() {
             </GlassCard>
 
             {/* Logbook Reviews */}
-            <GlassCard className="space-y-4">
+            <GlassCard id="logbook-reviews" className="space-y-4 scroll-mt-24">
               <h2 className="text-base font-bold flex items-center space-x-2 text-purple-400">
                 <BookOpen size={18} />
                 <span>Pending Logbook Journals ({logbooks.length})</span>
@@ -285,7 +285,7 @@ export default function MentorDashboard() {
 
           {/* Sprints Scheduling Block */}
           <div className="space-y-6">
-            <GlassCard>
+            <GlassCard id="sprint-meetings" className="scroll-mt-24">
               <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-4 flex items-center space-x-1.5">
                 <Calendar size={16} className="text-blue-400" />
                 <span>Schedule Weekly Meeting</span>

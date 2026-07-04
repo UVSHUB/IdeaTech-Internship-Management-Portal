@@ -8,6 +8,7 @@ interface GlassCardProps {
   className?: string;
   hoverEffect?: boolean;
   delay?: number;
+  id?: string;
 }
 
 export default function GlassCard({
@@ -15,6 +16,7 @@ export default function GlassCard({
   className = '',
   hoverEffect = true,
   delay = 0,
+  id,
 }: GlassCardProps) {
   const cardClasses = `rounded-3xl border border-white/20 dark:border-white/5 p-6 glass-card ${
     hoverEffect ? 'glass-card-hover' : ''
@@ -22,6 +24,7 @@ export default function GlassCard({
 
   return (
     <motion.div
+      id={id}
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut', delay }}

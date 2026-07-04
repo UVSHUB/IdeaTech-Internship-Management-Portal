@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -35,6 +35,9 @@ export default function Sidebar({ activeTab }: SidebarProps) {
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentTab = searchParams?.get('tab');
+  const currentUrl = currentTab ? `${pathname}?tab=${currentTab}` : pathname;
   const [isOpen, setIsOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
 
@@ -55,63 +58,74 @@ export default function Sidebar({ activeTab }: SidebarProps) {
     if (role === 'SUPER_ADMIN') {
       return [
         ...base,
-        { name: 'Applications', icon: UserCheck, path: '/dashboard/admin/applications' },
-        { name: 'Attendance Logs', icon: Clock, path: '/dashboard/admin/attendance' },
-        { name: 'Sprint Tasks', icon: CheckSquare, path: '/dashboard/admin/tasks' },
-        { name: 'Projects', icon: FolderGit2, path: '/dashboard/admin/projects' },
-        { name: 'Meetings', icon: CalendarRange, path: '/dashboard/admin/meetings' },
-        { name: 'Leave Requests', icon: FileText, path: '/dashboard/admin/leaves' },
-        {name: 'Certificates', icon: Award, path: '/dashboard/admin/certificates'},
-        {name: 'Staff Management', icon: Users, path: '/dashboard/admin/staff'},
-        {name: 'Command Center', icon: ShieldAlert, path: '/dashboard/admin/command'},
+        { name: 'Applications', icon: UserCheck, path: '/dashboard/admin?tab=applications' },
+        { name: 'Attendance Logs', icon: Clock, path: '/dashboard/admin?tab=attendance' },
+        { name: 'Sprint Tasks', icon: CheckSquare, path: '/dashboard/admin?tab=tasks' },
+        { name: 'Projects', icon: FolderGit2, path: '/dashboard/admin?tab=projects' },
+        { name: 'Meetings', icon: CalendarRange, path: '/dashboard/admin?tab=meetings' },
+        { name: 'Leave Requests', icon: FileText, path: '/dashboard/admin?tab=leaves' },
+        {name: 'Certificates', icon: Award, path: '/dashboard/admin?tab=certificates'},
+        {name: 'Staff Management', icon: Users, path: '/dashboard/admin?tab=staff'},
+        {name: 'Command Center', icon: ShieldAlert, path: '/dashboard/admin?tab=command'},
       ];
     }
 
     if (role === 'HR_MANAGER') {
       return [
         ...base,
-        { name: 'Applications', icon: UserCheck, path: '/dashboard/hr/applications' },
-        { name: 'Attendance Reports', icon: Clock, path: '/dashboard/hr/attendance' },
-        { name: 'Leave Approvals', icon: FileText, path: '/dashboard/hr/leaves' },
-        { name: 'Certificates', icon: Award, path: '/dashboard/hr/certificates' },
+        { name: 'Applications', icon: UserCheck, path: '/dashboard/hr#applications' },
+        { name: 'Attendance Reports', icon: Clock, path: '/dashboard/hr' },
+        { name: 'Leave Approvals', icon: FileText, path: '/dashboard/hr#leave-approvals' },
+        { name: 'Certificates', icon: Award, path: '/dashboard/hr' },
       ];
     }
 
     if (role === 'TEAM_LEADER' || role === 'PROJECT_MANAGER') {
       return [
         ...base,
-        { name: 'Task Board', icon: CheckSquare, path: '/dashboard/team-leader/tasks' },
-        { name: 'Projects', icon: FolderGit2, path: '/dashboard/team-leader/projects' },
-        { name: 'Schedules', icon: CalendarRange, path: '/dashboard/team-leader/meetings' },
-        { name: 'Intern Logs', icon: FileText, path: '/dashboard/team-leader/logs' },
+        { name: 'Task Board', icon: CheckSquare, path: '/dashboard/team-leader#task-board' },
+        { name: 'Projects', icon: FolderGit2, path: '/dashboard/team-leader' },
+        { name: 'Schedules', icon: CalendarRange, path: '/dashboard/team-leader' },
+        { name: 'Intern Logs', icon: FileText, path: '/dashboard/team-leader' },
       ];
     }
 
     if (role === 'MENTOR') {
       return [
         ...base,
-        { name: 'Report Reviews', icon: FileText, path: '/dashboard/mentor/reports' },
-        { name: 'Logbook Reviews', icon: Clock, path: '/dashboard/mentor/logbooks' },
-        { name: 'Sprint Meetings', icon: CalendarRange, path: '/dashboard/mentor/meetings' },
+        { name: 'Report Reviews', icon: FileText, path: '/dashboard/mentor#report-reviews' },
+        { name: 'Logbook Reviews', icon: Clock, path: '/dashboard/mentor#logbook-reviews' },
+        { name: 'Sprint Meetings', icon: CalendarRange, path: '/dashboard/mentor#sprint-meetings' },
       ];
     }
 
     // Role: INTERN
     return [
       ...base,
-      { name: 'Clock In/Out', icon: Clock, path: '/dashboard/intern/attendance' },
-      { name: 'Daily Reports', icon: FileText, path: '/dashboard/intern/reports' },
-      { name: 'Digital Logbook', icon: FolderGit2, path: '/dashboard/intern/logbook' },
-      { name: 'Task Board', icon: CheckSquare, path: '/dashboard/intern/tasks' },
-      { name: 'Leave Request', icon: AlertTriangle, path: '/dashboard/intern/leaves' },
-      { name: 'My Certificates', icon: Award, path: '/dashboard/intern/certificates' },
+      { name: 'Clock In/Out', icon: Clock, path: '/dashboard/intern?tab=attendance' },
+      { name: 'Daily Reports', icon: FileText, path: '/dashboard/intern?tab=reports' },
+      { name: 'Digital Logbook', icon: FolderGit2, path: '/dashboard/intern?tab=logbook' },
+      { name: 'Task Board', icon: CheckSquare, path: '/dashboard/intern?tab=tasks' },
+      { name: 'Leave Request', icon: AlertTriangle, path: '/dashboard/intern?tab=leaves' },
+      { name: 'My Certificates', icon: Award, path: '/dashboard/intern?tab=certificates' },
     ];
   };
 
   const links = getLinks();
 
   const handleNav = (path: string) => {
-    router.push(path);
+    const [targetPath, hash] = path.split('#');
+
+    if (hash && targetPath === pathname) {
+      document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      router.push(path);
+      if (hash) {
+        setTimeout(() => {
+          document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 300);
+      }
+    }
     setIsOpen(false);
   };
 
@@ -129,15 +143,15 @@ export default function Sidebar({ activeTab }: SidebarProps) {
 
       {/* Sidebar Panel */}
       <aside className={`fixed top-0 left-0 h-screen w-64 p-6 flex flex-col justify-between transition-all duration-300 z-40 lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:block'}`}>
-        <div className="h-full flex flex-col justify-between p-4 rounded-3xl glass-panel relative overflow-hidden border border-white/20 dark:border-white/5">
+        <div className="h-full flex flex-col justify-between p-4 rounded-3xl glass-panel relative border border-white/20 dark:border-white/5">
           {/* Header logo */}
-          <div>
-            <div className="flex items-center space-x-3 mb-8 px-2">
+          <div className="flex-1 min-h-0 flex flex-col">
+            <div className="flex items-center space-x-3 mb-8 px-2 shrink-0">
               {!logoError ? (
-                <img 
-                  src="/logo.png" 
-                  alt="Logo" 
-                  onError={() => setLogoError(true)} 
+                <img
+                  src="/logo.png"
+                  alt="Logo"
+                  onError={() => setLogoError(true)}
                   className="w-11 h-11 object-contain dark:invert"
                 />
               ) : (
@@ -154,9 +168,10 @@ export default function Sidebar({ activeTab }: SidebarProps) {
             </div>
 
             {/* Navigation links */}
-            <nav className="space-y-1.5">
+            <nav className="space-y-1.5 overflow-y-auto min-h-0">
               {links.map((link) => {
-                const isActive = pathname === link.path;
+                const linkPath = link.path.split('#')[0];
+                const isActive = currentUrl === linkPath && !link.path.includes('#');
                 return (
                   <button
                     key={link.name}
@@ -176,7 +191,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
           </div>
 
           {/* Footer controls & user details */}
-          <div className="space-y-4 pt-6 border-t border-slate-200/50 dark:border-slate-800/50">
+          <div className="shrink-0 space-y-4 pt-6 border-t border-slate-200/50 dark:border-slate-800/50">
             {/* User profile capsule */}
             <div className="flex items-center space-x-3 px-2 py-1">
               <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-800 dark:text-slate-200 font-semibold border border-zinc-300/20">

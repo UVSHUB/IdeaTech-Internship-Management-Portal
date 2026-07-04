@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { useParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import GlassCard from '@/components/GlassCard';
 import { 
@@ -16,13 +16,28 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AdminDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-screen items-center justify-center bg-slate-900 text-slate-100">
+        <div className="text-center space-y-3">
+          <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto" />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Loading System Cockpit...</p>
+        </div>
+      </div>
+    }>
+      <AdminDashboardInner />
+    </Suspense>
+  );
+}
+
+function AdminDashboardInner() {
   const { token } = useAuth();
-  const params = useParams();
-  const tab = params?.tab as string | undefined; // undefined (Overview), 'applications', 'attendance', 'tasks', 'projects', 'meetings', 'leaves', 'certificates'
+  const searchParams = useSearchParams();
+  const tab = searchParams?.get('tab') ?? undefined; // undefined (Overview), 'applications', 'attendance', 'tasks', 'projects', 'meetings', 'leaves', 'certificates'
 
   // Global Lists
   const [stats, setStats] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [tabLoading, setTabLoading] = useState(false);
   
   // Tab-Specific States
   const [applications, setApplications] = useState<any[]>([]);
@@ -88,7 +103,7 @@ export default function AdminDashboard() {
 
   const fetchTabSpecificData = async () => {
     if (!token) return;
-    setLoading(true);
+    setTabLoading(true);
     try {
       if (tab === 'applications') {
         const res = await fetch('/api/auth/pending-applications', {
@@ -126,7 +141,7 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error("Error loading data:", err);
     } finally {
-      setLoading(false);
+      setTabLoading(false);
     }
   };
 
@@ -139,7 +154,6 @@ export default function AdminDashboard() {
 
   const fetchCommandCenterData = async () => {
     if (!token) return;
-    setLoading(true);
     try {
       const auditRes = await fetch('/api/analytics/inactivity-audit', {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -147,8 +161,6 @@ export default function AdminDashboard() {
       if (auditRes.ok) setInactiveInterns(await auditRes.json());
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -543,7 +555,7 @@ export default function AdminDashboard() {
   const mentors = usersList.filter(u => u.role === 'MENTOR');
   const teamLeaders = usersList.filter(u => u.role === 'TEAM_LEADER');
 
-  if (loading || !stats) {
+  if (!stats) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-900 text-slate-100">
         <div className="text-center space-y-3">
@@ -578,6 +590,9 @@ export default function AdminDashboard() {
               {tab ? `Manage and view portal ${tab} inputs.` : 'ITIMP portal health, logs, database reports, and audits.'}
             </p>
           </div>
+          {tabLoading && (
+            <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
+          )}
         </div>
 
         {/* 1. DEFAULT OVERVIEW VIEW */}
@@ -628,9 +643,10 @@ export default function AdminDashboard() {
                     <BarChart data={stats.departments}>
                       <XAxis dataKey="name" stroke="#71717a" fontSize={12} tickLine={false} />
                       <YAxis stroke="#71717a" fontSize={12} tickLine={false} />
-                      <Tooltip 
+                      <Tooltip
                         contentStyle={{ background: '#18181b', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px' }}
                         labelStyle={{ color: '#FFFFFF', fontWeight: 'bold' }}
+                        itemStyle={{ color: '#E4E4E7' }}
                       />
                       <Bar dataKey="count" fill="url(#bluePurpleGrad)" radius={[8, 8, 0, 0]} />
                       <defs>
@@ -666,8 +682,10 @@ export default function AdminDashboard() {
                             <Cell key={`cell-${index}`} fill={entry.fill} />
                           ))}
                         </Pie>
-                        <Tooltip 
+                        <Tooltip
                           contentStyle={{ background: '#1E293B', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', fontSize: 11 }}
+                          labelStyle={{ color: '#F1F5F9', fontWeight: 'bold' }}
+                          itemStyle={{ color: '#E2E8F0' }}
                         />
                       </PieChart>
                     </ResponsiveContainer>
