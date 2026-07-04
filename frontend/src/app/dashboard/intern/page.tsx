@@ -243,7 +243,7 @@ export default function InternDashboard() {
         if (tRes.ok) {
           const allTasks = await tRes.json();
           // Filter tasks assigned to this user
-          setTasksList(allTasks.filter((t: any) => t.assigneeId === user.id));
+          setTasksList(allTasks.filter((t: any) => t.assigneeId === user?.id));
         }
       } else if (tab === 'leaves') {
         const lvRes = await fetch('/api/leaves/my', {

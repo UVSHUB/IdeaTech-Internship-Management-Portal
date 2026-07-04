@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import { 
   ShieldAlert, Activity, CheckSquare, Clock, Settings, Play, 
-  UserCheck, FolderGit2, CalendarRange, FileText, Award, Plus, Loader2 
+  UserCheck, FolderGit2, CalendarRange, FileText, Award, Plus, Loader2, Users
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 

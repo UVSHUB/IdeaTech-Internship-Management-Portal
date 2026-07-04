@@ -36,10 +36,11 @@ export interface InternProfile {
 export interface User {
   id: string;
   email: string;
-  role: 'SUPER_ADMIN' | 'HR_MANAGER' | 'TEAM_LEADER' | 'MENTOR' | 'INTERN';
+  role: 'SUPER_ADMIN' | 'HR_MANAGER' | 'TEAM_LEADER' | 'PROJECT_MANAGER' | 'MENTOR' | 'INTERN';
   firstName: string;
   lastName: string;
   internProfile?: InternProfile;
+  projectMembers?: { project: { id: string; name: string } }[];
 }
 
 interface AuthContextProps {
