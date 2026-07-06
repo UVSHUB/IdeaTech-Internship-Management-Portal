@@ -47,4 +47,11 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
 });
 
+// CVs are uploaded to Supabase Storage, so keep the file in memory instead of writing to disk
+export const uploadCv = multer({
+  storage: multer.memoryStorage(),
+  fileFilter,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+});
+
 export default upload;

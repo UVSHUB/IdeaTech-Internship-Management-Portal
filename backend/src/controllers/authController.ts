@@ -5,6 +5,7 @@ import prisma from '../utils/db';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { generateIDCardPDF } from '../services/pdf';
 import { sendEmail } from '../services/mail';
+import { uploadCvToSupabase } from '../utils/supabase';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'ideatech_secret_key_for_jwt_2026_itimp';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -56,6 +57,12 @@ export async function registerIntern(req: Request, res: Response) {
     // Encrypt password
     const passwordHash = await bcrypt.hash(password, 10);
 
+    // Upload CV to Supabase Storage (private bucket) before creating DB records
+    let cvPath = '';
+    if (req.file) {
+      cvPath = await uploadCvToSupabase(req.file);
+    }
+
     // Create User & Intern Profile (PENDING status)
     const result = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
@@ -77,7 +84,7 @@ export async function registerIntern(req: Request, res: Response) {
           degree,
           year: parseInt(year),
           skills,
-          cvUrl: req.file ? `/uploads/cv/${req.file.filename}` : '', // If a file was uploaded
+          cvUrl: cvPath, // Storage path within the Supabase 'ITIMP CV' bucket
           portfolio,
           github,
           linkedin,

@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
-import upload from '../utils/upload';
+import upload, { uploadCv } from '../utils/upload';
+import { getSignedCvUrl } from '../utils/supabase';
 import { authenticateToken, authorizeRoles } from '../middleware/auth';
 import prisma from '../utils/db';
 
@@ -87,7 +88,7 @@ const router = Router();
 // ==========================================
 router.post('/auth/login', login);
 router.post('/auth/google-login', googleLogin);
-router.post('/auth/register-intern', upload.single('cv'), registerIntern);
+router.post('/auth/register-intern', uploadCv.single('cv'), registerIntern);
 router.get('/certificates/verify/:key', verifyCertificate);
 
 // Fetch departments (useful for apply form dropdown)
@@ -136,7 +137,15 @@ router.get(
           department: true,
         },
       });
-      return res.json(applications);
+
+      const applicationsWithSignedCvUrls = await Promise.all(
+        applications.map(async (app) => ({
+          ...app,
+          cvUrl: (await getSignedCvUrl(app.cvUrl)) || app.cvUrl,
+        }))
+      );
+
+      return res.json(applicationsWithSignedCvUrls);
     } catch (error) {
       return res.status(500).json({ message: 'Error retrieving application forms.' });
     }
