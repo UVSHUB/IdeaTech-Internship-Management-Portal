@@ -1034,7 +1034,7 @@ function InternDashboardInner() {
                         <div>
                           <h4 className="text-xs font-bold text-white">{new Date(rep.date).toLocaleDateString()}</h4>
                           <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 font-semibold">Tasks: {rep.todayTasks}</p>
-                          <p className="text-xs text-zinc-500 dark:text-zinc-400">Deliverables: {rep.completedWork}</p>
+                          <p className="text-xs text-zinc-600 dark:text-zinc-400">Deliverables: {rep.completedWork}</p>
                         </div>
                         <span className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase ${
                           rep.status === 'APPROVED' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
@@ -1053,13 +1053,13 @@ function InternDashboardInner() {
             <GlassCard className="space-y-4">
               <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Submit Daily Report</h3>
               {user?.projectMembers?.[0]?.project ? (
-                <div className="p-3 mb-3 bg-zinc-950/45 border border-emerald-500/20 rounded-2xl text-[10.5px] text-zinc-400 leading-normal">
-                  <span className="font-bold text-emerald-400 uppercase block mb-1">👥 Group Project: {user.projectMembers[0].project.name}</span>
+                <div className="p-3 mb-3 bg-emerald-50 dark:bg-zinc-950/45 border border-emerald-500/20 rounded-2xl text-[10.5px] text-zinc-600 dark:text-zinc-400 leading-normal">
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase block mb-1">👥 Group Project: {user.projectMembers[0].project.name}</span>
                   This is a <strong>Group Daily Report</strong>. Only one member of your project group needs to submit this report daily on behalf of the entire group.
                 </div>
               ) : (
-                <div className="p-3 mb-3 bg-zinc-950/45 border border-zinc-800 rounded-2xl text-[10.5px] text-zinc-500 leading-normal">
-                  <span className="font-bold text-zinc-500 uppercase block mb-1">ℹ️ Individual Mode</span>
+                <div className="p-3 mb-3 bg-zinc-100 dark:bg-zinc-950/45 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-[10.5px] text-zinc-600 dark:text-zinc-500 leading-normal">
+                  <span className="font-bold text-zinc-700 dark:text-zinc-500 uppercase block mb-1">ℹ️ Individual Mode</span>
                   You are not currently assigned to any project group. This report will submit individually.
                 </div>
               )}
