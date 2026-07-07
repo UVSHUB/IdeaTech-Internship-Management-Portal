@@ -422,7 +422,7 @@ export default function TeamLeaderDashboard() {
 
             {/* Team Members List */}
             <GlassCard>
-              <h3 className="text-sm font-bold text-zinc-550 dark:text-zinc-400 uppercase tracking-widest mb-3">Project Team Members (Click to Inspect)</h3>
+              <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-3">Project Team Members (Click to Inspect)</h3>
               <div className="space-y-2">
                 {interns.map(intern => (
                   <div 
@@ -457,14 +457,14 @@ export default function TeamLeaderDashboard() {
               exit={{ scale: 0.95, opacity: 0 }}
               className="w-full max-w-3xl rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 bg-zinc-900 shadow-2xl space-y-5 text-zinc-100 max-h-[90vh] flex flex-col overflow-y-auto"
             >
-              <div className="flex justify-between items-center border-b border-zinc-250 dark:border-zinc-800 pb-3">
+              <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
                 <div>
                   <h3 className="text-base font-bold text-white">{selectedIntern.firstName} {selectedIntern.lastName}</h3>
                   <p className="text-[10px] text-zinc-500 font-mono">{selectedIntern.email}</p>
                 </div>
                 <button
                   onClick={() => setSelectedIntern(null)}
-                  className="text-zinc-400 hover:text-white font-bold text-xs bg-zinc-800 hover:bg-zinc-750 px-3 py-1.5 rounded-lg border border-white/5"
+                  className="text-zinc-400 hover:text-white font-bold text-xs bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded-lg border border-white/5"
                 >
                   Close
                 </button>
@@ -523,7 +523,7 @@ export default function TeamLeaderDashboard() {
                         {internScorecards.map((sc: any) => (
                           <div key={sc.id} className="p-3 bg-zinc-900 border border-white/5 rounded-xl space-y-2 text-[10.5px]">
                             <div className="flex justify-between items-center">
-                              <span className="text-[9.5px] text-zinc-550 font-mono">End: {new Date(sc.weekEnd).toLocaleDateString()}</span>
+                              <span className="text-[9.5px] text-zinc-500 font-mono">End: {new Date(sc.weekEnd).toLocaleDateString()}</span>
                               <span className={`px-1.5 py-0.5 rounded text-[9.5px] font-bold ${sc.score >= 80 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
                                 Score: {sc.score}/100
                               </span>

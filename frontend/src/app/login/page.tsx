@@ -210,7 +210,7 @@ export default function LoginPage() {
         <button
           type="button"
           onClick={() => setGoogleModalOpen(true)}
-          className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-700 dark:text-zinc-300 font-semibold text-xs transition-colors border border-zinc-250 dark:border-zinc-800 shadow-sm"
+          className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-700 dark:text-zinc-300 font-semibold text-xs transition-colors border border-zinc-200 dark:border-zinc-800 shadow-sm"
         >
           <Chrome size={13} className="text-zinc-500 dark:text-zinc-300" />
           <span>Google Workspace SSO</span>

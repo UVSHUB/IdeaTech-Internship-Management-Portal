@@ -70,7 +70,7 @@ export default function VerifyCertificatePage() {
             </div>
             <button 
               onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-slate-800 hover:bg-slate-750 text-xs font-semibold rounded-xl transition-colors border border-white/5"
+              className="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-xl transition-colors border border-white/5"
             >
               Retry Verification
             </button>

@@ -626,7 +626,7 @@ function InternDashboardInner() {
                         onClick={handleCheckIn}
                         disabled={submitting || attendanceStatus !== 'Not Checked In'}
                         className={`flex-grow py-2.5 rounded-xl font-bold text-xs ${
-                          attendanceStatus === 'Not Checked In' ? 'bg-blue-600 hover:bg-blue-750 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                          attendanceStatus === 'Not Checked In' ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                         }`}
                       >
                         Clock In
@@ -635,7 +635,7 @@ function InternDashboardInner() {
                         onClick={handleCheckOut}
                         disabled={submitting || attendanceStatus !== 'Checked In'}
                         className={`flex-grow py-2.5 rounded-xl font-bold text-xs ${
-                          attendanceStatus === 'Checked In' ? 'bg-purple-600 hover:bg-purple-750 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                          attendanceStatus === 'Checked In' ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                         }`}
                       >
                         Clock Out
@@ -696,7 +696,7 @@ function InternDashboardInner() {
                             href={commit.htmlUrl} 
                             target="_blank" 
                             rel="noopener noreferrer" 
-                            className="px-2.5 py-1 bg-zinc-850 hover:bg-zinc-800 text-zinc-300 rounded font-bold text-[10px] border border-white/5 whitespace-nowrap animate-pulse"
+                            className="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 rounded font-bold text-[10px] border border-white/5 whitespace-nowrap animate-pulse"
                           >
                             View Commit 🔗
                           </a>
@@ -734,7 +734,7 @@ function InternDashboardInner() {
                           <span 
                             key={index} 
                             title={badge.desc}
-                            className="px-2 py-0.5 bg-zinc-800 text-[10px] text-zinc-350 rounded border border-white/5 font-semibold"
+                            className="px-2 py-0.5 bg-zinc-800 text-[10px] text-zinc-400 rounded border border-white/5 font-semibold"
                           >
                             {badge.name}
                           </span>
@@ -850,7 +850,7 @@ function InternDashboardInner() {
                     onClick={handleCheckOut}
                     disabled={submitting || attendanceStatus !== 'Checked In'}
                     className={`w-full py-3 rounded-xl font-bold ${
-                      attendanceStatus === 'Checked In' ? 'bg-purple-600 hover:bg-purple-750 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-white/5'
+                      attendanceStatus === 'Checked In' ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-white/5'
                     }`}
                   >
                     Clock Out
@@ -893,7 +893,7 @@ function InternDashboardInner() {
                       ⚠️ Warning: Your meeting attendance is below the 80% threshold. Please join all scheduled sprint meetings.
                     </div>
                   ) : (
-                    <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-[10px] text-emerald-450 leading-normal">
+                    <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-[10px] text-emerald-400 leading-normal">
                       ✓ Good Standing: Your meeting attendance meets the portal requirement.
                     </div>
                   )}
@@ -920,7 +920,7 @@ function InternDashboardInner() {
                           Score: {sc.score}/100
                         </span>
                       </div>
-                      <p className="text-[10.5px] text-zinc-650 dark:text-zinc-300 leading-normal"><strong className="text-zinc-450">Feedback:</strong> "{sc.summary}"</p>
+                      <p className="text-[10.5px] text-zinc-600 dark:text-zinc-300 leading-normal"><strong className="text-zinc-400">Feedback:</strong> "{sc.summary}"</p>
                       <p className="text-[10px] text-blue-400 bg-blue-500/5 p-2 rounded-lg leading-normal">💡 <strong className="text-blue-300">Recommendation:</strong> {sc.areasOfImp}</p>
                     </div>
                   ))}
@@ -932,7 +932,7 @@ function InternDashboardInner() {
             <GlassCard className="space-y-3">
               <h3 className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Flexible WFH Shift Planner</h3>
               {hoursPlannerMsg && (
-                <p className={`text-[10px] font-bold ${hoursPlannerMsg.startsWith('✅') ? 'text-emerald-450' : 'text-red-455'}`}>
+                <p className={`text-[10px] font-bold ${hoursPlannerMsg.startsWith('✅') ? 'text-emerald-400' : 'text-red-400'}`}>
                   {hoursPlannerMsg}
                 </p>
               )}
@@ -1001,7 +1001,7 @@ function InternDashboardInner() {
                       <div className="flex space-x-1.5 items-center">
                         {/* Planned Bar */}
                         <div className="flex-1 bg-zinc-200 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
-                          <div className="bg-zinc-550 dark:bg-zinc-500 h-full" style={{ width: `${Math.min(100, (plannedHours / 12) * 100)}%` }} />
+                          <div className="bg-zinc-500 dark:bg-zinc-500 h-full" style={{ width: `${Math.min(100, (plannedHours / 12) * 100)}%` }} />
                         </div>
                         {/* Actual Bar */}
                         <div className="flex-1 bg-zinc-200 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
@@ -1053,7 +1053,7 @@ function InternDashboardInner() {
             <GlassCard className="space-y-4">
               <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Submit Daily Report</h3>
               {user?.projectMembers?.[0]?.project ? (
-                <div className="p-3 mb-3 bg-zinc-950/45 border border-emerald-550/20 rounded-2xl text-[10.5px] text-zinc-400 leading-normal">
+                <div className="p-3 mb-3 bg-zinc-950/45 border border-emerald-500/20 rounded-2xl text-[10.5px] text-zinc-400 leading-normal">
                   <span className="font-bold text-emerald-400 uppercase block mb-1">👥 Group Project: {user.projectMembers[0].project.name}</span>
                   This is a <strong>Group Daily Report</strong>. Only one member of your project group needs to submit this report daily on behalf of the entire group.
                 </div>
@@ -1279,7 +1279,7 @@ function InternDashboardInner() {
                         <span className="text-red-400 font-semibold uppercase">{task.priority}</span>
                         <button
                           onClick={() => handleUpdateTaskStatus(task.id, 'WORKING')}
-                          className="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-750 text-white font-bold transition-colors"
+                          className="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white font-bold transition-colors"
                         >
                           Start Work
                         </button>
@@ -1306,7 +1306,7 @@ function InternDashboardInner() {
                         <span className="text-amber-400 font-semibold uppercase">{task.priority}</span>
                         <button
                           onClick={() => handleUpdateTaskStatus(task.id, 'COMPLETED')}
-                          className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-750 text-white font-bold transition-colors"
+                          className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-colors"
                         >
                           Complete Task
                         </button>
@@ -1376,7 +1376,7 @@ function InternDashboardInner() {
 
             <GlassCard className="space-y-4 h-fit">
               <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Apply for Leave</h3>
-              {leaveMsg && <div className="p-3 mb-2 rounded-xl bg-slate-900 border border-white/5 text-[10px] text-center text-blue-450 font-bold">{leaveMsg}</div>}
+              {leaveMsg && <div className="p-3 mb-2 rounded-xl bg-slate-900 border border-white/5 text-[10px] text-center text-blue-400 font-bold">{leaveMsg}</div>}
               <form onSubmit={handleLeaveSubmit} className="space-y-3 text-xs">
                 <div>
                   <label className="block text-slate-500 mb-0.5">LEAVE REASON *</label>

@@ -1042,7 +1042,7 @@ function AdminDashboardInner() {
                       <div className="flex justify-between items-start">
                         <div>
                           <h4 className="text-base font-bold text-zinc-900 dark:text-white">{project.name}</h4>
-                          <span className="text-[10px] text-zinc-500 dark:text-zinc-450 block mt-0.5">ID: {project.id}</span>
+                          <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block mt-0.5">ID: {project.id}</span>
                         </div>
                         <span className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/25 px-2 py-0.5 rounded font-bold uppercase">
                           {project.status}
@@ -1097,7 +1097,7 @@ function AdminDashboardInner() {
                       </div>
 
                       {/* AI Sprint Advisor Button */}
-                      <div className="pt-3 border-t border-zinc-200 dark:border-zinc-850 flex justify-between items-center">
+                      <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800 flex justify-between items-center">
                         <span className="text-[10px] text-zinc-500 font-bold uppercase">{project.tasks?.length || 0} Tasks Assigned</span>
                         <button
                           type="button"
@@ -1202,7 +1202,7 @@ function AdminDashboardInner() {
                             {meeting.attendance.map((att: any) => {
                               const isPresent = !!att.joinedAt;
                               return (
-                                <div key={att.id} className="flex items-center justify-between p-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded-lg">
+                                <div key={att.id} className="flex items-center justify-between p-2 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg">
                                   <span className="font-semibold text-zinc-700 dark:text-zinc-300">
                                     {att.user?.firstName} {att.user?.lastName}
                                   </span>
@@ -1342,7 +1342,7 @@ function AdminDashboardInner() {
                         <button
                           onClick={() => handleReviewLeave(leave.id, 'REJECTED')}
                           disabled={submitting}
-                          className="flex-grow py-2 rounded-xl bg-red-600 hover:bg-red-750 text-white font-bold text-xs transition-colors shadow-md"
+                          className="flex-grow py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition-colors shadow-md"
                         >
                           Reject
                         </button>
@@ -1469,10 +1469,10 @@ function AdminDashboardInner() {
                         <tr key={staff.id}>
                           <td className="py-3 font-bold text-zinc-900 dark:text-white">{staff.firstName} {staff.lastName}</td>
                           <td className="py-3 font-mono text-zinc-500">{staff.email}</td>
-                          <td className="py-3 text-zinc-650 dark:text-zinc-400">
+                          <td className="py-3 text-zinc-600 dark:text-zinc-400">
                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                               staff.role === 'SUPER_ADMIN' ? 'bg-red-500/10 text-red-400' :
-                              staff.role === 'PROJECT_MANAGER' ? 'bg-amber-500/10 text-amber-450 border border-amber-500/25' :
+                              staff.role === 'PROJECT_MANAGER' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/25' :
                               staff.role === 'TEAM_LEADER' ? 'bg-blue-500/10 text-blue-400' :
                               'bg-zinc-500/10 text-zinc-400'
                             }`}>
@@ -1480,7 +1480,7 @@ function AdminDashboardInner() {
                             </span>
                           </td>
                           <td className="py-3 text-center">
-                            <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-450 rounded text-[9px] font-bold">
+                            <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded text-[9px] font-bold">
                               ACTIVE
                             </span>
                           </td>
@@ -1502,7 +1502,7 @@ function AdminDashboardInner() {
                 )}
                 
                 <div>
-                  <label className="block text-slate-550 mb-1">FIRST NAME *</label>
+                  <label className="block text-slate-500 mb-1">FIRST NAME *</label>
                   <input
                     type="text"
                     required
@@ -1514,7 +1514,7 @@ function AdminDashboardInner() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-550 mb-1">LAST NAME *</label>
+                  <label className="block text-slate-500 mb-1">LAST NAME *</label>
                   <input
                     type="text"
                     required
@@ -1526,7 +1526,7 @@ function AdminDashboardInner() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-550 mb-1">EMAIL ADDRESS *</label>
+                  <label className="block text-slate-500 mb-1">EMAIL ADDRESS *</label>
                   <input
                     type="email"
                     required
@@ -1538,7 +1538,7 @@ function AdminDashboardInner() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-550 mb-1">PASSWORD *</label>
+                  <label className="block text-slate-500 mb-1">PASSWORD *</label>
                   <input
                     type="password"
                     required
@@ -1551,7 +1551,7 @@ function AdminDashboardInner() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-550 mb-1">DESIGNATED ROLE *</label>
+                  <label className="block text-slate-500 mb-1">DESIGNATED ROLE *</label>
                   <select
                     value={staffForm.role}
                     onChange={(e) => setStaffForm({ ...staffForm, role: e.target.value })}
@@ -1592,7 +1592,7 @@ function AdminDashboardInner() {
                   <button
                     onClick={handleGenerateStandupDigest}
                     disabled={loadingDigest}
-                    className="px-4 py-2 bg-blue-650 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-colors"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-colors"
                   >
                     {loadingDigest ? 'Generating Standup Digest...' : 'Compile Standup Digest'}
                   </button>
@@ -1613,7 +1613,7 @@ function AdminDashboardInner() {
               <GlassCard className="space-y-4">
                 <div>
                   <h2 className="text-base font-bold text-zinc-900 dark:text-white flex items-center space-x-2">
-                    <ShieldAlert size={18} className="text-red-450" />
+                    <ShieldAlert size={18} className="text-red-400" />
                     <span>Inactivity & Slackness Audit List</span>
                   </h2>
                   <p className="text-[10px] text-zinc-500 mt-0.5">Interns in ACTIVE status who have not logged any check-ins, tasks, or commits in the last 48 hours.</p>
@@ -1645,7 +1645,7 @@ function AdminDashboardInner() {
                                 onClick={async () => {
                                   alert(`⚠️ Inactivity warning notification sent to ${profile.user?.firstName}!`);
                                 }}
-                                className="px-2.5 py-1 bg-red-650/10 hover:bg-red-650/20 text-red-400 rounded-lg border border-red-500/20 text-[10px] font-bold"
+                                className="px-2.5 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/20 text-[10px] font-bold"
                               >
                                 Send Alert Notice 🚨
                               </button>
@@ -1673,7 +1673,7 @@ function AdminDashboardInner() {
                     <select
                       value={badgeForm.userId}
                       onChange={(e) => setBadgeForm({ ...badgeForm, userId: e.target.value })}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-zinc-150 focus:outline-none"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-zinc-100 focus:outline-none"
                     >
                       <option value="">-- Choose Intern --</option>
                       {usersList
@@ -1691,7 +1691,7 @@ function AdminDashboardInner() {
                     <select
                       value={badgeForm.badgeName}
                       onChange={(e) => setBadgeForm({ ...badgeForm, badgeName: e.target.value })}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-zinc-150 focus:outline-none"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-zinc-100 focus:outline-none"
                     >
                       <option value="Agile Champion">⚡ Agile Champion</option>
                       <option value="Bug Exterminator">🐛 Bug Exterminator</option>
@@ -1704,7 +1704,7 @@ function AdminDashboardInner() {
                   <button
                     type="submit"
                     disabled={awardingBadge}
-                    className="w-full py-2 bg-blue-600 hover:bg-blue-750 text-white rounded-xl font-bold transition-all shadow-md text-xs"
+                    className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-md text-xs"
                   >
                     {awardingBadge ? 'Awarding Badge...' : 'Award Badge & Grant +50 XP'}
                   </button>
@@ -1721,7 +1721,7 @@ function AdminDashboardInner() {
                     .map((u, i) => (
                       <div key={u.id} className="flex justify-between items-center bg-zinc-950/20 p-2.5 rounded-xl border border-white/5">
                         <div className="flex items-center space-x-2 text-xs">
-                          <span className="font-bold text-blue-450">#{i + 1}</span>
+                          <span className="font-bold text-blue-400">#{i + 1}</span>
                           <span className="font-semibold text-zinc-900 dark:text-white">{u.firstName} {u.lastName}</span>
                         </div>
                         <span className="text-[10.5px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">

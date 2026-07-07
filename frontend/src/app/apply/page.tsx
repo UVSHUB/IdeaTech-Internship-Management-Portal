@@ -144,8 +144,8 @@ export default function ApplyPage() {
           ))}
         </div>
 
-        {error && <div className="p-4 mb-6 rounded-xl bg-zinc-100 dark:bg-zinc-950 border border-zinc-250 dark:border-zinc-800 text-red-650 dark:text-red-400 text-sm text-center font-semibold">{error}</div>}
-        {message && <div className="p-4 mb-6 rounded-xl bg-zinc-150 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-green-600 dark:text-green-400 text-sm text-center font-semibold">{message}</div>}
+        {error && <div className="p-4 mb-6 rounded-xl bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-red-600 dark:text-red-400 text-sm text-center font-semibold">{error}</div>}
+        {message && <div className="p-4 mb-6 rounded-xl bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-green-600 dark:text-green-400 text-sm text-center font-semibold">{message}</div>}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* STEP 1: Personal details */}
