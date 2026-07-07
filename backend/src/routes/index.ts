@@ -301,7 +301,17 @@ router.get(
   async (req: Request, res: Response) => {
     try {
       const users = await prisma.user.findMany({
-        select: { id: true, firstName: true, lastName: true, role: true },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          role: true,
+          internProfile: { select: { xp: true, internId: true } },
+          certificates: {
+            select: { id: true, certificateType: true, serialNumber: true, issuedAt: true, pdfUrl: true },
+          },
+        },
       });
       return res.json(users);
     } catch (error) {

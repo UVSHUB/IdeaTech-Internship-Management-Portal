@@ -722,7 +722,7 @@ function AdminDashboardInner() {
                     <tbody className="divide-y divide-white/5 text-zinc-600 dark:text-zinc-400">
                       {stats.activityLogs.map((log: any) => (
                         <tr key={log.id}>
-                          <td className="py-3 font-semibold text-white">{log.user.firstName} {log.user.lastName}</td>
+                          <td className="py-3 font-semibold text-zinc-900 dark:text-white">{log.user.firstName} {log.user.lastName}</td>
                           <td className="py-3">
                             <span className={`px-1.5 py-0.5 rounded font-bold text-[9px] ${
                               log.action.includes('TERMINATION') ? 'bg-red-500/10 text-red-400' :
@@ -886,7 +886,7 @@ function AdminDashboardInner() {
                     attendanceLogs.map((log: any) => (
                       <tr key={log.id}>
                         <td className="py-3.5 font-medium">{new Date(log.date).toLocaleDateString()}</td>
-                        <td className="py-3.5 font-bold text-white">{log.user.firstName} {log.user.lastName}</td>
+                        <td className="py-3.5 font-bold text-zinc-900 dark:text-white">{log.user.firstName} {log.user.lastName}</td>
                         <td className="py-3.5 text-zinc-500 dark:text-zinc-400">{new Date(log.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                         <td className="py-3.5 text-zinc-500">
                           {log.checkOut ? new Date(log.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Still Working'}
@@ -1383,7 +1383,7 @@ function AdminDashboardInner() {
                     ) : (
                       usersList.flatMap(u => (u.certificates || []).map((c: any) => ({ ...c, user: u }))).map((cert: any) => (
                         <tr key={cert.id}>
-                          <td className="py-3.5 font-bold text-white">{cert.user.firstName} {cert.user.lastName}</td>
+                          <td className="py-3.5 font-bold text-zinc-900 dark:text-white">{cert.user.firstName} {cert.user.lastName}</td>
                           <td className="py-3.5 font-semibold text-purple-400 uppercase tracking-wider">{cert.certificateType}</td>
                           <td className="py-3.5 font-mono text-amber-400">{cert.serialNumber}</td>
                           <td className="py-3.5 text-zinc-500">{new Date(cert.issuedAt).toLocaleDateString()}</td>
@@ -1467,7 +1467,7 @@ function AdminDashboardInner() {
                     ) : (
                       usersList.filter(u => ['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR'].includes(u.role)).map((staff: any) => (
                         <tr key={staff.id}>
-                          <td className="py-3 font-bold text-white">{staff.firstName} {staff.lastName}</td>
+                          <td className="py-3 font-bold text-zinc-900 dark:text-white">{staff.firstName} {staff.lastName}</td>
                           <td className="py-3 font-mono text-zinc-500">{staff.email}</td>
                           <td className="py-3 text-zinc-650 dark:text-zinc-400">
                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
@@ -1584,7 +1584,7 @@ function AdminDashboardInner() {
               <GlassCard className="space-y-4">
                 <div className="flex justify-between items-center border-b border-white/5 pb-3">
                   <div>
-                    <h2 className="text-base font-bold text-white flex items-center space-x-2">
+                    <h2 className="text-base font-bold text-zinc-900 dark:text-white flex items-center space-x-2">
                       <span>✨ AI WFH Daily Standup Digest</span>
                     </h2>
                     <p className="text-[10px] text-zinc-500 mt-0.5">Aggregates and summarizes all daily reports submitted today using Gemini AI.</p>
@@ -1612,7 +1612,7 @@ function AdminDashboardInner() {
               {/* Inactivity Slackness Audit */}
               <GlassCard className="space-y-4">
                 <div>
-                  <h2 className="text-base font-bold text-white flex items-center space-x-2">
+                  <h2 className="text-base font-bold text-zinc-900 dark:text-white flex items-center space-x-2">
                     <ShieldAlert size={18} className="text-red-450" />
                     <span>Inactivity & Slackness Audit List</span>
                   </h2>
@@ -1629,7 +1629,7 @@ function AdminDashboardInner() {
                         <th className="py-2.5 text-center">Alert Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5 text-zinc-400">
+                    <tbody className="divide-y divide-white/5 text-zinc-600 dark:text-zinc-400">
                       {inactiveInterns.length === 0 ? (
                         <tr>
                           <td colSpan={4} className="text-center py-8 text-zinc-500 italic">No inactive interns flagged. Remote team is highly active!</td>
@@ -1637,7 +1637,7 @@ function AdminDashboardInner() {
                       ) : (
                         inactiveInterns.map((profile: any) => (
                           <tr key={profile.id}>
-                            <td className="py-3 font-semibold text-white">{profile.user?.firstName} {profile.user?.lastName}</td>
+                            <td className="py-3 font-semibold text-zinc-900 dark:text-white">{profile.user?.firstName} {profile.user?.lastName}</td>
                             <td className="py-3 font-mono">{profile.user?.email}</td>
                             <td className="py-3 text-red-400 font-bold">{new Date(profile.lastActive).toLocaleString()}</td>
                             <td className="py-3 text-center">
@@ -1722,7 +1722,7 @@ function AdminDashboardInner() {
                       <div key={u.id} className="flex justify-between items-center bg-zinc-950/20 p-2.5 rounded-xl border border-white/5">
                         <div className="flex items-center space-x-2 text-xs">
                           <span className="font-bold text-blue-450">#{i + 1}</span>
-                          <span className="font-semibold text-white">{u.firstName} {u.lastName}</span>
+                          <span className="font-semibold text-zinc-900 dark:text-white">{u.firstName} {u.lastName}</span>
                         </div>
                         <span className="text-[10.5px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
                           {u.internProfile?.xp || 0} XP
