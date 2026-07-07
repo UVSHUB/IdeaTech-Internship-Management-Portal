@@ -6,9 +6,9 @@ import { useSearchParams } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import GlassCard from '@/components/GlassCard';
 import { motion } from 'framer-motion';
-import { 
-  Award, Zap, Calendar, AlertTriangle, MessageSquare, 
-  Send, CheckCircle, Clock, MapPin, Code, Loader2, Play, FolderGit2
+import {
+  Award, Zap, Calendar, AlertTriangle, MessageSquare,
+  Send, CheckCircle, Clock, MapPin, Code, Loader2, Play, FolderGit2, Download, UserCog
 } from 'lucide-react';
 
 export default function InternDashboard() {
@@ -29,7 +29,7 @@ export default function InternDashboard() {
 function InternDashboardInner() {
   const { user, token, refreshUser } = useAuth();
   const searchParams = useSearchParams();
-  const tab = searchParams?.get('tab') ?? undefined; // undefined (Overview), 'attendance', 'reports', 'logbook', 'tasks', 'leaves', 'certificates'
+  const tab = searchParams?.get('tab') ?? undefined; // undefined (Overview), 'attendance', 'reports', 'logbook', 'tasks', 'leaves', 'certificates', 'profile'
 
   // Metrics loading
   const [stats, setStats] = useState<any>(null);
@@ -76,6 +76,7 @@ function InternDashboardInner() {
   const [challenges, setChallenges] = useState('');
   const [solutions, setSolutions] = useState('');
   const [logbookMsg, setLogbookMsg] = useState('');
+  const [exportingLogbook, setExportingLogbook] = useState(false);
 
   // Leave Form State
   const [leaveForm, setLeaveForm] = useState({ reason: 'PERSONAL', startDate: '', endDate: '', description: '' });
@@ -88,6 +89,15 @@ function InternDashboardInner() {
   ]);
   const [chatLoading, setChatLoading] = useState(false);
 
+  // Profile Management Form State
+  const [profileForm, setProfileForm] = useState({
+    firstName: '', lastName: '', mobileNumber: '', address: '', emergencyContact: '',
+    nic: '', dob: '', university: '', degree: '', year: '1', skills: '',
+    portfolio: '', github: '', linkedin: '', preferredTech: '', availability: '',
+  });
+  const [profileMsg, setProfileMsg] = useState('');
+  const [savingProfile, setSavingProfile] = useState(false);
+
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -95,6 +105,63 @@ function InternDashboardInner() {
       fetchBaseData();
     }
   }, [token]);
+
+  // Populate profile form once user data is available
+  useEffect(() => {
+    if (user) {
+      const p = user.internProfile;
+      setProfileForm({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        mobileNumber: p?.mobileNumber || '',
+        address: p?.address || '',
+        emergencyContact: p?.emergencyContact || '',
+        nic: p?.nic || '',
+        dob: p?.dob ? new Date(p.dob).toISOString().split('T')[0] : '',
+        university: p?.university || '',
+        degree: p?.degree || '',
+        year: p?.year ? String(p.year) : '1',
+        skills: p?.skills || '',
+        portfolio: p?.portfolio || '',
+        github: p?.github || '',
+        linkedin: p?.linkedin || '',
+        preferredTech: p?.preferredTech || '',
+        availability: p?.availability || '',
+      });
+    }
+  }, [user]);
+
+  const handleProfileFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setProfileForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleProfileSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingProfile(true);
+    setProfileMsg('');
+    try {
+      const res = await fetch('/api/users/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(profileForm),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setProfileMsg('Profile updated successfully!');
+        await refreshUser();
+      } else {
+        setProfileMsg(data.message || 'Failed to update profile.');
+      }
+    } catch {
+      setProfileMsg('Network error while updating profile.');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
 
   useEffect(() => {
     fetchTabSpecificData();
@@ -394,6 +461,33 @@ function InternDashboardInner() {
       }
     } catch {
       setLogbookMsg('Submission error.');
+    }
+  };
+
+  // Export Logbook as PDF
+  const handleExportLogbook = async () => {
+    setExportingLogbook(true);
+    try {
+      const res = await fetch('/api/logbook/export', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `logbook-${user?.internProfile?.internId || 'export'}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert('Failed to export logbook.');
+      }
+    } catch {
+      alert('Network error while exporting logbook.');
+    } finally {
+      setExportingLogbook(false);
     }
   };
 
@@ -1146,10 +1240,21 @@ function InternDashboardInner() {
         {tab === 'logbook' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <GlassCard className="lg:col-span-2 space-y-4">
-              <h2 className="text-base font-bold flex items-center space-x-2 text-blue-400 border-b border-white/5 pb-2">
-                <Send size={18} />
-                <span>My Academic Logbook History</span>
-              </h2>
+              <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                <h2 className="text-base font-bold flex items-center space-x-2 text-blue-400">
+                  <Send size={18} />
+                  <span>My Academic Logbook History</span>
+                </h2>
+                <button
+                  onClick={handleExportLogbook}
+                  disabled={exportingLogbook || logbookHistory.length === 0}
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed text-white text-[10px] font-bold border border-white/10 transition-colors"
+                  title="Export logbook as PDF"
+                >
+                  {exportingLogbook ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
+                  <span>{exportingLogbook ? 'Exporting...' : 'Export PDF'}</span>
+                </button>
+              </div>
               <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
                 {logbookHistory.length === 0 ? (
                   <p className="text-xs text-slate-500 text-center py-16">No logbook insights recorded yet.</p>
@@ -1479,6 +1584,147 @@ function InternDashboardInner() {
               )}
             </div>
           </GlassCard>
+        )}
+
+        {/* PROFILE MANAGEMENT TAB */}
+        {tab === 'profile' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <GlassCard className="lg:col-span-3 space-y-4">
+              <h2 className="text-base font-bold flex items-center space-x-2 text-blue-400 border-b border-white/5 pb-2">
+                <UserCog size={18} />
+                <span>Edit My Profile Details</span>
+              </h2>
+              <p className="text-[10.5px] text-zinc-500 dark:text-zinc-400 -mt-2">
+                Update the details you submitted during registration. Email, department, and position are managed by portal staff and cannot be changed here.
+              </p>
+
+              {profileMsg && (
+                <div className={`p-3 rounded-xl border text-[11px] text-center font-bold ${
+                  profileMsg.includes('success') ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'
+                }`}>
+                  {profileMsg}
+                </div>
+              )}
+
+              <form onSubmit={handleProfileSubmit} className="space-y-6 text-xs">
+                {/* Personal Details */}
+                <div className="space-y-3">
+                  <h3 className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Personal Credentials</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-slate-500 mb-0.5">First Name *</label>
+                      <input type="text" name="firstName" required value={profileForm.firstName} onChange={handleProfileFormChange}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors" />
+                    </div>
+                    <div>
+                      <label className="block text-slate-500 mb-0.5">Last Name *</label>
+                      <input type="text" name="lastName" required value={profileForm.lastName} onChange={handleProfileFormChange}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors" />
+                    </div>
+                    <div>
+                      <label className="block text-slate-500 mb-0.5">Date of Birth</label>
+                      <input type="date" name="dob" value={profileForm.dob} onChange={handleProfileFormChange}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors [color-scheme:light] dark:[color-scheme:dark]" />
+                    </div>
+                    <div>
+                      <label className="block text-slate-500 mb-0.5">National ID (NIC)</label>
+                      <input type="text" name="nic" value={profileForm.nic} onChange={handleProfileFormChange}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors" />
+                    </div>
+                    <div>
+                      <label className="block text-slate-500 mb-0.5">Mobile Number</label>
+                      <input type="tel" name="mobileNumber" value={profileForm.mobileNumber} onChange={handleProfileFormChange}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors" />
+                    </div>
+                    <div>
+                      <label className="block text-slate-500 mb-0.5">Emergency Contact</label>
+                      <input type="text" name="emergencyContact" value={profileForm.emergencyContact} onChange={handleProfileFormChange}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-slate-500 mb-0.5">Residential Address</label>
+                    <input type="text" name="address" value={profileForm.address} onChange={handleProfileFormChange}
+                      className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors" />
+                  </div>
+                </div>
+
+                {/* Education Details */}
+                <div className="space-y-3">
+                  <h3 className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Educational Details</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-slate-500 mb-0.5">University</label>
+                      <input type="text" name="university" value={profileForm.university} onChange={handleProfileFormChange}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors" />
+                    </div>
+                    <div>
+                      <label className="block text-slate-500 mb-0.5">Degree Title</label>
+                      <input type="text" name="degree" value={profileForm.degree} onChange={handleProfileFormChange}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors" />
+                    </div>
+                    <div>
+                      <label className="block text-slate-500 mb-0.5">Academic Year</label>
+                      <select name="year" value={profileForm.year} onChange={handleProfileFormChange}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-700 dark:text-zinc-300 focus:outline-none focus:border-zinc-500 transition-colors">
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-slate-500 mb-0.5">Skills (Comma-separated)</label>
+                    <textarea name="skills" rows={2} value={profileForm.skills} onChange={handleProfileFormChange}
+                      className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors" />
+                  </div>
+                </div>
+
+                {/* Professional Links */}
+                <div className="space-y-3">
+                  <h3 className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Professional Profiles</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-slate-500 mb-0.5">GitHub URL</label>
+                      <input type="url" name="github" value={profileForm.github} onChange={handleProfileFormChange}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors" placeholder="https://github.com/username" />
+                    </div>
+                    <div>
+                      <label className="block text-slate-500 mb-0.5">LinkedIn URL</label>
+                      <input type="url" name="linkedin" value={profileForm.linkedin} onChange={handleProfileFormChange}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors" placeholder="https://linkedin.com/in/username" />
+                    </div>
+                    <div>
+                      <label className="block text-slate-500 mb-0.5">Portfolio Link</label>
+                      <input type="url" name="portfolio" value={profileForm.portfolio} onChange={handleProfileFormChange}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors" placeholder="https://mywebsite.com" />
+                    </div>
+                    <div>
+                      <label className="block text-slate-500 mb-0.5">Preferred Tech Stack</label>
+                      <input type="text" name="preferredTech" value={profileForm.preferredTech} onChange={handleProfileFormChange}
+                        className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors" placeholder="e.g. Next.js, Node, MERN" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-slate-500 mb-0.5">Availability</label>
+                    <input type="text" name="availability" value={profileForm.availability} onChange={handleProfileFormChange}
+                      className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors" placeholder="e.g. Immediate, 1 Month Notice" />
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-2">
+                  <button
+                    type="submit"
+                    disabled={savingProfile}
+                    className="px-8 py-2.5 rounded-xl bg-theme-gradient text-white text-xs font-bold hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {savingProfile ? 'Saving...' : 'Save Profile Changes'}
+                  </button>
+                </div>
+              </form>
+            </GlassCard>
+          </div>
         )}
       </main>
     </div>

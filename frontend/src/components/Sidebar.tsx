@@ -109,6 +109,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
       { name: 'Task Board', icon: CheckSquare, path: '/dashboard/intern?tab=tasks' },
       { name: 'Leave Request', icon: AlertTriangle, path: '/dashboard/intern?tab=leaves' },
       { name: 'My Certificates', icon: Award, path: '/dashboard/intern?tab=certificates' },
+      { name: 'Profile', icon: UserCheck, path: '/dashboard/intern?tab=profile' },
     ];
   };
 
