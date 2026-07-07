@@ -1160,8 +1160,8 @@ function InternDashboardInner() {
                         <div>
                           <h4 className="text-xs font-bold text-white">{new Date(l.date).toLocaleDateString()}</h4>
                           <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1"><strong>Activities:</strong> {l.activities}</p>
-                          <p className="text-[11px] text-zinc-500 dark:text-zinc-400"><strong>Learning:</strong> {l.learning}</p>
-                          <p className="text-[11px] text-zinc-500 dark:text-zinc-400"><strong>Skills:</strong> {l.skillsLearned}</p>
+                          <p className="text-[11px] text-zinc-600 dark:text-zinc-400"><strong>Learning:</strong> {l.learning}</p>
+                          <p className="text-[11px] text-zinc-600 dark:text-zinc-400"><strong>Skills:</strong> {l.skillsLearned}</p>
                         </div>
                         <span className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase ${
                           l.status === 'APPROVED' ? 'bg-green-500/10 text-green-400' : 'bg-amber-500/10 text-amber-400'
@@ -1180,8 +1180,8 @@ function InternDashboardInner() {
 
             <GlassCard className="space-y-4">
               <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Log Today's Insight</h3>
-              <div className="p-3 mb-3 bg-zinc-950/45 border border-zinc-800 rounded-2xl text-[10.5px] text-zinc-500 leading-normal">
-                <span className="font-bold text-zinc-400 uppercase block mb-1">📝 Individual Logbook</span>
+              <div className="p-3 mb-3 bg-zinc-100 dark:bg-zinc-950/45 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-[10.5px] text-zinc-600 dark:text-zinc-500 leading-normal">
+                <span className="font-bold text-zinc-700 dark:text-zinc-400 uppercase block mb-1">📝 Individual Logbook</span>
                 This logbook is <strong>individual</strong>. Every intern must submit their own logbook entry daily to record personal study progress and learnings.
               </div>
               {logbookMsg && <div className="p-3 mb-2 rounded-xl bg-slate-900 border border-white/5 text-[10px] text-center text-emerald-400 font-bold">{logbookMsg}</div>}
