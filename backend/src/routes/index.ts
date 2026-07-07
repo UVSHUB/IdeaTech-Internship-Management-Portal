@@ -184,7 +184,7 @@ router.post(
 router.get('/logbook/my', authorizeRoles(['INTERN']), getMyLogbook as any);
 router.get(
   '/logbook/pending',
-  authorizeRoles(['SUPER_ADMIN', 'MENTOR']),
+  authorizeRoles(['SUPER_ADMIN', 'MENTOR', 'TEAM_LEADER', 'PROJECT_MANAGER']),
   getPendingLogbooks as any
 );
 

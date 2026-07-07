@@ -60,6 +60,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
         ...base,
         { name: 'Applications', icon: UserCheck, path: '/dashboard/admin?tab=applications' },
         { name: 'Attendance Logs', icon: Clock, path: '/dashboard/admin?tab=attendance' },
+        { name: 'Report & Logbook Reviews', icon: FileText, path: '/dashboard/admin?tab=logs' },
         { name: 'Sprint Tasks', icon: CheckSquare, path: '/dashboard/admin?tab=tasks' },
         { name: 'Projects', icon: FolderGit2, path: '/dashboard/admin?tab=projects' },
         { name: 'Meetings', icon: CalendarRange, path: '/dashboard/admin?tab=meetings' },
@@ -86,7 +87,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
         { name: 'Task Board', icon: CheckSquare, path: '/dashboard/team-leader#task-board' },
         { name: 'Projects', icon: FolderGit2, path: '/dashboard/team-leader' },
         { name: 'Schedules', icon: CalendarRange, path: '/dashboard/team-leader' },
-        { name: 'Intern Logs', icon: FileText, path: '/dashboard/team-leader' },
+        { name: 'Intern Logs', icon: FileText, path: '/dashboard/team-leader#intern-logs' },
       ];
     }
 

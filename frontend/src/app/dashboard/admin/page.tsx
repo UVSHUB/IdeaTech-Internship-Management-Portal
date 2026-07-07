@@ -9,9 +9,10 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
   PieChart, Pie, Cell 
 } from 'recharts';
-import { 
-  ShieldAlert, Activity, CheckSquare, Clock, Settings, Play, 
-  UserCheck, FolderGit2, CalendarRange, FileText, Award, Plus, Loader2, Users
+import {
+  ShieldAlert, Activity, CheckSquare, Clock, Settings, Play,
+  UserCheck, FolderGit2, CalendarRange, FileText, Award, Plus, Loader2, Users,
+  BookOpen, CheckCircle, XCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -33,7 +34,7 @@ export default function AdminDashboard() {
 function AdminDashboardInner() {
   const { token } = useAuth();
   const searchParams = useSearchParams();
-  const tab = searchParams?.get('tab') ?? undefined; // undefined (Overview), 'applications', 'attendance', 'tasks', 'projects', 'meetings', 'leaves', 'certificates'
+  const tab = searchParams?.get('tab') ?? undefined; // undefined (Overview), 'applications', 'attendance', 'tasks', 'projects', 'meetings', 'leaves', 'certificates', 'logs'
 
   // Global Lists
   const [stats, setStats] = useState<any>(null);
@@ -47,6 +48,10 @@ function AdminDashboardInner() {
   const [meetingsList, setMeetingsList] = useState<any[]>([]);
   const [leavesList, setLeavesList] = useState<any[]>([]);
   const [usersList, setUsersList] = useState<any[]>([]);
+  const [reportsList, setReportsList] = useState<any[]>([]);
+  const [logbooksList, setLogbooksList] = useState<any[]>([]);
+  const [reportRemarks, setReportRemarks] = useState<Record<string, string>>({});
+  const [logbookComments, setLogbookComments] = useState<Record<string, string>>({});
 
   // Selection state for assignments
   const [selectedMentor, setSelectedMentor] = useState<Record<string, string>>({});
@@ -135,6 +140,13 @@ function AdminDashboardInner() {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         if (res.ok) setLeavesList(await res.json());
+      } else if (tab === 'logs') {
+        const [reportsRes, logbooksRes] = await Promise.all([
+          fetch('/api/reports/pending', { headers: { 'Authorization': `Bearer ${token}` } }),
+          fetch('/api/logbook/pending', { headers: { 'Authorization': `Bearer ${token}` } }),
+        ]);
+        if (reportsRes.ok) setReportsList(await reportsRes.json());
+        if (logbooksRes.ok) setLogbooksList(await logbooksRes.json());
       } else if (tab === 'command') {
         await fetchCommandCenterData();
       }
@@ -220,6 +232,52 @@ function AdminDashboardInner() {
 
   const fetchAllData = async () => {
     await Promise.all([fetchBaseData(), fetchTabSpecificData()]);
+  };
+
+  // Review daily report
+  const handleReviewReport = async (reportId: string, status: 'APPROVED' | 'REJECTED') => {
+    const remarks = reportRemarks[reportId] || '';
+    try {
+      const res = await fetch(`/api/reports/review/${reportId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status, remarks })
+      });
+      if (res.ok) {
+        alert(`Daily report ${status.toLowerCase()} successfully.`);
+        fetchTabSpecificData();
+      } else {
+        alert('Action failed.');
+      }
+    } catch {
+      alert('Error.');
+    }
+  };
+
+  // Review logbook entry
+  const handleReviewLogbook = async (logbookId: string, status: 'APPROVED' | 'REJECTED') => {
+    const mentorComments = logbookComments[logbookId] || '';
+    try {
+      const res = await fetch(`/api/logbook/review/${logbookId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status, mentorComments })
+      });
+      if (res.ok) {
+        alert(`Logbook entry ${status.toLowerCase()} successfully.`);
+        fetchTabSpecificData();
+      } else {
+        alert('Action failed.');
+      }
+    } catch {
+      alert('Error.');
+    }
   };
 
   // Applications Actions
@@ -855,6 +913,130 @@ function AdminDashboardInner() {
               </div>
             )}
           </GlassCard>
+        )}
+
+        {/* REPORT & LOGBOOK REVIEWS VIEW */}
+        {tab === 'logs' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Daily Reports Review */}
+            <GlassCard className="space-y-4">
+              <h2 className="text-base font-bold flex items-center space-x-2 text-blue-400 border-b border-white/5 pb-2">
+                <FileText size={18} />
+                <span>Pending Daily Reports ({reportsList.length})</span>
+              </h2>
+
+              {reportsList.length === 0 ? (
+                <p className="text-xs text-slate-500 text-center py-16">No daily reports awaiting review.</p>
+              ) : (
+                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
+                  {reportsList.map((report) => (
+                    <div key={report.id} className="p-4 bg-slate-900/60 border border-white/5 rounded-2xl space-y-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="text-sm font-bold text-white">{report.user.firstName} {report.user.lastName} ({report.user.internProfile?.internId})</h4>
+                          <p className="text-[10px] text-zinc-500 dark:text-zinc-400">Logged date: {new Date(report.date).toLocaleDateString()}</p>
+                        </div>
+                        <span className="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-bold">
+                          Pending
+                        </span>
+                      </div>
+
+                      <div className="text-xs space-y-1.5 bg-zinc-100 dark:bg-zinc-950/40 p-3 rounded-xl text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                        <p><strong>Today's Tasks:</strong> {report.todayTasks}</p>
+                        <p><strong>Completed:</strong> {report.completedWork}</p>
+                        {report.problemsFaced && <p><strong>Blockers:</strong> <span className="text-red-400 font-semibold">{report.problemsFaced}</span></p>}
+                        <p className="text-[10px] text-slate-500 mt-2">Hours logged: {report.hoursWorked} hrs | Git: {report.githubLink || 'N/A'}</p>
+                      </div>
+
+                      <div className="flex space-x-2 items-center">
+                        <input
+                          type="text"
+                          value={reportRemarks[report.id] || ''}
+                          onChange={(e) => setReportRemarks({ ...reportRemarks, [report.id]: e.target.value })}
+                          className="flex-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
+                          placeholder="Feedback/remarks (optional)"
+                        />
+                        <button
+                          onClick={() => handleReviewReport(report.id, 'APPROVED')}
+                          className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs"
+                          title="Approve"
+                        >
+                          <CheckCircle size={15} />
+                        </button>
+                        <button
+                          onClick={() => handleReviewReport(report.id, 'REJECTED')}
+                          className="p-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold text-xs"
+                          title="Reject"
+                        >
+                          <XCircle size={15} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </GlassCard>
+
+            {/* Logbook Reviews */}
+            <GlassCard className="space-y-4">
+              <h2 className="text-base font-bold flex items-center space-x-2 text-purple-400 border-b border-white/5 pb-2">
+                <BookOpen size={18} />
+                <span>Pending Logbook Journals ({logbooksList.length})</span>
+              </h2>
+
+              {logbooksList.length === 0 ? (
+                <p className="text-xs text-slate-500 text-center py-16">No logbook entries awaiting review.</p>
+              ) : (
+                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
+                  {logbooksList.map((log) => (
+                    <div key={log.id} className="p-4 bg-slate-900/60 border border-white/5 rounded-2xl space-y-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="text-sm font-bold text-white">{log.user.firstName} {log.user.lastName} ({log.user.internProfile?.internId})</h4>
+                          <p className="text-[10px] text-zinc-500 dark:text-zinc-400">Date logged: {new Date(log.date).toLocaleDateString()}</p>
+                        </div>
+                        <span className="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-bold">
+                          Pending
+                        </span>
+                      </div>
+
+                      <div className="text-xs space-y-2 bg-zinc-100 dark:bg-zinc-950/40 p-3 rounded-xl text-zinc-600 dark:text-zinc-400 leading-normal">
+                        <div><strong>Activities:</strong> {log.activities}</div>
+                        <div><strong>Learning gained:</strong> {log.learning}</div>
+                        <div><strong>Skills:</strong> {log.skillsLearned}</div>
+                        {log.challenges && <div><strong>Challenges:</strong> {log.challenges}</div>}
+                        {log.solutions && <div><strong>Solutions:</strong> {log.solutions}</div>}
+                      </div>
+
+                      <div className="flex space-x-2 items-center">
+                        <input
+                          type="text"
+                          value={logbookComments[log.id] || ''}
+                          onChange={(e) => setLogbookComments({ ...logbookComments, [log.id]: e.target.value })}
+                          className="flex-1 bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 transition-colors"
+                          placeholder="Comments to include (optional)"
+                        />
+                        <button
+                          onClick={() => handleReviewLogbook(log.id, 'APPROVED')}
+                          className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs"
+                          title="Approve Log"
+                        >
+                          <CheckCircle size={15} />
+                        </button>
+                        <button
+                          onClick={() => handleReviewLogbook(log.id, 'REJECTED')}
+                          className="p-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold text-xs"
+                          title="Reject Log"
+                        >
+                          <XCircle size={15} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </GlassCard>
+          </div>
         )}
 
         {/* 3. ATTENDANCE LOGS VIEW */}
