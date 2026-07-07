@@ -3,23 +3,18 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Mail, ArrowRight, Chrome, ShieldAlert } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Lock, Mail, ArrowRight, ShieldAlert } from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [logoError, setLogoError] = useState(false);
-
-  // Google Login Modal State
-  const [googleModalOpen, setGoogleModalOpen] = useState(false);
-  const [googleEmail, setGoogleEmail] = useState('');
-  const [googleLoading, setGoogleLoading] = useState(false);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -58,42 +53,6 @@ export default function LoginPage() {
       const btn = document.getElementById('login-submit-btn');
       if (btn) btn.click();
     }, 100);
-  };
-
-  // Handle Google OAuth Callback Simulation
-  const handleGoogleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!googleEmail.trim()) return;
-
-    setGoogleLoading(true);
-    setError('');
-
-    try {
-      // Simulate ID Token by encoding email as credential
-      const mockCredential = btoa(JSON.stringify({ email: googleEmail, iss: 'accounts.google.com' }));
-      
-      const res = await fetch('/api/auth/google-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ credential: mockCredential }),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setGoogleModalOpen(false);
-        login(data.token, data.user);
-      } else {
-        setError(data.message || 'Google login failed.');
-        setGoogleModalOpen(false);
-      }
-    } catch (err) {
-      setError('Connection to auth server failed.');
-      setGoogleModalOpen(false);
-    } finally {
-      setGoogleLoading(false);
-    }
   };
 
   return (
@@ -200,22 +159,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="relative flex py-4 items-center">
-          <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
-          <span className="flex-shrink mx-4 text-[9px] text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">or login with</span>
-          <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
-        </div>
-
-        {/* Google OAuth Simulation trigger */}
-        <button
-          type="button"
-          onClick={() => setGoogleModalOpen(true)}
-          className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-700 dark:text-zinc-300 font-semibold text-xs transition-colors border border-zinc-200 dark:border-zinc-800 shadow-sm"
-        >
-          <Chrome size={13} className="text-zinc-500 dark:text-zinc-300" />
-          <span>Google Workspace SSO</span>
-        </button>
-
         <div className="text-center mt-6 text-xs text-zinc-500 dark:text-zinc-400">
           Not registered yet?{' '}
           <button onClick={() => router.push('/apply')} className="text-zinc-950 dark:text-zinc-200 font-semibold hover:underline">
@@ -223,59 +166,6 @@ export default function LoginPage() {
           </button>
         </div>
       </motion.div>
-
-      {/* Google Login Simulator Modal */}
-      <AnimatePresence>
-        {googleModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-xs z-50 p-4 animate-fade-in">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-sm rounded-2xl border border-zinc-800 p-6 bg-zinc-900 shadow-2xl space-y-4"
-            >
-              <div className="text-center">
-                <Chrome size={28} className="text-zinc-300 mx-auto mb-2" />
-                <h3 className="text-base font-bold text-zinc-100">Sign in with Google</h3>
-                <p className="text-xs text-zinc-400 leading-normal px-2 mt-1">
-                  Enter your pre-registered Google email. SSO will query the database to issue your session token.
-                </p>
-              </div>
-
-              <form onSubmit={handleGoogleSubmit} className="space-y-3">
-                <div>
-                  <label className="block text-[10px] text-zinc-500 mb-1">GOOGLE EMAIL</label>
-                  <input
-                    type="email"
-                    required
-                    value={googleEmail}
-                    onChange={(e) => setGoogleEmail(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-zinc-400 focus:outline-none focus:border-zinc-500"
-                    placeholder="e.g. name@gmail.com"
-                  />
-                </div>
-
-                <div className="flex space-x-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setGoogleModalOpen(false)}
-                    className="flex-1 py-2 rounded-xl bg-zinc-950 text-zinc-400 text-xs font-semibold hover:bg-zinc-900 border border-zinc-800"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={googleLoading}
-                    className="flex-1 py-2 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-semibold shadow-md"
-                  >
-                    {googleLoading ? 'Verifying...' : 'Verify SSO'}
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

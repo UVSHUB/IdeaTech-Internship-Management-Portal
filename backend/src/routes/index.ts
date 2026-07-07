@@ -9,7 +9,6 @@ import {
   login,
   approveIntern,
   rejectIntern,
-  googleLogin,
   registerStaff,
 } from '../controllers/authController';
 
@@ -87,7 +86,6 @@ const router = Router();
 // PUBLIC ROUTES
 // ==========================================
 router.post('/auth/login', login);
-router.post('/auth/google-login', googleLogin);
 router.post('/auth/register-intern', uploadCv.single('cv'), registerIntern);
 router.get('/certificates/verify/:key', verifyCertificate);
 
