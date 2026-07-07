@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import prisma from '../utils/db';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { generateLogbookPDF } from '../services/pdf';
 
 /**
  * Submit Logbook Entry
@@ -136,6 +137,44 @@ export async function getMyLogbook(req: AuthenticatedRequest, res: Response) {
     return res.json(logbooks);
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error.' });
+  }
+}
+
+/**
+ * Intern: Export own logbook history as a PDF
+ */
+export async function exportMyLogbook(req: AuthenticatedRequest, res: Response) {
+  try {
+    const userId = req.user!.id;
+
+    const [profile, logbooks] = await Promise.all([
+      prisma.internProfile.findUnique({
+        where: { userId },
+        include: { user: true, department: true },
+      }),
+      prisma.logbook.findMany({
+        where: { userId },
+        orderBy: { date: 'asc' },
+      }),
+    ]);
+
+    if (!profile) {
+      return res.status(404).json({ message: 'Intern profile not found.' });
+    }
+
+    const pdfBuffer = await generateLogbookPDF({
+      name: `${profile.user.firstName} ${profile.user.lastName}`,
+      internId: profile.internId || 'N/A',
+      department: profile.department.name,
+      entries: logbooks,
+    });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="logbook-${profile.internId || userId}.pdf"`);
+    return res.send(pdfBuffer);
+  } catch (error: any) {
+    console.error('Export logbook error:', error);
+    return res.status(500).json({ message: 'Internal server error.', error: error.message });
   }
 }
 

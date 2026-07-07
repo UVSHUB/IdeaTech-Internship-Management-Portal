@@ -31,6 +31,7 @@ import {
   reviewLogbook,
   getMyLogbook,
   getPendingLogbooks,
+  exportMyLogbook,
 } from '../controllers/logbookController';
 
 import {
@@ -182,6 +183,7 @@ router.post(
   reviewLogbook as any
 );
 router.get('/logbook/my', authorizeRoles(['INTERN']), getMyLogbook as any);
+router.get('/logbook/export', authorizeRoles(['INTERN']), exportMyLogbook as any);
 router.get(
   '/logbook/pending',
   authorizeRoles(['SUPER_ADMIN', 'MENTOR', 'TEAM_LEADER', 'PROJECT_MANAGER']),
@@ -265,6 +267,59 @@ router.get('/users/me', async (req: Request | any, res: Response) => {
     return res.json(user);
   } catch (error) {
     return res.status(500).json({ message: 'Error retrieving user details.' });
+  }
+});
+
+router.put('/users/me', async (req: Request | any, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const { firstName, lastName, ...profileFields } = req.body;
+
+    const userUpdate: Record<string, any> = {};
+    if (firstName !== undefined) userUpdate.firstName = firstName;
+    if (lastName !== undefined) userUpdate.lastName = lastName;
+
+    if (Object.keys(userUpdate).length > 0) {
+      await prisma.user.update({ where: { id: userId }, data: userUpdate });
+    }
+
+    if (req.user.role === 'INTERN') {
+      const allowedFields = [
+        'nic', 'university', 'degree', 'year', 'skills', 'portfolio',
+        'github', 'linkedin', 'mobileNumber', 'address', 'emergencyContact',
+        'preferredTech', 'availability',
+      ];
+
+      const profileUpdate: Record<string, any> = {};
+      for (const field of allowedFields) {
+        if (profileFields[field] !== undefined) {
+          profileUpdate[field] = field === 'year' ? parseInt(profileFields[field], 10) : profileFields[field];
+        }
+      }
+      if (profileFields.dob !== undefined) {
+        profileUpdate.dob = new Date(profileFields.dob);
+      }
+
+      if (Object.keys(profileUpdate).length > 0) {
+        await prisma.internProfile.update({
+          where: { userId },
+          data: profileUpdate,
+        });
+      }
+    }
+
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        internProfile: { include: { department: true } },
+        projectMembers: { include: { project: true } },
+      },
+    });
+
+    return res.json({ message: 'Profile updated successfully.', user: updatedUser });
+  } catch (error: any) {
+    console.error('Update profile error:', error);
+    return res.status(500).json({ message: 'Error updating profile.', error: error.message });
   }
 });
 

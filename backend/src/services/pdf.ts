@@ -1,6 +1,17 @@
 import PDFDocument from 'pdfkit';
 import QRCode from 'qrcode';
 
+interface LogbookEntryData {
+  date: Date;
+  activities: string;
+  learning: string;
+  skillsLearned: string;
+  challenges?: string | null;
+  solutions?: string | null;
+  status: string;
+  mentorComments?: string | null;
+}
+
 /**
  * Generate a Digital ID Card PDF
  */
@@ -212,6 +223,90 @@ export async function generateCertificatePDF(data: {
       doc.image(qrBuffer, 376, 420, { width: 90 });
       doc.fillColor('#64748B');
       doc.fontSize(8).font('Helvetica').text('Scan to Verify Legitimacy', 40, 515, { align: 'center', width: 842 - 80 });
+
+      doc.end();
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+/**
+ * Generate a Digital Logbook Export PDF for an Intern
+ */
+export async function generateLogbookPDF(data: {
+  name: string;
+  internId: string;
+  department: string;
+  entries: LogbookEntryData[];
+}): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    try {
+      const doc = new PDFDocument({ size: 'A4', margin: 40 });
+      const chunks: Buffer[] = [];
+
+      doc.on('data', chunk => chunks.push(chunk));
+      doc.on('end', () => resolve(Buffer.concat(chunks)));
+      doc.on('error', err => reject(err));
+
+      // Header
+      doc.fillColor('#1E293B');
+      doc.fontSize(20).font('Helvetica-Bold').text('IDEATECH (PVT) LTD', { align: 'center' });
+      doc.fontSize(13).font('Helvetica-Bold').fillColor('#3B82F6').text('DIGITAL LOGBOOK EXPORT', { align: 'center' });
+      doc.moveDown(0.5);
+
+      doc.fillColor('#334155');
+      doc.fontSize(10).font('Helvetica-Bold').text(`Intern: ${data.name} (${data.internId})`);
+      doc.font('Helvetica').text(`Department: ${data.department}`);
+      doc.text(`Generated: ${new Date().toLocaleString()}`);
+      doc.text(`Total Entries: ${data.entries.length}`);
+      doc.moveDown();
+
+      doc.moveTo(40, doc.y).lineTo(555, doc.y).lineWidth(1).stroke('#CBD5E1');
+      doc.moveDown();
+
+      if (data.entries.length === 0) {
+        doc.fontSize(11).fillColor('#64748B').text('No logbook entries recorded.', { align: 'center' });
+      }
+
+      for (const entry of data.entries) {
+        if (doc.y > 700) {
+          doc.addPage();
+        }
+
+        doc.fontSize(11).font('Helvetica-Bold').fillColor('#0F172A')
+          .text(new Date(entry.date).toLocaleDateString(), { continued: true })
+          .fillColor(entry.status === 'APPROVED' ? '#059669' : entry.status === 'REJECTED' ? '#DC2626' : '#D97706')
+          .font('Helvetica-Bold')
+          .text(`   [${entry.status}]`, { align: 'left' });
+
+        doc.fontSize(9).font('Helvetica-Bold').fillColor('#475569').text('Activities: ', { continued: true });
+        doc.font('Helvetica').fillColor('#1E293B').text(entry.activities);
+
+        doc.fontSize(9).font('Helvetica-Bold').fillColor('#475569').text('Learning: ', { continued: true });
+        doc.font('Helvetica').fillColor('#1E293B').text(entry.learning);
+
+        doc.fontSize(9).font('Helvetica-Bold').fillColor('#475569').text('Skills: ', { continued: true });
+        doc.font('Helvetica').fillColor('#1E293B').text(entry.skillsLearned);
+
+        if (entry.challenges) {
+          doc.fontSize(9).font('Helvetica-Bold').fillColor('#475569').text('Challenges: ', { continued: true });
+          doc.font('Helvetica').fillColor('#1E293B').text(entry.challenges);
+        }
+
+        if (entry.solutions) {
+          doc.fontSize(9).font('Helvetica-Bold').fillColor('#475569').text('Solutions: ', { continued: true });
+          doc.font('Helvetica').fillColor('#1E293B').text(entry.solutions);
+        }
+
+        if (entry.mentorComments) {
+          doc.fontSize(9).font('Helvetica-BoldOblique').fillColor('#3B82F6').text(`Mentor Comments: "${entry.mentorComments}"`);
+        }
+
+        doc.moveDown(0.4);
+        doc.moveTo(40, doc.y).lineTo(555, doc.y).lineWidth(0.5).stroke('#E2E8F0');
+        doc.moveDown(0.6);
+      }
 
       doc.end();
     } catch (error) {
