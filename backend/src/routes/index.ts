@@ -10,6 +10,8 @@ import {
   approveIntern,
   rejectIntern,
   registerStaff,
+  updateUserRole,
+  updateUserStatus,
 } from '../controllers/authController';
 
 import {
@@ -109,6 +111,18 @@ router.post(
   '/auth/register-staff',
   authorizeRoles(['SUPER_ADMIN']),
   registerStaff as any
+);
+
+router.put(
+  '/users/:userId/role',
+  authorizeRoles(['SUPER_ADMIN']),
+  updateUserRole as any
+);
+
+router.put(
+  '/users/:userId/status',
+  authorizeRoles(['SUPER_ADMIN']),
+  updateUserStatus as any
 );
 
 // Auth - Admin approvals
@@ -360,6 +374,7 @@ router.get(
           lastName: true,
           email: true,
           role: true,
+          isActive: true,
           internProfile: { select: { xp: true, internId: true } },
           certificates: {
             select: { id: true, certificateType: true, serialNumber: true, issuedAt: true, pdfUrl: true },

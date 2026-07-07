@@ -78,6 +78,7 @@ model User {
   updatedAt          DateTime            @updatedAt
   isTwoFactorEnabled Boolean             @default(false)
   twoFactorSecret    String?
+  isActive           Boolean             @default(true)
   
   // Relations
   internProfile      InternProfile?      @relation("UserToProfile")

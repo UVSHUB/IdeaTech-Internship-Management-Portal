@@ -32,7 +32,7 @@ export default function AdminDashboard() {
 }
 
 function AdminDashboardInner() {
-  const { token } = useAuth();
+  const { token, user: currentUser } = useAuth();
   const searchParams = useSearchParams();
   const tab = searchParams?.get('tab') ?? undefined; // undefined (Overview), 'applications', 'attendance', 'tasks', 'projects', 'meetings', 'leaves', 'certificates', 'logs'
 
@@ -64,6 +64,7 @@ function AdminDashboardInner() {
   const [certificateForm, setCertificateForm] = useState({ userId: '', certificateType: 'COMPLETION' });
   const [staffForm, setStaffForm] = useState({ firstName: '', lastName: '', email: '', password: '', role: 'TEAM_LEADER' });
   const [staffMsg, setStaffMsg] = useState('');
+  const [updatingStaffId, setUpdatingStaffId] = useState<string | null>(null);
 
   // Project member assigner and AI Advisor states
   const [selectedProjectMembers, setSelectedProjectMembers] = useState<Record<string, string>>({});
@@ -572,6 +573,54 @@ function AdminDashboardInner() {
       setStaffMsg('❌ Network error.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleChangeStaffRole = async (staffId: string, role: string) => {
+    setUpdatingStaffId(staffId);
+    try {
+      const res = await fetch(`/api/users/${staffId}/role`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ role }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        fetchBaseData();
+      } else {
+        alert(data.message || 'Failed to update role.');
+      }
+    } catch {
+      alert('Network error.');
+    } finally {
+      setUpdatingStaffId(null);
+    }
+  };
+
+  const handleToggleStaffStatus = async (staffId: string, isActive: boolean) => {
+    setUpdatingStaffId(staffId);
+    try {
+      const res = await fetch(`/api/users/${staffId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isActive }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        fetchBaseData();
+      } else {
+        alert(data.message || 'Failed to update status.');
+      }
+    } catch {
+      alert('Network error.');
+    } finally {
+      setUpdatingStaffId(null);
     }
   };
 
@@ -1647,27 +1696,50 @@ function AdminDashboardInner() {
                         <td colSpan={4} className="text-center py-16 text-slate-500">No staff members found.</td>
                       </tr>
                     ) : (
-                      usersList.filter(u => ['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR'].includes(u.role)).map((staff: any) => (
-                        <tr key={staff.id}>
-                          <td className="py-3 font-bold text-zinc-900 dark:text-white">{staff.firstName} {staff.lastName}</td>
-                          <td className="py-3 font-mono text-zinc-500">{staff.email}</td>
-                          <td className="py-3 text-zinc-600 dark:text-zinc-400">
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                              staff.role === 'SUPER_ADMIN' ? 'bg-red-500/10 text-red-400' :
-                              staff.role === 'PROJECT_MANAGER' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/25' :
-                              staff.role === 'TEAM_LEADER' ? 'bg-blue-500/10 text-blue-400' :
-                              'bg-zinc-500/10 text-zinc-400'
-                            }`}>
-                              {staff.role.replace('_', ' ')}
-                            </span>
-                          </td>
-                          <td className="py-3 text-center">
-                            <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded text-[9px] font-bold">
-                              ACTIVE
-                            </span>
-                          </td>
-                        </tr>
-                      ))
+                      usersList.filter(u => ['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR'].includes(u.role)).map((staff: any) => {
+                        const isSelf = staff.id === currentUser?.id;
+                        const isUpdating = updatingStaffId === staff.id;
+                        return (
+                          <tr key={staff.id}>
+                            <td className="py-3 font-bold text-zinc-900 dark:text-white">{staff.firstName} {staff.lastName}</td>
+                            <td className="py-3 font-mono text-zinc-500">{staff.email}</td>
+                            <td className="py-3 text-zinc-600 dark:text-zinc-400">
+                              <select
+                                value={staff.role}
+                                disabled={isSelf || isUpdating}
+                                onChange={(e) => handleChangeStaffRole(staff.id, e.target.value)}
+                                title={isSelf ? 'You cannot change your own role.' : 'Change staff role'}
+                                className={`px-2 py-1 rounded-lg text-[10px] font-bold border focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
+                                  staff.role === 'SUPER_ADMIN' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                                  staff.role === 'PROJECT_MANAGER' ? 'bg-amber-500/10 text-amber-400 border-amber-500/25' :
+                                  staff.role === 'TEAM_LEADER' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                                  'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
+                                }`}
+                              >
+                                <option value="SUPER_ADMIN">SUPER ADMIN</option>
+                                <option value="HR_MANAGER">HR MANAGER</option>
+                                <option value="PROJECT_MANAGER">PROJECT MANAGER</option>
+                                <option value="TEAM_LEADER">TEAM LEADER</option>
+                                <option value="MENTOR">MENTOR</option>
+                              </select>
+                            </td>
+                            <td className="py-3 text-center">
+                              <button
+                                onClick={() => handleToggleStaffStatus(staff.id, !(staff.isActive ?? true))}
+                                disabled={isSelf || isUpdating}
+                                title={isSelf ? 'You cannot change your own status.' : (staff.isActive ?? true) ? 'Deactivate account' : 'Activate account'}
+                                className={`px-2 py-0.5 rounded text-[9px] font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                                  (staff.isActive ?? true)
+                                    ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
+                                    : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
+                                }`}
+                              >
+                                {(staff.isActive ?? true) ? 'ACTIVE' : 'INACTIVE'}
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>

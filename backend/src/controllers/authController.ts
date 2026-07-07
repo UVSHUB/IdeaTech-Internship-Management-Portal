@@ -131,6 +131,10 @@ export async function login(req: Request, res: Response) {
       return res.status(401).json({ message: 'Invalid email or password.' });
     }
 
+    if (!user.isActive) {
+      return res.status(403).json({ message: 'Your account has been deactivated. Please contact an administrator.' });
+    }
+
     // If intern, check status
     if (user.role === 'INTERN' && user.internProfile) {
       if (user.internProfile.status === 'PENDING') {
@@ -408,6 +412,81 @@ export async function registerStaff(req: Request, res: Response) {
     });
   } catch (error: any) {
     console.error('Register staff error:', error);
+    return res.status(500).json({ message: 'Internal server error.', error: error.message });
+  }
+}
+
+const STAFF_ROLES = ['SUPER_ADMIN', 'HR_MANAGER', 'TEAM_LEADER', 'PROJECT_MANAGER', 'MENTOR'];
+
+/**
+ * Super Admin: Change a staff member's role
+ */
+export async function updateUserRole(req: AuthenticatedRequest, res: Response) {
+  try {
+    const { userId } = req.params;
+    const { role } = req.body;
+
+    if (!STAFF_ROLES.includes(role)) {
+      return res.status(400).json({ message: 'Invalid staff role specified.' });
+    }
+
+    const target = await prisma.user.findUnique({ where: { id: userId } });
+    if (!target) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+    if (target.role === 'INTERN' || !STAFF_ROLES.includes(target.role)) {
+      return res.status(400).json({ message: 'This endpoint only manages staff accounts.' });
+    }
+    if (target.id === req.user!.id) {
+      return res.status(400).json({ message: 'You cannot change your own role.' });
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: { role },
+    });
+
+    return res.json({
+      message: `Role updated to ${role.replace('_', ' ')} successfully.`,
+      user: { id: updated.id, role: updated.role },
+    });
+  } catch (error: any) {
+    console.error('Update user role error:', error);
+    return res.status(500).json({ message: 'Internal server error.', error: error.message });
+  }
+}
+
+/**
+ * Super Admin: Activate or deactivate a staff member's account
+ */
+export async function updateUserStatus(req: AuthenticatedRequest, res: Response) {
+  try {
+    const { userId } = req.params;
+    const { isActive } = req.body;
+
+    if (typeof isActive !== 'boolean') {
+      return res.status(400).json({ message: 'isActive must be a boolean.' });
+    }
+
+    const target = await prisma.user.findUnique({ where: { id: userId } });
+    if (!target) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+    if (target.id === req.user!.id) {
+      return res.status(400).json({ message: 'You cannot change your own account status.' });
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: { isActive },
+    });
+
+    return res.json({
+      message: `Account ${isActive ? 'activated' : 'deactivated'} successfully.`,
+      user: { id: updated.id, isActive: updated.isActive },
+    });
+  } catch (error: any) {
+    console.error('Update user status error:', error);
     return res.status(500).json({ message: 'Internal server error.', error: error.message });
   }
 }
