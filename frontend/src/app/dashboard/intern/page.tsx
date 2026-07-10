@@ -27,8 +27,12 @@ export default function InternDashboard() {
 }
 
 function InternDashboardInner() {
-  const { user, token, refreshUser } = useAuth();
+  const { user, token, refreshUser, logout } = useAuth();
   const searchParams = useSearchParams();
+
+  // Mandatory daily-logging policy: an intern who logs neither a daily report
+  // nor a logbook entry within this many days has their account auto-disabled.
+  const LOGGING_INACTIVITY_LIMIT_DAYS = 5;
   const tab = searchParams?.get('tab') ?? undefined; // undefined (Overview), 'attendance', 'reports', 'logbook', 'tasks', 'leaves', 'certificates', 'profile'
 
   // Metrics loading
@@ -78,6 +82,10 @@ function InternDashboardInner() {
   const [logbookMsg, setLogbookMsg] = useState('');
   const [exportingLogbook, setExportingLogbook] = useState(false);
 
+  // Logging compliance standing (days since last daily report / logbook entry).
+  // `null` for a value means the intern has never submitted that type of entry.
+  const [logCompliance, setLogCompliance] = useState<{ daysSinceReport: number | null; daysSinceLogbook: number | null } | null>(null);
+
   // Leave Form State
   const [leaveForm, setLeaveForm] = useState({ reason: 'PERSONAL', startDate: '', endDate: '', description: '' });
   const [leaveMsg, setLeaveMsg] = useState('');
@@ -103,6 +111,7 @@ function InternDashboardInner() {
   useEffect(() => {
     if (token) {
       fetchBaseData();
+      enforceLoggingPolicy();
     }
   }, [token]);
 
@@ -247,6 +256,55 @@ function InternDashboardInner() {
       }
     } catch (err) {
       console.error('Error loading base intern stats:', err);
+    }
+  };
+
+  // Whole days elapsed since an ISO date string, or null if there is no date.
+  const daysSince = (dateStr?: string | null) => {
+    if (!dateStr) return null;
+    return Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
+  };
+
+  /**
+   * Enforce the mandatory daily-logging policy. Fetches the intern's daily
+   * report and logbook history, records their standing for the on-screen
+   * warnings, and — if nothing has been logged in EITHER place within the
+   * allowed window — asks the server to auto-disable the account. The server
+   * re-validates the breach (and honours a new-account grace period) so this
+   * can never wrongly disable a compliant intern.
+   */
+  const enforceLoggingPolicy = async () => {
+    if (!token) return;
+    try {
+      const [rRes, lRes] = await Promise.all([
+        fetch('/api/reports/my', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('/api/logbook/my', { headers: { 'Authorization': `Bearer ${token}` } }),
+      ]);
+      const reports = rRes.ok ? await rRes.json() : [];
+      const logbooks = lRes.ok ? await lRes.json() : [];
+
+      // Histories are ordered newest-first by the API.
+      const daysSinceReport = daysSince(reports[0]?.date ?? reports[0]?.createdAt);
+      const daysSinceLogbook = daysSince(logbooks[0]?.date ?? logbooks[0]?.createdAt);
+      setLogCompliance({ daysSinceReport, daysSinceLogbook });
+
+      const reportStale = daysSinceReport === null || daysSinceReport >= LOGGING_INACTIVITY_LIMIT_DAYS;
+      const logbookStale = daysSinceLogbook === null || daysSinceLogbook >= LOGGING_INACTIVITY_LIMIT_DAYS;
+
+      // Only a breach of BOTH logs triggers auto-deactivation.
+      if (reportStale && logbookStale) {
+        const res = await fetch('/api/users/me/deactivate', {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (res.ok && data.deactivated) {
+          alert(data.message || 'Your account has been disabled due to inactivity in your daily reports and logbook. Please contact an administrator.');
+          logout();
+        }
+      }
+    } catch (err) {
+      console.error('Logging policy check failed:', err);
     }
   };
 
@@ -424,6 +482,7 @@ function InternDashboardInner() {
         setGitLink('');
         setCommitLink('');
         fetchInternData();
+        enforceLoggingPolicy();
         refreshUser();
       } else {
         setReportMsg(data.message || 'Submission failed.');
@@ -455,6 +514,7 @@ function InternDashboardInner() {
         setChallenges('');
         setSolutions('');
         fetchInternData();
+        enforceLoggingPolicy();
         refreshUser();
       } else {
         setLogbookMsg(data.message || 'Submission failed.');
@@ -581,6 +641,44 @@ function InternDashboardInner() {
     } finally {
       setChatLoading(false);
     }
+  };
+
+  // Warning banner explaining the mandatory daily-logging policy. Rendered in
+  // both the Daily Reports and Logbook sections so the rule is impossible to miss.
+  const renderLoggingPolicyBanner = () => {
+    const daysSinceReport = logCompliance?.daysSinceReport ?? null;
+    const daysSinceLogbook = logCompliance?.daysSinceLogbook ?? null;
+    const reportStale = daysSinceReport === null || daysSinceReport >= LOGGING_INACTIVITY_LIMIT_DAYS;
+    const logbookStale = daysSinceLogbook === null || daysSinceLogbook >= LOGGING_INACTIVITY_LIMIT_DAYS;
+    // "At risk" = both logs breached the window (account is a submission away from disable).
+    const atRisk = logCompliance !== null && reportStale && logbookStale;
+
+    const describe = (days: number | null) =>
+      days === null ? 'never submitted' : days === 0 ? 'logged today' : `${days} day${days === 1 ? '' : 's'} ago`;
+
+    return (
+      <div className={`p-3 mb-3 rounded-2xl border text-[10.5px] leading-normal ${
+        atRisk
+          ? 'bg-red-500/10 border-red-500/30 text-red-500 dark:text-red-400'
+          : 'bg-amber-500/10 border-amber-500/25 text-amber-600 dark:text-amber-400'
+      }`}>
+        <span className="font-bold uppercase flex items-center gap-1 mb-1">
+          <AlertTriangle size={13} /> Mandatory Daily-Logging Policy
+        </span>
+        <p>
+          You must submit a <strong>daily report</strong> or a <strong>logbook entry</strong> at least
+          once every <strong>{LOGGING_INACTIVITY_LIMIT_DAYS} days</strong>. If you log nothing in
+          <strong> both</strong> your daily reports and your logbook within this window, your account is
+          <strong> automatically disabled</strong> and only an administrator can restore access.
+        </p>
+        {logCompliance && (
+          <p className="mt-1.5 opacity-90">
+            Last daily report: <strong>{describe(daysSinceReport)}</strong> · Last logbook entry: <strong>{describe(daysSinceLogbook)}</strong>.
+            {atRisk && ' ⚠️ Your account is at risk — log an entry now to stay active.'}
+          </p>
+        )}
+      </div>
+    );
   };
 
   if (!stats) {
@@ -1146,6 +1244,7 @@ function InternDashboardInner() {
 
             <GlassCard className="space-y-4">
               <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Submit Daily Report</h3>
+              {renderLoggingPolicyBanner()}
               {user?.projectMembers?.[0]?.project ? (
                 <div className="p-3 mb-3 bg-emerald-50 dark:bg-zinc-950/45 border border-emerald-500/20 rounded-2xl text-[10.5px] text-zinc-600 dark:text-zinc-400 leading-normal">
                   <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase block mb-1">👥 Group Project: {user.projectMembers[0].project.name}</span>
@@ -1285,6 +1384,7 @@ function InternDashboardInner() {
 
             <GlassCard className="space-y-4">
               <h3 className="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest border-b border-white/5 pb-2">Log Today's Insight</h3>
+              {renderLoggingPolicyBanner()}
               <div className="p-3 mb-3 bg-zinc-100 dark:bg-zinc-950/45 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-[10.5px] text-zinc-600 dark:text-zinc-500 leading-normal">
                 <span className="font-bold text-zinc-700 dark:text-zinc-400 uppercase block mb-1">📝 Individual Logbook</span>
                 This logbook is <strong>individual</strong>. Every intern must submit their own logbook entry daily to record personal study progress and learnings.

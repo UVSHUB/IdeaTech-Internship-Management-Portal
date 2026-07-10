@@ -12,6 +12,7 @@ import {
   registerStaff,
   updateUserRole,
   updateUserStatus,
+  deactivateOwnAccount,
 } from '../controllers/authController';
 
 import {
@@ -283,6 +284,9 @@ router.get('/users/me', async (req: Request | any, res: Response) => {
     return res.status(500).json({ message: 'Error retrieving user details.' });
   }
 });
+
+// Intern self-service: auto-disable own account on daily-logging policy breach
+router.put('/users/me/deactivate', deactivateOwnAccount as any);
 
 router.put('/users/me', async (req: Request | any, res: Response) => {
   try {

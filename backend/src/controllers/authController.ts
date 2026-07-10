@@ -490,3 +490,91 @@ export async function updateUserStatus(req: AuthenticatedRequest, res: Response)
     return res.status(500).json({ message: 'Internal server error.', error: error.message });
   }
 }
+
+/**
+ * Number of days an intern can go without submitting either a daily report
+ * or a logbook entry before their account is automatically disabled.
+ */
+export const LOGGING_INACTIVITY_LIMIT_DAYS = 5;
+
+/**
+ * Intern self-service: automatically disable the caller's own account when the
+ * mandatory daily-logging requirement has been breached (no daily report AND no
+ * logbook entry within LOGGING_INACTIVITY_LIMIT_DAYS days).
+ *
+ * The breach is re-validated against the database here so that a bug or tampering
+ * on the client can never disable an account that is actually compliant. Newly
+ * created accounts are protected by a grace period equal to the limit.
+ */
+export async function deactivateOwnAccount(req: AuthenticatedRequest, res: Response) {
+  try {
+    const userId = req.user!.id;
+
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - LOGGING_INACTIVITY_LIMIT_DAYS);
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { internProfile: true },
+    });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // The daily-logging policy only governs interns.
+    if (user.role !== 'INTERN') {
+      return res.json({ deactivated: false, message: 'Policy does not apply to this role.' });
+    }
+    if (!user.isActive) {
+      return res.json({ deactivated: true, message: 'Account is already disabled.' });
+    }
+
+    // Grace period: never disable an account younger than the limit.
+    const accountAnchor = user.internProfile?.createdAt ?? user.createdAt;
+    if (accountAnchor > cutoff) {
+      return res.json({ deactivated: false, message: 'Account is still within the grace period.' });
+    }
+
+    const recentReport = await prisma.dailyReport.findFirst({
+      where: { userId, createdAt: { gte: cutoff } },
+    });
+    const recentLogbook = await prisma.logbook.findFirst({
+      where: { userId, createdAt: { gte: cutoff } },
+    });
+
+    // Compliant if they logged *something* (report or logbook) within the window.
+    if (recentReport || recentLogbook) {
+      return res.json({ deactivated: false, message: 'Logging requirement is met.' });
+    }
+
+    // Breach confirmed -> disable the account.
+    await prisma.user.update({
+      where: { id: userId },
+      data: { isActive: false },
+    });
+
+    await prisma.warning.create({
+      data: {
+        userId,
+        type: 'AUTO_DEACTIVATION',
+        reason: `Account auto-disabled: no daily report or logbook entry logged in the last ${LOGGING_INACTIVITY_LIMIT_DAYS} days.`,
+      },
+    });
+
+    await prisma.activityLog.create({
+      data: {
+        userId,
+        action: 'AUTO_DEACTIVATION',
+        details: `Intern account automatically disabled for failing to log a daily report or logbook entry within ${LOGGING_INACTIVITY_LIMIT_DAYS} days.`,
+      },
+    });
+
+    return res.json({
+      deactivated: true,
+      message: `Your account has been disabled because no daily report or logbook entry was logged in the last ${LOGGING_INACTIVITY_LIMIT_DAYS} days. Please contact an administrator to restore access.`,
+    });
+  } catch (error: any) {
+    console.error('Deactivate own account error:', error);
+    return res.status(500).json({ message: 'Internal server error.', error: error.message });
+  }
+}

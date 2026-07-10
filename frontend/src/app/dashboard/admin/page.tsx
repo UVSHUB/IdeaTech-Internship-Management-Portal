@@ -1827,6 +1827,70 @@ function AdminDashboardInner() {
                 </button>
               </form>
             </GlassCard>
+
+            {/* Disabled / Deactivated Accounts (staff + auto-disabled interns) */}
+            {(() => {
+              const disabledAccounts = usersList.filter((u: any) => u.isActive === false);
+              return (
+                <GlassCard className="lg:col-span-3 space-y-4">
+                  <div className="border-b border-white/5 pb-2">
+                    <h2 className="text-lg font-bold flex items-center space-x-2 text-red-400">
+                      <XCircle size={20} />
+                      <span>Disabled Accounts ({disabledAccounts.length})</span>
+                    </h2>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">
+                      Accounts deactivated manually or auto-disabled for failing to log daily reports / logbook entries. Re-enable to instantly restore login access.
+                    </p>
+                  </div>
+
+                  {disabledAccounts.length === 0 ? (
+                    <p className="text-xs text-slate-500 text-center py-12">No disabled accounts. Everyone currently has active access. 🎉</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="border-b border-white/5 text-slate-500 uppercase font-semibold">
+                            <th className="py-2.5">Name</th>
+                            <th className="py-2.5">Email</th>
+                            <th className="py-2.5">Role</th>
+                            <th className="py-2.5">Intern ID</th>
+                            <th className="py-2.5 text-center">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5 text-zinc-600 dark:text-zinc-400">
+                          {disabledAccounts.map((acc: any) => {
+                            const isUpdating = updatingStaffId === acc.id;
+                            return (
+                              <tr key={acc.id}>
+                                <td className="py-3 font-bold text-zinc-900 dark:text-white">{acc.firstName} {acc.lastName}</td>
+                                <td className="py-3 font-mono text-zinc-500">{acc.email}</td>
+                                <td className="py-3">
+                                  <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-zinc-500/10 text-zinc-400 border border-zinc-500/20">
+                                    {acc.role}
+                                  </span>
+                                </td>
+                                <td className="py-3 font-mono text-zinc-500">{acc.internProfile?.internId || '—'}</td>
+                                <td className="py-3 text-center">
+                                  <button
+                                    onClick={() => handleToggleStaffStatus(acc.id, true)}
+                                    disabled={isUpdating}
+                                    title="Re-enable this account"
+                                    className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-lg text-[10px] font-bold bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {isUpdating ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle size={12} />}
+                                    <span>{isUpdating ? 'Enabling...' : 'Re-enable'}</span>
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </GlassCard>
+              );
+            })()}
           </div>
         )}
 
