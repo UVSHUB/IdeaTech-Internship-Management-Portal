@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import upload, { uploadCv } from '../utils/upload';
-import { getSignedCvUrl } from '../utils/supabase';
+import { getSignedCvUrl, getSignedUrl } from '../utils/supabase';
 import { authenticateToken, authorizeRoles } from '../middleware/auth';
 import prisma from '../utils/db';
 
@@ -274,11 +274,14 @@ router.get('/users/me', async (req: Request | any, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
-      include: { 
+      include: {
         internProfile: { include: { department: true } },
         projectMembers: { include: { project: true } }
       },
     });
+    if (user?.internProfile?.idCardUrl) {
+      user.internProfile.idCardUrl = await getSignedUrl(user.internProfile.idCardUrl);
+    }
     return res.json(user);
   } catch (error) {
     return res.status(500).json({ message: 'Error retrieving user details.' });
@@ -334,6 +337,10 @@ router.put('/users/me', async (req: Request | any, res: Response) => {
       },
     });
 
+    if (updatedUser?.internProfile?.idCardUrl) {
+      updatedUser.internProfile.idCardUrl = await getSignedUrl(updatedUser.internProfile.idCardUrl);
+    }
+
     return res.json({ message: 'Profile updated successfully.', user: updatedUser });
   } catch (error: any) {
     console.error('Update profile error:', error);
@@ -385,7 +392,17 @@ router.get(
           },
         },
       });
-      return res.json(users);
+
+      // Replace stored certificate object paths with short-lived signed URLs
+      const usersWithSignedCerts = await Promise.all(
+        users.map(async (u) => ({
+          ...u,
+          certificates: await Promise.all(
+            u.certificates.map(async (c) => ({ ...c, pdfUrl: await getSignedUrl(c.pdfUrl) }))
+          ),
+        }))
+      );
+      return res.json(usersWithSignedCerts);
     } catch (error) {
       return res.status(500).json({ message: 'Error listing users.' });
     }

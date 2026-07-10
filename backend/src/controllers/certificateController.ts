@@ -4,6 +4,7 @@ import prisma from '../utils/db';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { generateCertificatePDF } from '../services/pdf';
 import { sendEmail } from '../services/mail';
+import { uploadBufferToSupabase, getSignedUrl } from '../utils/supabase';
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
@@ -43,7 +44,6 @@ export async function generateCertificates(req: AuthenticatedRequest, res: Respo
       .substring(0, 16);
 
     const verificationUrl = `${FRONTEND_URL}/verify/${verificationHash}`;
-    const relativePdfPath = `/uploads/certificates/${serialNumber}.pdf`;
 
     // Generate the PDF
     const pdfBuffer = await generateCertificatePDF({
@@ -58,14 +58,12 @@ export async function generateCertificates(req: AuthenticatedRequest, res: Respo
       certificateType,
     });
 
-    // Write file to uploads/certificates
-    const fs = require('fs');
-    const path = require('path');
-    const certDir = path.join(__dirname, '../../../uploads/certificates');
-    if (!fs.existsSync(certDir)) {
-      fs.mkdirSync(certDir, { recursive: true });
-    }
-    fs.writeFileSync(path.join(certDir, `${serialNumber}.pdf`), pdfBuffer);
+    // Upload the certificate PDF to Supabase Storage; store the object path in the DB
+    const storedPdfPath = await uploadBufferToSupabase(
+      pdfBuffer,
+      `certificates/${serialNumber}.pdf`,
+      'application/pdf'
+    );
 
     // Save Certificate record in database
     const certificate = await prisma.certificate.create({
@@ -74,7 +72,7 @@ export async function generateCertificates(req: AuthenticatedRequest, res: Respo
         certificateType,
         serialNumber,
         verificationHash,
-        pdfUrl: relativePdfPath,
+        pdfUrl: storedPdfPath,
       },
     });
 
@@ -106,7 +104,7 @@ export async function generateCertificates(req: AuthenticatedRequest, res: Respo
 
     return res.status(201).json({
       message: 'Certificate generated successfully.',
-      certificate,
+      certificate: { ...certificate, pdfUrl: await getSignedUrl(certificate.pdfUrl) },
     });
   } catch (error: any) {
     console.error('Cert generation error:', error);
@@ -158,7 +156,7 @@ export async function verifyCertificate(req: Request, res: Response) {
       internId: certificate.user.internProfile?.internId,
       position: certificate.user.internProfile?.positionApplied,
       startDate: certificate.user.internProfile?.createdAt,
-      pdfUrl: certificate.pdfUrl,
+      pdfUrl: await getSignedUrl(certificate.pdfUrl),
     });
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error.' });
@@ -175,7 +173,10 @@ export async function getMyCertificates(req: AuthenticatedRequest, res: Response
       where: { userId },
       orderBy: { issuedAt: 'desc' },
     });
-    return res.json(certificates);
+    const signed = await Promise.all(
+      certificates.map(async (c) => ({ ...c, pdfUrl: await getSignedUrl(c.pdfUrl) }))
+    );
+    return res.json(signed);
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error.' });
   }

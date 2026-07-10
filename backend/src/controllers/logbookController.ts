@@ -2,6 +2,7 @@ import { Response } from 'express';
 import prisma from '../utils/db';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { generateLogbookPDF } from '../services/pdf';
+import { uploadFileToSupabase, getSignedUrl } from '../utils/supabase';
 
 /**
  * Submit Logbook Entry
@@ -32,6 +33,10 @@ export async function submitLogbook(req: AuthenticatedRequest, res: Response) {
       return res.status(400).json({ message: 'Logbook entry already submitted for today.' });
     }
 
+    const storedAttachmentPath = req.file
+      ? await uploadFileToSupabase(req.file, 'attachments')
+      : (attachmentUrl || null);
+
     const logbook = await prisma.logbook.create({
       data: {
         userId,
@@ -41,7 +46,7 @@ export async function submitLogbook(req: AuthenticatedRequest, res: Response) {
         skillsLearned,
         challenges,
         solutions,
-        attachmentUrl: req.file ? `/uploads/attachments/${req.file.filename}` : (attachmentUrl || null),
+        attachmentUrl: storedAttachmentPath,
         status: 'PENDING',
       },
     });
@@ -134,7 +139,10 @@ export async function getMyLogbook(req: AuthenticatedRequest, res: Response) {
       where: { userId },
       orderBy: { date: 'desc' },
     });
-    return res.json(logbooks);
+    const signed = await Promise.all(
+      logbooks.map(async (l) => ({ ...l, attachmentUrl: await getSignedUrl(l.attachmentUrl) }))
+    );
+    return res.json(signed);
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error.' });
   }
@@ -222,7 +230,10 @@ export async function getPendingLogbooks(req: AuthenticatedRequest, res: Respons
       });
     }
 
-    return res.json(logbooks);
+    const signed = await Promise.all(
+      logbooks.map(async (l) => ({ ...l, attachmentUrl: await getSignedUrl(l.attachmentUrl) }))
+    );
+    return res.json(signed);
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error.' });
   }

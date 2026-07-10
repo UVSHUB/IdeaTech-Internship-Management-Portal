@@ -2,8 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import path from 'path';
-import fs from 'fs';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -35,18 +33,7 @@ app.use('/api/', limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Ensure upload folders exist
-const uploadsDir = path.join(__dirname, '../../uploads');
-const subfolders = ['cv', 'screenshots', 'attachments', 'leaves', 'idcards', 'certificates'];
-subfolders.forEach(folder => {
-  const folderPath = path.join(uploadsDir, folder);
-  if (!fs.existsSync(folderPath)) {
-    fs.mkdirSync(folderPath, { recursive: true });
-  }
-});
-
-// Serve uploads as static assets
-app.use('/uploads', express.static(uploadsDir));
+// All file storage is handled by Supabase Storage (no local disk — Vercel-compatible).
 
 // API Routes
 app.use('/api', apiRoutes);
@@ -64,7 +51,6 @@ app.use((req, res) => {
 // Start Server
 app.listen(PORT, () => {
   console.log(`🚀 ITIMP Backend running on port ${PORT}`);
-  console.log(`📂 Uploads directory mapped: ${uploadsDir}`);
 });
 
 export default app;

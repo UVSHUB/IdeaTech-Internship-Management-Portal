@@ -5,7 +5,7 @@ import prisma from '../utils/db';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { generateIDCardPDF } from '../services/pdf';
 import { sendEmail } from '../services/mail';
-import { uploadCvToSupabase } from '../utils/supabase';
+import { uploadCvToSupabase, uploadBufferToSupabase, getSignedUrl } from '../utils/supabase';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'ideatech_secret_key_for_jwt_2026_itimp';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -245,17 +245,12 @@ export async function approveIntern(req: AuthenticatedRequest, res: Response) {
       verificationUrl,
     });
 
-    // Save ID Card locally in a real app (using Cloudinary or local disk for simplicity here)
-    const relativeIdCardPath = `/uploads/idcards/${internId}.pdf`;
-
-    // Write file to uploads (we can do it dynamically or in memory)
-    const fs = require('fs');
-    const path = require('path');
-    const uploadsDir = path.join(__dirname, '../../../uploads/idcards');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-    fs.writeFileSync(path.join(uploadsDir, `${internId}.pdf`), idCardBuffer);
+    // Upload the ID card PDF to Supabase Storage; store the object path in the DB
+    const storedIdCardPath = await uploadBufferToSupabase(
+      idCardBuffer,
+      `idcards/${internId}.pdf`,
+      'application/pdf'
+    );
 
     // 3. Update profile to ACTIVE
     await prisma.internProfile.update({
@@ -263,7 +258,7 @@ export async function approveIntern(req: AuthenticatedRequest, res: Response) {
       data: {
         internId,
         status: 'ACTIVE',
-        idCardUrl: relativeIdCardPath,
+        idCardUrl: storedIdCardPath,
         mentorId: mentorId || null,
         teamLeaderId: teamLeaderId || null,
       },
@@ -312,7 +307,7 @@ export async function approveIntern(req: AuthenticatedRequest, res: Response) {
     return res.json({
       message: 'Intern application approved successfully!',
       internId,
-      idCardUrl: relativeIdCardPath,
+      idCardUrl: await getSignedUrl(storedIdCardPath),
     });
   } catch (error: any) {
     console.error('Approval error:', error);

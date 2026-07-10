@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import prisma from '../utils/db';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { uploadFileToSupabase, getSignedUrl } from '../utils/supabase';
 
 /**
  * Submit Daily Report
@@ -54,6 +55,10 @@ export async function submitReport(req: AuthenticatedRequest, res: Response) {
       }
     }
 
+    const storedScreenshotPath = req.file
+      ? await uploadFileToSupabase(req.file, 'screenshots')
+      : (screenshotUrl || null);
+
     const report = await prisma.dailyReport.create({
       data: {
         userId,
@@ -65,7 +70,7 @@ export async function submitReport(req: AuthenticatedRequest, res: Response) {
         githubLink,
         commitLink,
         demoLink,
-        screenshotUrl: req.file ? `/uploads/screenshots/${req.file.filename}` : (screenshotUrl || null),
+        screenshotUrl: storedScreenshotPath,
         status: 'PENDING',
         projectId: member ? member.projectId : null,
       },
@@ -204,7 +209,10 @@ export async function getMyReports(req: AuthenticatedRequest, res: Response) {
       where: { userId },
       orderBy: { date: 'desc' },
     });
-    return res.json(reports);
+    const signed = await Promise.all(
+      reports.map(async (r) => ({ ...r, screenshotUrl: await getSignedUrl(r.screenshotUrl) }))
+    );
+    return res.json(signed);
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error.' });
   }
@@ -256,7 +264,10 @@ export async function getPendingReports(req: AuthenticatedRequest, res: Response
       });
     }
 
-    return res.json(reports);
+    const signed = await Promise.all(
+      reports.map(async (r) => ({ ...r, screenshotUrl: await getSignedUrl(r.screenshotUrl) }))
+    );
+    return res.json(signed);
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error.' });
   }

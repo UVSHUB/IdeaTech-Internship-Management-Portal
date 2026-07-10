@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import prisma from '../utils/db';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { uploadFileToSupabase, getSignedUrl } from '../utils/supabase';
 
 /**
  * Apply for Leave
@@ -10,6 +11,10 @@ export async function applyLeave(req: AuthenticatedRequest, res: Response) {
     const userId = req.user!.id;
     const { reason, startDate, endDate, description, documentUrl } = req.body;
 
+    const storedDocumentPath = req.file
+      ? await uploadFileToSupabase(req.file, 'leaves')
+      : (documentUrl || null);
+
     const leave = await prisma.leaveRequest.create({
       data: {
         userId,
@@ -17,7 +22,7 @@ export async function applyLeave(req: AuthenticatedRequest, res: Response) {
         startDate: new Date(startDate),
         endDate: new Date(endDate),
         description,
-        documentUrl: req.file ? `/uploads/leaves/${req.file.filename}` : (documentUrl || null),
+        documentUrl: storedDocumentPath,
         status: 'PENDING',
       },
     });
@@ -100,7 +105,10 @@ export async function getMyLeaves(req: AuthenticatedRequest, res: Response) {
       where: { userId },
       orderBy: { createdAt: 'desc' },
     });
-    return res.json(leaves);
+    const signed = await Promise.all(
+      leaves.map(async (l) => ({ ...l, documentUrl: await getSignedUrl(l.documentUrl) }))
+    );
+    return res.json(signed);
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error.' });
   }
@@ -123,7 +131,10 @@ export async function getAllLeaves(req: AuthenticatedRequest, res: Response) {
       },
       orderBy: { createdAt: 'desc' },
     });
-    return res.json(leaves);
+    const signed = await Promise.all(
+      leaves.map(async (l) => ({ ...l, documentUrl: await getSignedUrl(l.documentUrl) }))
+    );
+    return res.json(signed);
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error.' });
   }
