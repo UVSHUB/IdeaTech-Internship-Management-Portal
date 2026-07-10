@@ -48,9 +48,12 @@ app.use((req, res) => {
   res.status(404).json({ message: 'API Route not found.' });
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`🚀 ITIMP Backend running on port ${PORT}`);
-});
+// Start Server (local/traditional hosting only).
+// On Vercel the app is invoked as a serverless function (see api/index.ts), so we must NOT listen.
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 ITIMP Backend running on port ${PORT}`);
+  });
+}
 
 export default app;

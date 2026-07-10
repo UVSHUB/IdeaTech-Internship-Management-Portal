@@ -16,6 +16,7 @@ build/
 
 # Local uploads storage
 uploads/
+DEPLOYMENT.md
 
 # OS specific files
 .DS_Store

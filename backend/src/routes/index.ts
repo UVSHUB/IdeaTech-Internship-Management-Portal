@@ -103,6 +103,26 @@ router.get('/departments', async (req: Request, res: Response) => {
   }
 });
 
+// Scheduled automation endpoint (invoked by Vercel Cron — see vercel.json).
+// Not JWT-protected; guarded by CRON_SECRET. Vercel Cron sends
+// "Authorization: Bearer <CRON_SECRET>" automatically when CRON_SECRET is set.
+router.get('/cron/daily-checks', async (req: Request, res: Response) => {
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret && req.headers.authorization !== `Bearer ${cronSecret}`) {
+    return res.status(401).json({ message: 'Unauthorized.' });
+  }
+
+  try {
+    const { checkDailyViolations, checkInactivityAndTerminate } = require('../services/automation');
+    await checkDailyViolations();
+    await checkInactivityAndTerminate();
+    return res.json({ message: 'Scheduled checks executed successfully.', ranAt: new Date() });
+  } catch (error: any) {
+    console.error('Cron daily-checks failed:', error);
+    return res.status(500).json({ message: 'Scheduled checks failed.', error: error.message });
+  }
+});
+
 // ==========================================
 // AUTHENTICATED ROUTES
 // ==========================================
