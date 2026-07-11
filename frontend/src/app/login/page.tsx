@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Lock, Mail, ArrowRight, ShieldAlert } from 'lucide-react';
+import { Lock, Mail, ArrowRight } from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -43,18 +43,6 @@ export default function LoginPage() {
     }
   };
 
-  // Pre-fill Admin Credentials & Login
-  const handleAdminQuickLogin = () => {
-    setEmail('vibodhasilvaulindu@gmail.com');
-    setPassword('Ulindu_2004');
-    setError('');
-    // Automatically submit in next tick
-    setTimeout(() => {
-      const btn = document.getElementById('login-submit-btn');
-      if (btn) btn.click();
-    }, 100);
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 relative">
       <motion.div
@@ -78,24 +66,6 @@ export default function LoginPage() {
           )}
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Welcome Back</h1>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">IdeaTech Internship Management Portal (ITIMP)</p>
-        </div>
-
-        {/* Admin Quick Login Pill */}
-        <div className="mb-6 p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <ShieldAlert size={16} className="text-zinc-600 dark:text-zinc-300" />
-            <div className="text-left">
-              <span className="text-[10px] text-zinc-500 dark:text-zinc-500 block font-bold uppercase tracking-wider">Admin Sandbox</span>
-              <span className="text-[11px] text-zinc-800 dark:text-zinc-300 font-medium">vibodhasilvaulindu@gmail.com</span>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={handleAdminQuickLogin}
-            className="px-3 py-1.5 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-[10px] font-bold transition-colors shadow-sm"
-          >
-            Quick Login
-          </button>
         </div>
 
         {error && (
@@ -125,7 +95,7 @@ export default function LoginPage() {
               <label className="block text-[11px] text-zinc-500 dark:text-zinc-500 mb-1 font-semibold tracking-wider">PASSWORD</label>
               <button
                 type="button"
-                onClick={() => setError('Use your seeded password (e.g. Ulindu_2004 for admin, password123 for others).')}
+                onClick={() => setError('Please contact your administrator to reset your password.')}
                 className="text-[10px] text-zinc-500 dark:text-zinc-400 hover:underline"
               >
                 Forgot Password?
@@ -146,7 +116,6 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            id="login-submit-btn"
             disabled={loading}
             className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold text-sm transition-colors mt-6 shadow-md shadow-black/10"
           >
