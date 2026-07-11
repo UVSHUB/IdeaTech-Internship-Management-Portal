@@ -141,7 +141,7 @@ export async function login(req: Request, res: Response) {
         return res.status(403).json({ message: 'Your application is pending admin approval.' });
       }
       if (user.internProfile.status === 'TERMINATED') {
-        return res.status(403).json({ message: 'Your internship has been terminated.' });
+        return res.status(403).json({ message: 'Your account has been deactivated due to inactivity. Please contact an administrator.' });
       }
     }
 
